@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alimento del Cielo - Catálogo Digital PWA</title>
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#2563eb">
+    <meta name="description" content="Catálogo digital de alimentos congelados - Alimento del Cielo">
+    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect width='192' height='192' fill='%232563eb' rx='20'/><text x='96' y='120' font-size='80' text-anchor='middle' fill='white'>🍽️</text></svg>">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Overlay -->
+    <div class="overlay" id="overlay" onclick="alternarCarrito()"></div>
+
+    <!-- Encabezado -->
+    <header class="encabezado">
+        <div class="contenedor-nav">
+            <div class="logo">
+               <img src="/Catalogo_Digital_PWA/Imagenes/Logo.png" alt=""> Alimento del Cielo
+            </div>
+            <div class="acciones-nav">
+                <button class="btn-tema" onclick="alternarTema()" title="Cambiar tema">
+                    <span id="iconoTema">🌙</span>
+                </button>
+                <button class="btn-carrito" onclick="alternarCarrito()" title="Ver carrito">
+                    🛒
+                    <span class="contador-carrito" id="contadorCarrito">0</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Contenido Principal -->
+    <main class="contenedor">
+        <!-- Sección Hero -->
+        <section class="seccion-hero">
+            <h1>🍽️ Alimentos Congelados de Calidad </h1>
+            <p>Productos frescos, listos para preparar y disfrutar en cualquier momento. Practico, sin complicaxiones, rico y de calidad.</p>
+            <button class="btn-llamada-accion" onclick="scrollearAProductos()">
+                🛍️ Ver Catálogo Completo
+            </button>
+        </section>
+
+        <!-- Búsqueda y Filtros -->
+        <section class="seccion-busqueda">
+            <input 
+                type="text" 
+                class="caja-busqueda" 
+                placeholder="🔍 Buscar productos (ej: pollo, carne, verduras)..." 
+                onkeyup="filtrarProductos()"
+                id="campoBusqueda"
+            >
+            <div class="contenedor-filtros">
+                <button class="btn-filtro activo" onclick="filtrarPorCategoria('todos', this)">
+                    🍽️ Todos
+                </button>
+                <button class="btn-filtro" onclick="filtrarPorCategoria('carnes', this)">
+                    🥩 Carnes
+                </button>
+                <button class="btn-filtro" onclick="filtrarPorCategoria('pollo', this)">
+                    🍗 Pollo
+                </button>
+                <button class="btn-filtro" onclick="filtrarPorCategoria('pescado', this)">
+                    🐟 Pescado
+                </button>
+                <button class="btn-filtro" onclick="filtrarPorCategoria('verduras', this)">
+                    🥬 Verduras
+                </button>
+                <button class="btn-filtro" onclick="filtrarPorCategoria('Deditos', this)">
+                    🍟 Deditos
+                </button>
+            </div>
+        </section>
+
+        <!-- Grilla de Productos -->
+        <section class="grilla-productos" id="grillaProductos">
+            <!-- Los productos se cargan dinámicamente aquí -->
+        </section>
+
+        <!-- Sección Combos Especiales -->
+        <section class="seccion-combos">
+            <h2 class="titulo-seccion">🎁 Combos Especiales - Ahorra Más</h2>
+            
+            <div class="tarjeta-combo">
+                <div class="etiqueta-combo">¡AHORRA 25%!</div>
+                <h3 class="titulo-combo">🏠 Combo Familiar Completo</h3>
+                <div class="ahorro-combo">💰 Ahorras $15.000</div>
+                <div class="items-combo">
+                    <div class="item-combo">
+                        <h4>🍗 Pollo Apanado Premium (1kg)</h4>
+                        <p><strong>$28.000</strong></p>
+                    </div>
+                    <div class="item-combo">
+                        <h4>🥔 Papas Criollas (500g)</h4>
+                        <p><strong>$12.000</strong></p>
+                    </div>
+                    <div class="item-combo">
+                        <h4>🥬 Mix Verduras Frescas (400g)</h4>
+                        <p><strong>$15.000</strong></p>
+                    </div>
+                </div>
+                <div class="acciones-producto">
+                    <button class="boton boton-primario" onclick="agregarComboAlCarrito('combo-familiar')">
+                        🛒 Agregar Combo - $40.000
+                    </button>
+                    <a href="https://wa.me/573001234567?text=¡Hola!%20Quiero%20el%20Combo%20Familiar%20Completo%20por%20$40.000.%20¿Está%20disponible?" 
+                       class="boton boton-whatsapp" target="_blank">
+                        💬 Pedir por WhatsApp
+                    </a>
+                </div>
+            </div>
+
+            <div class="tarjeta-combo combo-airfryer">
+                <div class="etiqueta-combo">¡NUEVO!</div>
+                <h3 class="titulo-combo">⚡ Combo Express Airfryer</h3>
+                <div class="ahorro-combo">🎯 Perfecto para airfryer</div>
+                <div class="items-combo">
+                    <div class="item-combo">
+                        <h4>🍗 Alitas BBQ (800g)</h4>
+                        <p><strong>$25.000</strong></p>
+                    </div>
+                    <div class="item-combo">
+                        <h4>🥩 Mini Hamburguesas (6 unidades)</h4>
+                        <p><strong>$18.000</strong></p>
+                    </div>
+                </div>
+                <div class="acciones-producto">
+                    <button class="boton boton-primario" onclick="agregarComboAlCarrito('combo-airfryer')">
+                        🛒 Agregar Combo - $35.000
+                    </button>
+                    <a href="https://wa.me/573001234567?text=¡Hola!%20Quiero%20el%20Combo%20Express%20Airfryer%20por%20$35.000.%20¿Está%20disponible?" 
+                       class="boton boton-whatsapp" target="_blank">
+                        💬 Pedir por WhatsApp
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Programa de Referidos -->
+        <section class="seccion-referidos">
+            <h2>🎉 Programa de Referidos - ¡Gana con tus Amigos!</h2>
+            <p>¡Comparte y gana! Por cada amigo que compre con tu código, <strong>ambos reciben 10% de descuento</strong> en su próxima compra</p>
+            <div class="codigo-referido" id="codigoReferido">AMIGO-DEL-CIELO-123</div>
+            <button class="boton boton-primario" onclick="compartirCodigoReferido()">
+                📱 Compartir mi código
+            </button>
+        </section>
+    </main>
+
+    <!-- Sidebar del Carrito -->
+    <div class="sidebar-carrito" id="sidebarCarrito">
+        <div class="encabezado-carrito">
+            <h2>🛒 Mi Carrito de Compras</h2>
+            <button class="btn-cerrar-carrito" onclick="alternarCarrito()">✕</button>
+        </div>
+        <div id="itemsCarrito">
+            <div class="carrito-vacio" id="carritoVacio">
+                <h3>🛒 Tu carrito está vacío</h3>
+                <p>¡Agrega algunos productos deliciosos!</p>
+            </div>
+        </div>
+        <div class="total-carrito" id="totalCarrito" style="display: none;">
+            <div class="monto-total">
+                💰 Total: $<span id="montoTotal">0</span>
+            </div>
+            <button class="boton boton-whatsapp" onclick="finalizarPorWhatsApp()" style="width: 100%; margin-bottom: 1rem;">
+                💬 Finalizar por WhatsApp
+            </button>
+            <button class="boton boton-primario" onclick="procesarPago()" style="width: 100%;">
+                💳 Pagar en línea
+            </button>
+        </div>
+    </div>
+
+    <!-- Pie de Página -->
+    <footer class="pie-pagina">
+        <div class="contenido-pie">
+            <div class="seccion-pie">
+                <h3>📞 Contacto Directo</h3>
+                <p><strong>📱 WhatsApp:</strong> +57 313 521 2887</p>
+                <p><strong>📧 Email:</strong> congeladosmontelibano@gmail.com</p>
+                <p><strong>📍 Ubicación:</strong> Montelibano, Cordoba</p>
+                <p><strong>🚚 Entregas:</strong> Todo Montelibano</p>
+            </div>
+
+            <div class="seccion-pie">
+                <h3>🌐 Síguenos en Redes</h3>
+                <div class="enlaces-sociales">
+                    <a href="https://www.facebook.com/CongeladosmontelibanoOficial" class="enlace-social" title="Facebook"></a>
+                    <a href="https://www.instagram.com/congelados__montelibano?igsh=MTBhdXhxYWpmZ2MxeQ==" class="enlace-social" title="Instagram"></a>
+                    <a href="https://www.tiktok.com/@congeladosmontelibano" class="enlace-social" title="TikTok">🎵</a>
+                    <a href="#" class="enlace-social" title="WhatsApp">💬</a>
+                </div>
+                <p style="margin-top: 1rem;">Comparte tus recetas con <strong>#AlimentoDelCielo</strong></p>
+            </div>
+            <div class="seccion-pie">
+                <h3>⏰ Horarios de Atención</h3>
+                <p><strong>Lunes a Sábado:</strong> 8:00 AM - 8:00 PM</p>
+                <p><strong>Domingos:</strong> 9:00 AM - 4:00 PM</p>
+                <p><strong>Entregas:</strong> Lun-Sáb hasta 8:00 PM</p>
+                <p><strong>Pedidos WhatsApp:</strong> 24/7</p>
+            </div>
+            <div class="seccion-pie">
+                <h3>🏆 Garantía de Calidad</h3>
+                <p>✅ Productos 100% frescos</p>
+                <p>❄️ Cadena de frío garantizada</p>
+                <p>🚚 Entrega rápida y segura</p>
+                <p>💰 Devolución si no quedas satisfecho</p>
+            </div>
+        </div>
+
+        <!-- Prompt de Instalación PWA -->
+    <div class="prompt-instalacion" id="promptInstalacion">
+        <h4>📱 ¡Instala nuestra App!</h4>
+        <p>Accede más rápido a nuestro catálogo desde tu pantalla principal</p>
+        <button class="btn-instalar" onclick="instalarPWA()">⬇️ Instalar App</button>
+        <button onclick="cerrarPromptInstalacion()" style="float: right; background: none; border: none; color: white; font-size: 1.2rem;">✕</button>
+    </div>
+
+    <!-- Notificación -->
+    <div class="notificacion" id="notificacion">
+        <span id="textoNotificacion"></span>
+    </div>
+
+    <script src="script.js"></script>
+
+
+
+    </footer>
+
+    <!-- Prompt de Instalación PWA -->
+    <div class="prompt-instalacion" id="promptInstalacion">
+        <h4>📱 ¡Instala nuestra App!</h4>
+        <p>Accede más rápido a nuestro catálogo desde tu pantalla principal</p>
+        <button class="btn-instalar" onclick="instalarPWA()">⬇️ Instalar App</button>
+        <button onclick="cerrarPromptInstalacion()" style="float: right; background: none; border: none; color: white; font-size: 1.2rem;">✕</button>
+    </div>
+
+    <!-- Notificación -->
+    <div class="notificacion" id="notificacion">
+        <span id="textoNotificacion"></span>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
