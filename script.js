@@ -206,7 +206,7 @@ function agregarAlCarrito(idProducto) {
 
 // === ELIMINAR PRODUCTO ===
 function removerDelCarrito(idProducto) {
-    carritoCompras = carritoCompras.filter(item => item.id !== idProducto);
+    carritoCompras = carritoCompras.filter(item => item.id != idProducto); // Permite comparar string y número
     guardarCarrito();
     actualizarCarrito();
     mostrarNotificacion("🗑️ Producto eliminado del carrito");
@@ -214,7 +214,7 @@ function removerDelCarrito(idProducto) {
 
 // === CAMBIAR CANTIDAD ===
 function cambiarCantidad(idProducto, nuevaCantidad) {
-    const item = carritoCompras.find(item => item.id === idProducto);
+    const item = carritoCompras.find(item => item.id == idProducto); // Permite comparar string y número
     if (!item) return;
 
     if (nuevaCantidad <= 0) {
@@ -271,10 +271,10 @@ function actualizarCarrito() {
                 <div class="titulo-item-carrito">${item.nombre}</div>
                 <div class="precio-item-carrito">$${(item.precio * item.cantidad).toLocaleString("es-CO")}</div>
                 <div class="controles-cantidad">
-                    <button class="btn-cantidad" onclick="cambiarCantidad(${item.id}, ${item.cantidad - 1})">−</button>
+                    <button class="btn-cantidad" onclick="cambiarCantidad('${item.id}', ${item.cantidad - 1})">−</button>
                     <span class="cantidad-texto">${item.cantidad}</span>
-                    <button class="btn-cantidad" onclick="cambiarCantidad(${item.id}, ${item.cantidad + 1})">+</button>
-                    <button class="btn-cantidad btn-eliminar" onclick="removerDelCarrito(${item.id})">🗑️</button>
+                    <button class="btn-cantidad" onclick="cambiarCantidad('${item.id}', ${item.cantidad + 1})">+</button>
+                    <button class="btn-cantidad btn-eliminar" onclick="removerDelCarrito('${item.id}')">🗑️</button>
                 </div>
             </div>
         </div>
