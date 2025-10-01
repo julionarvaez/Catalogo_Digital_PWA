@@ -1,7 +1,5 @@
 // === SERVICE WORKER PARA ALIMENTO DEL CIELO PWA ===
 const CACHE_NAME = 'alimento-del-cielo-v1.0.0';
-const STATIC_CACHE = 'static-cache-v1';
-const DYNAMIC_CACHE = 'dynamic-cache-v1';
 
 // Archivos esenciales para cachear
 const urlsToCache = [
@@ -9,9 +7,8 @@ const urlsToCache = [
     '/index.html',
     '/styles.css',
     '/script.js',
-    '/manifest.json',
-    // Archivos adicionales
-    'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192"><rect width="192" height="192" fill="%232563eb" rx="20"/><text x="96" y="120" font-size="80" text-anchor="middle" fill="white">🍽️</text></svg>'
+    '/manifest.json'
+    // No incluyas data:image/svg+xml aquí
 ];
 
 // === INSTALACIÓN DEL SERVICE WORKER ===
@@ -43,7 +40,7 @@ self.addEventListener('activate', function(event) {
             return Promise.all(
                 cacheNames.map(function(cacheName) {
                     // Eliminar caches antiguos
-                    if (cacheName !== CACHE_NAME && cacheName !== STATIC_CACHE && cacheName !== DYNAMIC_CACHE) {
+                    if (cacheName !== CACHE_NAME) {
                         console.log('🗑️ Service Worker: Eliminando cache antiguo:', cacheName);
                         return caches.delete(cacheName);
                     }
@@ -80,7 +77,7 @@ self.addEventListener('fetch', function(event) {
                             const responseToCache = response.clone();
                             
                             // Agregar al cache dinámico
-                            caches.open(DYNAMIC_CACHE)
+                            caches.open(CACHE_NAME)
                                 .then(function(cache) {
                                     cache.put(event.request, responseToCache);
                                 });
@@ -246,7 +243,7 @@ self.addEventListener('message', function(event) {
     
     if (event.data && event.data.type === 'CACHE_URLS') {
         event.waitUntil(
-            caches.open(DYNAMIC_CACHE).then(cache => {
+            caches.open(CACHE_NAME).then(cache => {
                 return cache.addAll(event.data.payload);
             })
         );
@@ -271,7 +268,7 @@ self.addEventListener('activate', function(event) {
 });
 
 async function limpiarCacheAntiguo() {
-    const cacheWhitelist = [CACHE_NAME, STATIC_CACHE, DYNAMIC_CACHE];
+    const cacheWhitelist = [CACHE_NAME];
     
     const cacheNames = await caches.keys();
     const deletePromises = cacheNames.map(cacheName => {
@@ -319,7 +316,7 @@ async function cacheFirst(request) {
     try {
         const networkResponse = await fetch(request);
         if (networkResponse.ok) {
-            const cache = await caches.open(DYNAMIC_CACHE);
+            const cache = await caches.open(CACHE_NAME);
             cache.put(request, networkResponse.clone());
         }
         return networkResponse;
@@ -333,7 +330,7 @@ async function networkFirst(request) {
     try {
         const networkResponse = await fetch(request);
         if (networkResponse.ok) {
-            const cache = await caches.open(DYNAMIC_CACHE);
+            const cache = await caches.open(CACHE_NAME);
             cache.put(request, networkResponse.clone());
         }
         return networkResponse;
