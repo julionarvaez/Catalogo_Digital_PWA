@@ -71,8 +71,10 @@ html, body {
     background: linear-gradient(135deg, var(--color-primario), var(--color-secundario));
     color: white;
     padding: 1rem 0;
-    position: sticky;
+    position: fixed; 
     top: 0;
+    left: 0;
+    width: 100%;     
     z-index: 1000;
     box-shadow: var(--sombra);
 }
@@ -139,7 +141,7 @@ html, body {
 .contenedor {
     max-width: 1200px;
     margin: 0 auto;
-    padding: 2rem 1rem;
+    padding: 6rem 1rem 2rem 1rem; /* Agrega espacio arriba (ajusta según el alto del header) */
 }
 
 /* === SECCIÓN HERO === */
