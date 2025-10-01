@@ -1,10 +1,10 @@
 /* === VARIABLES CSS PRINCIPALES === */
 :root {
-    --color-primario: #2563eb;
-    --color-secundario: #1e40af;
-    --color-acento: #f59e0b;
-    --color-exito: #10b981;
-    --color-error: #ef4444;
+    --color-primario: #2563eb;      /*el color principal*/
+    --color-secundario: #1e40af;    /*Color segundario */
+    --color-acento: #f59e0b;        /*el Color de acento (botones especiales)*/
+    --color-exito: #10b981;         /*el verde para éxito*/
+    --color-error: #ef4444;         /*el rojo para errores*/
     --fondo-claro: #f8fafc;
     --fondo-oscuro: #0f172a;
     --texto-claro: #334155;
