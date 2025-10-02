@@ -3,11 +3,12 @@ const CACHE_NAME = 'alimento-del-cielo-v1.0.0';
 
 // Archivos esenciales para cachear
 const urlsToCache = [
-    '/',
-    '/index.html',
-    '/styles.css',
-    '/script.js',
-    '/manifest.json'
+    './',
+    './index.html',
+    './styles.css',
+    './script.js',
+    './manifest.json',
+    './Imagenes/logo/Logo.png',
     // No incluyas data:image/svg+xml aquí
 ];
 
