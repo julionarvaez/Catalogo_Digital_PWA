@@ -2,7 +2,8 @@
   "name": "Alimento del Cielo - Catálogo Digital",
   "short_name": "Alimento del Cielo",
   "description": "Catálogo digital de alimentos congelados premium. Productos frescos, listos para preparar y disfrutar en familia.",
-  "start_url": "/index.html",
+  "start_url": "./index.html",
+  "escape": "./",
   "display": "standalone",
   "background_color": "#f8fafc",
   "theme_color": "#2563eb",
@@ -13,51 +14,52 @@
   "scope": "/",
   "icons": [
     {
-      "src": "/Imagenes/logo/Logo.png",
+      "src": "./Imagenes/logo/Logo.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any maskable"
     },
     {
-      "src": "/Imagenes/logo/Logo.png",
+      "src": "./Imagenes/logo/Logo.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
     },
     {
-      "src": "/Imagenes/logo/Logo.png",
+      "src": "./Imagenes/logo/Logo.png",
       "sizes": "72x72",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/Imagenes/logo/Logo.png",
+      "src": "./Imagenes/logo/Logo.png",
       "sizes": "96x96",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/Imagenes/logo/Logo.png",
+      "src": "./Imagenes/logo/Logo.png",
       "sizes": "128x128",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/Imagenes/logo/Logo.png",
+      "src": "./Imagenes/logo/Logo.png",
       "sizes": "256x256",
       "type": "image/png",
       "purpose": "any"
     }
   ],
+
   "screenshots": [
     {
-      "src": "/imagenes/screenshots/Screenshot_1.png",
+      "src": "./imagenes/screenshots/Screenshot_1.png",
       "sizes": "393x852",
       "type": "image/png",
       "label": "Catálogo de productos"
     },
     {
-      "src": "/imagenes/screenshots/Screenshot_22.png",
+      "src": "./imagenes/screenshots/Screenshot_22.png",
       "sizes": "393x852",
       "type": "image/png",
       "label": "Carrito de compras"
@@ -71,7 +73,7 @@
       "url": "/#catalogo",
       "icons": [
         {
-          "src": "/iconos/catalogo.png",
+          "src": "./iconos/catalogo.png",
           "sizes": "96x96",
           "type": "image/png"
         }
@@ -84,7 +86,7 @@
       "url": "/#combos",
       "icons": [
         {
-          "src": "/iconos/combos.png",
+          "src": "./iconos/combos.png",
           "sizes": "96x96",
           "type": "image/png"
         }
@@ -94,12 +96,12 @@
       "name": "Contacto WhatsApp",
       "short_name": "WhatsApp",
       "description": "Contactar por WhatsApp",
-      "url": "https://wa.me/573001234567",
+      "url": "https://wa.me/573135212887",
       "icons": [
         {
-          "src": "/iconos/whatsapp.png",
+          "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 96 96'><rect width='96' height='96' fill='%2325d366' rx='10'/><text x='48' y='60' font-size='40' text-anchor='middle' fill='white'>💬</text></svg>",
           "sizes": "96x96",
-          "type": "image/png"
+          "type": "image/svg+xml"
         }
       ]
     }
