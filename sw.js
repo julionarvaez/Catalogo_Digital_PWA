@@ -355,11 +355,11 @@ self.addEventListener('install', function(event) {
         caches.open(`${CACHE_NAME}-${ASSETS_VERSION}`)
             .then(cache => {
                 return cache.addAll([
-                    '/',
-                    '/index.html',
-                    '/styles.css',
-                    '/script.js',
-                    '/manifest.json'
+                    './',
+                    './index.html',
+                    './styles.css',
+                    './script.js',
+                    './manifest.json'
                 ]);
             })
             .then(() => self.skipWaiting())
