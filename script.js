@@ -543,12 +543,46 @@ function mostrarPromptInstalacion() {
         evento.preventDefault();
         eventoInstalacion = evento;
         
+        // Mostrar el botón FAB siempre
+        mostrarBotonFABInstalar();
+        
+        // Mostrar popup solo si no se ha cerrado antes y no está instalada
         setTimeout(() => {
-            if (!localStorage.getItem('pwaInstalada')) {
+            const popupCerrado = localStorage.getItem('popupInstalacionCerrado');
+            const pwaInstalada = localStorage.getItem('pwaInstalada');
+            
+            if (!popupCerrado && !pwaInstalada) {
                 document.getElementById('promptInstalacion').classList.add('mostrar');
             }
         }, 5000);
     });
+    
+    // Verificar si la PWA ya está instalada
+    if (window.matchMedia('(display-mode: standalone)').matches) {
+        localStorage.setItem('pwaInstalada', 'true');
+        ocultarBotonFABInstalar();
+    }
+}
+
+function mostrarBotonFABInstalar() {
+    const btnFab = document.getElementById('btnFabInstalar');
+    if (btnFab && !localStorage.getItem('pwaInstalada')) {
+        btnFab.classList.remove('oculto');
+        
+        // Animación de entrada
+        setTimeout(() => {
+            btnFab.style.opacity = '1';
+            btnFab.style.visibility = 'visible';
+            btnFab.style.transform = 'translateY(0)';
+        }, 100);
+    }
+}
+
+function ocultarBotonFABInstalar() {
+    const btnFab = document.getElementById('btnFabInstalar');
+    if (btnFab) {
+        btnFab.classList.add('oculto');
+    }
 }
 
 function instalarPWA() {
@@ -558,15 +592,26 @@ function instalarPWA() {
             if (resultado.outcome === 'accepted') {
                 mostrarNotificacion('🎉 ¡App instalada exitosamente!');
                 localStorage.setItem('pwaInstalada', 'true');
+                ocultarBotonFABInstalar();
+            } else {
+                mostrarNotificacion('ℹ️ Instalación cancelada');
             }
             eventoInstalacion = null;
         });
+    } else {
+        // Si no hay evento de instalación disponible
+        if (window.matchMedia('(display-mode: standalone)').matches) {
+            mostrarNotificacion('✅ La app ya está instalada');
+        } else {
+            mostrarNotificacion('ℹ️ Usa el menú de tu navegador para instalar la app');
+        }
     }
     cerrarPromptInstalacion();
 }
 
 function cerrarPromptInstalacion() {
     document.getElementById('promptInstalacion').classList.remove('mostrar');
+    localStorage.setItem('popupInstalacionCerrado', 'true');
 }
 
 // === SERVICE WORKER ===
@@ -627,6 +672,8 @@ function configurarEventos() {
         console.log('📱 PWA instalada exitosamente');
         localStorage.setItem('pwaInstalada', 'true');
         cerrarPromptInstalacion();
+        ocultarBotonFABInstalar();
+        mostrarNotificacion('🎉 ¡App instalada! Búscala en tu pantalla de inicio');
     });
 }
 
