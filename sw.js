@@ -3,13 +3,12 @@ const CACHE_NAME = 'alimento-del-cielo-v1.0.0';
 
 // Archivos esenciales para cachear
 const urlsToCache = [
-    './',
-    './index.html',
-    './styles.css',
-    './script.js',
-    './manifest.json',
-    './Imagenes/logo/Logo.png',
-    // No incluyas data:image/svg+xml aquí
+    '/Catalogo_Digital_PWA/',
+    '/Catalogo_Digital_PWA/index.html',
+    '/Catalogo_Digital_PWA/styles.css',
+    '/Catalogo_Digital_PWA/script.js',
+    '/Catalogo_Digital_PWA/manifest.json',
+    '/Catalogo_Digital_PWA/Imagenes/logo/Logo.png'
 ];
 
 // === INSTALACIÓN DEL SERVICE WORKER ===
