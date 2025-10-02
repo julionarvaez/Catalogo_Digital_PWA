@@ -73,7 +73,7 @@
       "url": "/#catalogo",
       "icons": [
         {
-          "src": "./iconos/catalogo.png",
+          "src": "./Imagenes/iconos/catalogo.png",
           "sizes": "96x96",
           "type": "image/png"
         }
@@ -86,7 +86,7 @@
       "url": "/#combos",
       "icons": [
         {
-          "src": "./iconos/combos.png",
+          "src": "./Imagenes/iconos/combos.png",
           "sizes": "96x96",
           "type": "image/png"
         }
@@ -99,7 +99,7 @@
       "url": "https://wa.me/573135212887",
       "icons": [
         {
-          "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 96 96'><rect width='96' height='96' fill='%2325d366' rx='10'/><text x='48' y='60' font-size='40' text-anchor='middle' fill='white'>💬</text></svg>",
+          "src": "./Imagenes/iconos/WhatsApp.png",
           "sizes": "96x96",
           "type": "image/svg+xml"
         }
