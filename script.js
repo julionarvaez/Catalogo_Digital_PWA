@@ -106,7 +106,7 @@ const productos = [
 // === VARIABLES GLOBALES ===
 let carritoCompras = [];
 let filtroActual = 'todos';
-let eventoInstalacion = null;
+let deferredPrompt = null; // Variable global para capturar el evento de instalación
 
 // === INICIALIZACIÓN DE LA APP ===
 document.addEventListener('DOMContentLoaded', function() {
@@ -537,36 +537,54 @@ function mostrarNotificacion(mensaje, tipo = 'exito') {
     }, 3000);
 }
 
-// === PWA INSTALACIÓN ===
+
+// === PWA E INSTALACIÓN ===
 function mostrarPromptInstalacion() {
+    // Capturar el evento beforeinstallprompt
     window.addEventListener('beforeinstallprompt', (evento) => {
-        evento.preventDefault();
-        eventoInstalacion = evento;
+        console.log('✅ Evento beforeinstallprompt capturado');
         
-        // Mostrar el botón FAB siempre
+        // Prevenir que el navegador muestre su propio prompt
+        evento.preventDefault();
+        
+        // Guardar el evento para usarlo después
+        deferredPrompt = evento;
+        
+        // Mostrar el botón de instalación
         mostrarBotonFABInstalar();
         
-        // Mostrar popup solo si no se ha cerrado antes y no está instalada
+        // Mostrar popup promocional (opcional) solo la primera vez
         setTimeout(() => {
             const popupCerrado = localStorage.getItem('popupInstalacionCerrado');
-            const pwaInstalada = localStorage.getItem('pwaInstalada');
-            
-            if (!popupCerrado && !pwaInstalada) {
-                document.getElementById('promptInstalacion').classList.add('mostrar');
+            if (!popupCerrado) {
+                const promptElement = document.getElementById('promptInstalacion');
+                if (promptElement) {
+                    promptElement.classList.add('mostrar');
+                }
             }
         }, 5000);
     });
     
-    // Verificar si la PWA ya está instalada
-    if (window.matchMedia('(display-mode: standalone)').matches) {
-        localStorage.setItem('pwaInstalada', 'true');
-        ocultarBotonFABInstalar();
+    // Detectar si la app ya está instalada
+    window.addEventListener('appinstalled', (evento) => {
+        console.log('✅ PWA instalada exitosamente');
+        deferredPrompt = null;
+        mostrarNotificacion('🎉 ¡App instalada! Encuéntrala en tu pantalla de inicio');
+    });
+    
+    // Verificar si ya está ejecutándose en modo standalone (instalada)
+    if (window.matchMedia('(display-mode: standalone)').matches || 
+        window.navigator.standalone === true) {
+        console.log('ℹ️ La app ya está instalada y ejecutándose en modo standalone');
     }
+    
+    // Mostrar el botón siempre (se ocultará solo si no hay soporte)
+    mostrarBotonFABInstalar();
 }
 
 function mostrarBotonFABInstalar() {
     const btnFab = document.getElementById('btnFabInstalar');
-    if (btnFab && !localStorage.getItem('pwaInstalada')) {
+    if (btnFab) {
         btnFab.classList.remove('oculto');
         
         // Animación de entrada
@@ -581,81 +599,78 @@ function mostrarBotonFABInstalar() {
 function ocultarBotonFABInstalar() {
     const btnFab = document.getElementById('btnFabInstalar');
     if (btnFab) {
-        btnFab.classList.add('oculto');
+        btnFab.style.opacity = '0';
+        btnFab.style.visibility = 'hidden';
+        btnFab.style.transform = 'translateY(100px)';
+        
+        setTimeout(() => {
+            btnFab.classList.add('oculto');
+        }, 300);
     }
 }
 
 function instalarPWA() {
-    // Verificar si ya está instalada
-    if (window.matchMedia('(display-mode: standalone)').matches) {
-        mostrarNotificacion('✅ La app ya está instalada', 'exito');
-        ocultarBotonFABInstalar();
+    console.log('🚀 Intentando instalar PWA...');
+    
+    // Verificar si ya está ejecutándose como app instalada
+    if (window.matchMedia('(display-mode: standalone)').matches || 
+        window.navigator.standalone === true) {
+        mostrarNotificacion('ℹ️ La app ya está instalada. Puedes reinstalarla desde el menú del navegador si lo deseas.', 'exito');
         return;
     }
-
-    // Si tenemos el evento de instalación nativo
-    if (eventoInstalacion) {
-        eventoInstalacion.prompt();
-        eventoInstalacion.userChoice.then((resultado) => {
-            if (resultado.outcome === 'accepted') {
-                mostrarNotificacion('🎉 ¡App instalada exitosamente!');
-                localStorage.setItem('pwaInstalada', 'true');
-                ocultarBotonFABInstalar();
+    
+    // Si tenemos el evento de instalación guardado
+    if (deferredPrompt) {
+        console.log('✅ Mostrando prompt de instalación nativo');
+        
+        // Mostrar el prompt de instalación nativo
+        deferredPrompt.prompt();
+        
+        // Esperar a que el usuario responda
+        deferredPrompt.userChoice.then((choiceResult) => {
+            if (choiceResult.outcome === 'accepted') {
+                console.log('✅ Usuario aceptó la instalación');
+                mostrarNotificacion('🎉 ¡Instalando la app! Búscala en tu pantalla de inicio');
             } else {
-                mostrarNotificacion('ℹ️ Instalación cancelada');
+                console.log('❌ Usuario canceló la instalación');
+                mostrarNotificacion('ℹ️ Instalación cancelada. Puedes instalarla cuando quieras', 'exito');
             }
-            eventoInstalacion = null;
+            
+            // Resetear el prompt (aunque el navegador lo hace automáticamente)
+            deferredPrompt = null;
+        }).catch((error) => {
+            console.error('❌ Error al mostrar el prompt:', error);
+            mostrarNotificacion('⚠️ Error al instalar. Intenta desde el menú del navegador', 'error');
         });
+        
+        // Cerrar el popup promocional si está abierto
+        cerrarPromptInstalacion();
     } else {
-        // Si no hay evento nativo, mostrar instrucciones por navegador
-        mostrarInstruccionesInstalacion();
-    }
-    cerrarPromptInstalacion();
-}
-
-function mostrarInstruccionesInstalacion() {
-    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
-    const isAndroid = /Android/.test(navigator.userAgent);
-    
-    let mensaje = '';
-    
-    if (isIOS) {
-        mensaje = '📱 En Safari iOS:\n1. Toca el botón "Compartir" (cuadrado con flecha)\n2. Selecciona "Añadir a pantalla de inicio"';
-    } else if (isAndroid) {
-        mensaje = '📱 Para instalar:\n1. Abre el menú (⋮) del navegador\n2. Selecciona "Instalar app" o "Añadir a pantalla de inicio"';
-    } else {
-        mensaje = '💻 Para instalar:\n1. Busca el icono ⊕ o "Instalar" en la barra de direcciones\n2. O abre el menú del navegador (⋮) y selecciona "Instalar"';
-    }
-    
-    // Mostrar modal con instrucciones
-    mostrarModalInstalacion(mensaje);
-}
-
-function mostrarModalInstalacion(mensaje) {
-    // Crear modal temporal
-    const modal = document.createElement('div');
-    modal.className = 'modal-instalacion';
-    modal.innerHTML = `
-        <div class="contenido-modal-instalacion">
-            <button class="cerrar-modal" onclick="this.parentElement.parentElement.remove()">✕</button>
-            <h3>📱 Cómo instalar la app</h3>
-            <p style="white-space: pre-line; text-align: left; margin: 1.5rem 0;">${mensaje}</p>
-            <button class="boton boton-primario" onclick="this.parentElement.parentElement.remove()">
-                Entendido
-            </button>
-        </div>
-    `;
-    document.body.appendChild(modal);
-    
-    // Auto-eliminar después de 10 segundos
-    setTimeout(() => {
-        if (modal.parentElement) {
-            modal.remove();
+        // No hay evento disponible
+        console.log('⚠️ No hay evento beforeinstallprompt disponible');
+        
+        // Verificar el navegador y mostrar mensaje apropiado
+        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+        const isChrome = /Chrome/.test(navigator.userAgent) && /Google Inc/.test(navigator.vendor);
+        const isEdge = /Edg/.test(navigator.userAgent);
+        const isOpera = /OPR/.test(navigator.userAgent);
+        const isSafari = /Safari/.test(navigator.userAgent) && !/Chrome/.test(navigator.userAgent);
+        
+        if (isIOS && isSafari) {
+            mostrarNotificacion('📱 En iOS: Toca el botón "Compartir" y luego "Añadir a pantalla de inicio"', 'exito');
+        } else if (isChrome || isEdge || isOpera) {
+            mostrarNotificacion('💻 Busca el icono ⊕ "Instalar" en la barra de direcciones o en el menú del navegador', 'exito');
+        } else {
+            mostrarNotificacion('⚠️ Este navegador no soporta instalación automática de PWAs', 'error');
         }
-    }, 10000);
+    }
 }
+
 function cerrarPromptInstalacion() {
-    document.getElementById('promptInstalacion').classList.remove('mostrar');
+    const promptElement = document.getElementById('promptInstalacion');
+    if (promptElement) {
+        promptElement.classList.remove('mostrar');
+    }
     localStorage.setItem('popupInstalacionCerrado', 'true');
 }
 
@@ -701,25 +716,31 @@ function configurarEventos() {
     document.addEventListener('keydown', function(evento) {
         if (evento.key === 'Escape') {
             const carrito = document.getElementById('sidebarCarrito');
-            if (carrito.classList.contains('abierto')) {
+            if (carrito && carrito.classList.contains('abierto')) {
                 cerrarCarrito();
             }
         }
     });
 
     // Cerrar notificación al hacer click
-    document.getElementById('notificacion').addEventListener('click', function() {
-        this.classList.remove('mostrar');
-    });
+    const notificacion = document.getElementById('notificacion');
+    if (notificacion) {
+        notificacion.addEventListener('click', function() {
+            this.classList.remove('mostrar');
+        });
+    }
 
-    // Detectar si la app está instalada
+    // Evento cuando la PWA se instala exitosamente
     window.addEventListener('appinstalled', (evento) => {
-        console.log('📱 PWA instalada exitosamente');
-        localStorage.setItem('pwaInstalada', 'true');
-        cerrarPromptInstalacion();
-        ocultarBotonFABInstalar();
+        console.log('✅ PWA instalada exitosamente');
+        deferredPrompt = null;
         mostrarNotificacion('🎉 ¡App instalada! Búscala en tu pantalla de inicio');
     });
+    
+    // Detectar si se está ejecutando como PWA instalada
+    if (window.matchMedia('(display-mode: standalone)').matches) {
+        console.log('ℹ️ La app está ejecutándose en modo standalone (instalada)');
+    }
 }
 
 // === PERSISTENCIA DEL CARRITO ===
