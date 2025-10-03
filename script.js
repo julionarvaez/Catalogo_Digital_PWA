@@ -586,6 +586,14 @@ function ocultarBotonFABInstalar() {
 }
 
 function instalarPWA() {
+    // Verificar si ya está instalada
+    if (window.matchMedia('(display-mode: standalone)').matches) {
+        mostrarNotificacion('✅ La app ya está instalada', 'exito');
+        ocultarBotonFABInstalar();
+        return;
+    }
+
+    // Si tenemos el evento de instalación nativo
     if (eventoInstalacion) {
         eventoInstalacion.prompt();
         eventoInstalacion.userChoice.then((resultado) => {
@@ -599,16 +607,53 @@ function instalarPWA() {
             eventoInstalacion = null;
         });
     } else {
-        // Si no hay evento de instalación disponible
-        if (window.matchMedia('(display-mode: standalone)').matches) {
-            mostrarNotificacion('✅ La app ya está instalada');
-        } else {
-            mostrarNotificacion('ℹ️ Usa el menú de tu navegador para instalar la app');
-        }
+        // Si no hay evento nativo, mostrar instrucciones por navegador
+        mostrarInstruccionesInstalacion();
     }
     cerrarPromptInstalacion();
 }
 
+function mostrarInstruccionesInstalacion() {
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+    const isAndroid = /Android/.test(navigator.userAgent);
+    
+    let mensaje = '';
+    
+    if (isIOS) {
+        mensaje = '📱 En Safari iOS:\n1. Toca el botón "Compartir" (cuadrado con flecha)\n2. Selecciona "Añadir a pantalla de inicio"';
+    } else if (isAndroid) {
+        mensaje = '📱 Para instalar:\n1. Abre el menú (⋮) del navegador\n2. Selecciona "Instalar app" o "Añadir a pantalla de inicio"';
+    } else {
+        mensaje = '💻 Para instalar:\n1. Busca el icono ⊕ o "Instalar" en la barra de direcciones\n2. O abre el menú del navegador (⋮) y selecciona "Instalar"';
+    }
+    
+    // Mostrar modal con instrucciones
+    mostrarModalInstalacion(mensaje);
+}
+
+function mostrarModalInstalacion(mensaje) {
+    // Crear modal temporal
+    const modal = document.createElement('div');
+    modal.className = 'modal-instalacion';
+    modal.innerHTML = `
+        <div class="contenido-modal-instalacion">
+            <button class="cerrar-modal" onclick="this.parentElement.parentElement.remove()">✕</button>
+            <h3>📱 Cómo instalar la app</h3>
+            <p style="white-space: pre-line; text-align: left; margin: 1.5rem 0;">${mensaje}</p>
+            <button class="boton boton-primario" onclick="this.parentElement.parentElement.remove()">
+                Entendido
+            </button>
+        </div>
+    `;
+    document.body.appendChild(modal);
+    
+    // Auto-eliminar después de 10 segundos
+    setTimeout(() => {
+        if (modal.parentElement) {
+            modal.remove();
+        }
+    }, 10000);
+}
 function cerrarPromptInstalacion() {
     document.getElementById('promptInstalacion').classList.remove('mostrar');
     localStorage.setItem('popupInstalacionCerrado', 'true');
