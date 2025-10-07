@@ -1,5 +1,6 @@
 // === BASE DE DATOS DE PRODUCTOS ===
 const productos = [
+    // === POLLO ===
     {
         id: 1,
         nombre: 'Pollo Apanado Premium',
@@ -12,36 +13,6 @@ const productos = [
     },
     {
         id: 2,
-        nombre: 'Carne de Res Marinada',
-        categoria: 'carnes',
-        precio: 35000,
-        descripcion: 'Carne de res tierna marinada en especias naturales y hierbas aromáticas. Corte premium.',
-        emoji: '🥩',
-        etiqueta: 'Nuevo',
-        tipoEtiqueta: 'etiqueta-nuevo'
-    },
-    {
-        id: 3,
-        nombre: 'Filete de Salmón Atlántico',
-        categoria: 'pescado',
-        precio: 42000,
-        descripcion: 'Salmón fresco del Atlántico, rico en omega-3. Porciones de 200g cada una.',
-        emoji: '🐟',
-        etiqueta: 'Premium',
-        tipoEtiqueta: 'etiqueta-premium'
-    },
-    {
-        id: 4,
-        nombre: 'Mix de Verduras Gourmet',
-        categoria: 'verduras',
-        precio: 15000,
-        descripcion: 'Mezcla selecta de verduras frescas: brócoli, zanahoria, apio y pimentón.',
-        emoji: '🥬',
-        etiqueta: 'Saludable',
-        tipoEtiqueta: 'etiqueta-producto'
-    },
-    {
-        id: 5,
         nombre: 'Alitas BBQ Especiales',
         categoria: 'pollo',
         precio: 25000,
@@ -51,7 +22,29 @@ const productos = [
         tipoEtiqueta: 'etiqueta-oferta'
     },
     {
-        id: 6,
+        id: 3,
+        nombre: 'Pechuga de Pavo Ahumada',
+        categoria: 'pollo',
+        precio: 33000,
+        descripcion: 'Pechuga de pavo ahumada naturalmente, baja en grasa y alta en proteína.',
+        emoji: '🦃',
+        etiqueta: 'Fitness',
+        tipoEtiqueta: 'etiqueta-producto'
+    },
+
+    // === CARNES ===
+    {
+        id: 4,
+        nombre: 'Carne de Res Marinada',
+        categoria: 'carnes',
+        precio: 35000,
+        descripcion: 'Carne de res tierna marinada en especias naturales y hierbas aromáticas. Corte premium.',
+        emoji: '🥩',
+        etiqueta: 'Nuevo',
+        tipoEtiqueta: 'etiqueta-nuevo'
+    },
+    {
+        id: 5,
         nombre: 'Hamburguesas Artesanales',
         categoria: 'carnes',
         precio: 32000,
@@ -61,7 +54,29 @@ const productos = [
         tipoEtiqueta: 'etiqueta-producto'
     },
     {
+        id: 6,
+        nombre: 'Lomo de Cerdo Marinado',
+        categoria: 'carnes',
+        precio: 29000,
+        descripcion: 'Lomo de cerdo tierno marinado con especias mediterráneas.',
+        emoji: '🐷',
+        etiqueta: 'Delicioso',
+        tipoEtiqueta: 'etiqueta-oferta'
+    },
+
+    // === PESCADO ===
+    {
         id: 7,
+        nombre: 'Filete de Salmón Atlántico',
+        categoria: 'pescado',
+        precio: 42000,
+        descripcion: 'Salmón fresco del Atlántico, rico en omega-3. Porciones de 200g cada una.',
+        emoji: '🐟',
+        etiqueta: 'Premium',
+        tipoEtiqueta: 'etiqueta-premium'
+    },
+    {
+        id: 8,
         nombre: 'Camarones Tigre Gigantes',
         categoria: 'pescado',
         precio: 38000,
@@ -70,8 +85,20 @@ const productos = [
         etiqueta: 'Gourmet',
         tipoEtiqueta: 'etiqueta-premium'
     },
+
+    // === VERDURAS ===
     {
-        id: 8,
+        id: 9,
+        nombre: 'Mix de Verduras Gourmet',
+        categoria: 'verduras',
+        precio: 15000,
+        descripcion: 'Mezcla selecta de verduras frescas: brócoli, zanahoria, apio y pimentón.',
+        emoji: '🥬',
+        etiqueta: 'Saludable',
+        tipoEtiqueta: 'etiqueta-producto'
+    },
+    {
+        id: 10,
         nombre: 'Papas Criollas Baby',
         categoria: 'verduras',
         precio: 12000,
@@ -80,28 +107,134 @@ const productos = [
         etiqueta: 'Tradicional',
         tipoEtiqueta: 'etiqueta-producto'
     },
+
+    // === EMPANADAS ===
     {
-        id: 9,
-        nombre: 'Pechuga de Pavo Ahumada',
-        categoria: 'pollo',
-        precio: 33000,
-        descripcion: 'Pechuga de pavo ahumada naturalmente, baja en grasa y alta en proteína.',
-        emoji: '🦃',
-        etiqueta: 'Fitness',
+        id: 11,
+        nombre: 'Empanadas de Carne',
+        categoria: 'empanadas',
+        precio: 20000,
+        descripcion: 'Empanadas rellenas de carne molida sazonada con especias tradicionales. Pack x6 unidades.',
+        emoji: '🥟',
+        etiqueta: 'Clásico',
         tipoEtiqueta: 'etiqueta-producto'
     },
     {
-        id: 10,
-        nombre: 'Lomo de Cerdo Marinado',
-        categoria: 'carnes',
-        precio: 29000,
-        descripcion: 'Lomo de cerdo tierno marinado con especias mediterráneas.',
-        emoji: '🐷',
+        id: 12,
+        nombre: 'Empanadas de Pollo',
+        categoria: 'empanadas',
+        precio: 20000,
+        descripcion: 'Empanadas rellenas de pollo desmechado con un toque de especias. Pack x6 unidades.',
+        emoji: '🥟',
+        etiqueta: 'Clásico',
+        tipoEtiqueta: 'etiqueta-producto'
+    },
+    {
+        id: 13,
+        nombre: 'Empanadas de Queso',
+        categoria: 'empanadas',
+        precio: 20000,
+        descripcion: 'Empanadas rellenas de mezcla de quesos fundidos. Pack x6 unidades.',
+        emoji: '🥟',
+        etiqueta: 'Clásico',
+        tipoEtiqueta: 'etiqueta-producto'
+    },
+    {
+        id: 14,
+        nombre: 'Empanadas de Jamón con Queso',
+        categoria: 'empanadas',
+        precio: 8990,
+        descripcion: 'Empanadas rellenas de jamón y queso fundido. Pack x7 Unidades.',
+        emoji: '🥟',
         etiqueta: 'Delicioso',
-        tipoEtiqueta: 'etiqueta-oferta'
+        tipoEtiqueta: 'etiqueta-producto'
+    },
+
+    // === PASABOCAS ===
+    {
+        id: 15,
+        nombre: 'Combo_01: 50 unidades',
+        categoria: 'pasabocas',
+        precio: 28000,
+        descripcion: 'Incluye 25 deditos y 25 empanadas. Ideal para reuniones pequeñas.',
+        emoji: '🥟',
+        etiqueta: 'Económico',
+        tipoEtiqueta: 'etiqueta-producto'
+    },
+    {
+        id: 16,
+        nombre: 'Combo_02: 100 unidades',
+        categoria: 'pasabocas',
+        precio: 56000,
+        descripcion: 'Incluye 50 deditos, 30 empanadas y 20 medallones. Perfecto para compartir.',
+        emoji: '🍢',
+        etiqueta: 'Popular',
+        tipoEtiqueta: 'etiqueta-producto'
+    },
+    {
+        id: 17,
+        nombre: 'Combo_03: 150 unidades',
+        categoria: 'pasabocas',
+        precio: 84000,
+        descripcion: 'Incluye 100 deditos, 30 empanadas y 20 medallones. Ideal para eventos medianos.',
+        emoji: '🍴',
+        etiqueta: 'Recomendado',
+        tipoEtiqueta: 'etiqueta-producto'
+    },
+    {
+        id: 18,
+        nombre: 'Combo_04: 170 unidades',
+        categoria: 'pasabocas',
+        precio: 95000,
+        descripcion: 'Incluye 100 deditos, 50 empanadas y 20 medallones. Excelente opción para celebraciones.',
+        emoji: '🎉',
+        etiqueta: 'Favorito',
+        tipoEtiqueta: 'etiqueta-producto'
+    },
+    {
+        id: 19,
+        nombre: 'Combo_05: 200 unidades',
+        categoria: 'pasabocas',
+        precio: 112000,
+        descripcion: 'Incluye 100 deditos, 50 empanadas y 50 medallones. Ideal para eventos grandes.',
+        emoji: '🥳',
+        etiqueta: 'Premium',
+        tipoEtiqueta: 'etiqueta-producto'
+    },
+
+    // === DEDITOS ===
+    {
+        id: 20,
+        nombre: 'Deditos de Queso (x10)',
+        categoria: 'deditos',
+        precio: 8990,
+        descripcion: 'Crujientes deditos rellenos de queso mozzarella. Pack x10 unidades.',
+        emoji: '🧀',
+        etiqueta: 'Clásico',
+        tipoEtiqueta: 'etiqueta-producto'
+    },
+    {
+        id: 21,
+        nombre: 'Deditos de Queso (x13)',
+        categoria: 'deditos',
+        precio: 12990,
+        descripcion: 'Crujientes deditos rellenos de queso mozzarella. Pack x13 unidades.',
+        emoji: '🧀',
+        etiqueta: 'Clásico',
+        tipoEtiqueta: 'etiqueta-producto'
+    },
+    {
+        id: 22,
+        nombre: 'Deditos de Queso (x18)',
+        categoria: 'deditos',
+        precio: 16900,
+        descripcion: 'Crujientes deditos rellenos de queso mozzarella. Pack x18 unidades.',
+        emoji: '🧀',
+        etiqueta: 'Clásico',
+        tipoEtiqueta: 'etiqueta-producto'
     }
-    
 ];
+
 
 // === VARIABLES GLOBALES ===
 let carritoCompras = [];
