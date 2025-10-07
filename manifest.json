@@ -2,7 +2,7 @@
   "name": "Alimento del Cielo - Catálogo Digital",
   "short_name": "Alimento del Cielo",
   "description": "Catálogo digital de alimentos congelados premium. Productos frescos, listos para preparar y disfrutar en familia.",
-  "start_url": "./index.html",
+  "start_url": "index.html",
   "display": "standalone",
   "display_override": ["standalone", "browser"],
   "background_color": "#f8fafc",
@@ -11,7 +11,7 @@
   "categories": ["food", "shopping", "business"],
   "lang": "es",
   "dir": "ltr",
-  "scope": "./",
+  "scope": "/",
   "icons": [
     {
       "src": "/Imagenes/logo/Logo.png",
@@ -20,31 +20,31 @@
       "purpose": "any maskable"
     },
     {
-      "src": "./Imagenes/logo/Logo.png",
+      "src": "/Imagenes/logo/Logo.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
     },
     {
-      "src": "./Imagenes/logo/Logo.png",
+      "src": "/Imagenes/logo/Logo.png",
       "sizes": "72x72",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "./Imagenes/logo/Logo.png",
+      "src": "/Imagenes/logo/Logo.png",
       "sizes": "96x96",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "./Imagenes/logo/Logo.png",
+      "src": "/Imagenes/logo/Logo.png",
       "sizes": "128x128",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "./Imagenes/logo/Logo.png",
+      "src": "/Imagenes/logo/Logo.png",
       "sizes": "256x256",
       "type": "image/png",
       "purpose": "any"
@@ -53,13 +53,13 @@
 
   "screenshots": [
     {
-      "src": "./imagenes/screenshots/Screenshot_1.png",
+      "src": "/imagenes/screenshots/Screenshot_1.png",
       "sizes": "393x852",
       "type": "image/png",
       "label": "Catálogo de productos"
     },
     {
-      "src": "./imagenes/screenshots/Screenshot_22.png",
+      "src": "/imagenes/screenshots/Screenshot_22.png",
       "sizes": "393x852",
       "type": "image/png",
       "label": "Carrito de compras"
@@ -73,7 +73,7 @@
       "url": "/index.html#catalogo",
       "icons": [
         {
-          "src": "./Imagenes/iconos/catalogo.png",
+          "src": "/Imagenes/iconos/catalogo.png",
           "sizes": "96x96",
           "type": "image/png"
         }
@@ -86,7 +86,7 @@
       "url": "/index.html#combos",
       "icons": [
         {
-          "src": "./Imagenes/iconos/combos.png",
+          "src": "/Imagenes/iconos/combos.png",
           "sizes": "96x96",
           "type": "image/png"
         }
