@@ -2,48 +2,49 @@
   "name": "Alimento del Cielo - Catálogo Digital",
   "short_name": "Alimento del Cielo",
   "description": "Catálogo digital de alimentos congelados premium. Productos frescos, listos para preparar y disfrutar en familia.",
-  "start_url": "/Catalogo_Digital_PWA/",
+  "start_url": "./index.html",
   "display": "standalone",
+  "display_override": ["standalone", "browser"],
   "background_color": "#f8fafc",
   "theme_color": "#2563eb",
   "orientation": "portrait-primary",
   "categories": ["food", "shopping", "business"],
   "lang": "es",
   "dir": "ltr",
-  "scope": "/Catalogo_Digital_PWA/",
+  "scope": "./",
   "icons": [
     {
-      "src": "/Catalogo_Digital_PWA/Imagenes/logo/Logo.png",
+      "src": "/Imagenes/logo/Logo.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any maskable"
     },
     {
-      "src": "/Catalogo_Digital_PWA/Imagenes/logo/Logo.png",
+      "src": "./Imagenes/logo/Logo.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
     },
     {
-      "src": "/Catalogo_Digital_PWA/Imagenes/logo/Logo.png",
+      "src": "./Imagenes/logo/Logo.png",
       "sizes": "72x72",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/Catalogo_Digital_PWA/Imagenes/logo/Logo.png",
+      "src": "./Imagenes/logo/Logo.png",
       "sizes": "96x96",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/Catalogo_Digital_PWA/Imagenes/logo/Logo.png",
+      "src": "./Imagenes/logo/Logo.png",
       "sizes": "128x128",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/Catalogo_Digital_PWA/Imagenes/logo/Logo.png",
+      "src": "./Imagenes/logo/Logo.png",
       "sizes": "256x256",
       "type": "image/png",
       "purpose": "any"
@@ -64,12 +65,12 @@
       "label": "Carrito de compras"
     }
   ],
-  "shortcuts": [
+ "shortcuts": [
     {
       "name": "Ver Catálogo",
       "short_name": "Catálogo",
       "description": "Ver todos los productos disponibles",
-      "url": "/#catalogo",
+      "url": "/index.html#catalogo",
       "icons": [
         {
           "src": "./Imagenes/iconos/catalogo.png",
@@ -81,8 +82,8 @@
     {
       "name": "Combos Especiales",
       "short_name": "Combos",
-      "description": "Ver ofertas y combos especiales",
-      "url": "/#combos",
+      "description": "Ver nuestros combos especiales",
+      "url": "/index.html#combos",
       "icons": [
         {
           "src": "./Imagenes/iconos/combos.png",
@@ -90,21 +91,9 @@
           "type": "image/png"
         }
       ]
-    },
-    {
-      "name": "Contacto WhatsApp",
-      "short_name": "WhatsApp",
-      "description": "Contactar por WhatsApp",
-      "url": "https://wa.me/573135212887",
-      "icons": [
-        {
-          "src": "./Imagenes/iconos/WhatsApp.png",
-          "sizes": "96x96",
-          "type": "image/svg+xml"
-        }
-      ]
     }
   ],
+  
   "related_applications": [],
   "prefer_related_applications": false,
   "protocol_handlers": [

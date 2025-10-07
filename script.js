@@ -1048,7 +1048,7 @@ window.AlimentoDelCielo = {
 };
 
 // === MANIFEST.JSON DINÁMICO ===
-function crearManifestoDinamico() {
+/*function crearManifestoDinamico() 
     const manifestJson = {
         "name": "Alimento del Cielo - Catálogo Digital",
         "short_name": "Alimento del Cielo",
@@ -1091,12 +1091,12 @@ function crearManifestoDinamico() {
     if (linkManifest) {
         linkManifest.href = manifestURL;
     }
-}
+}*/
 
 // === INICIALIZACIÓN FINAL ===
 document.addEventListener('DOMContentLoaded', function() {
     // Crear manifest dinámico
-    crearManifestoDinamico();
+    //crearManifestoDinamico();
     
     // Optimizar imágenes
     optimizarImagenes();
