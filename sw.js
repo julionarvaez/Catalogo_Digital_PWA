@@ -345,7 +345,7 @@ async function networkFirst(request) {
 }
 
 // === GESTIÓN DE VERSIONES ===
-const VERSION = '1.0.0';
+const VERSION = '1.0.0  ';
 const ASSETS_VERSION = 'v1';
 
 self.addEventListener('install', function(event) {
