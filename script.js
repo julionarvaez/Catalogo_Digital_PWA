@@ -308,6 +308,7 @@ const productos = [
         precio: 95000,
         descripcion: 'Incluye 100 deditos, 50 empanadas y 20 medallones. Excelente opción para celebraciones.',
         emoji: '🎉',
+        imagen: './Imagenes/Productos/combo_2.png',
         etiqueta: 'Favorito',
         tipoEtiqueta: 'etiqueta-producto'
     },
@@ -330,6 +331,7 @@ const productos = [
         precio: 8990,
         descripcion: 'Crujientes deditos rellenos de queso mozzarella. Pack x10 unidades.',
         emoji: '🧀',
+        imagen: './Imagenes/Productos/Deditos/deditos.png',
         etiqueta: 'Clásico',
         tipoEtiqueta: 'etiqueta-producto'
     },
@@ -413,11 +415,18 @@ function renderizarProductos() {
     grilla.innerHTML = productosFiltrados.map(producto => `
         <article class="tarjeta-producto entrada-animada">
             <div class="imagen-producto">
-                ${producto.emoji}
+                ${producto.imagen ? `
+                    <img src="${producto.imagen}" 
+                         alt="${producto.nombre}" 
+                         class="producto-img"
+                         onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                    <div class="emoji-fallback" style="display: none;">${producto.emoji}</div>
+                ` : `
+                    <div class="emoji-fallback">${producto.emoji}</div>
+                `}
                 <div class="etiqueta-producto ${producto.tipoEtiqueta}">
                     ${producto.etiqueta}
                 </div>
-                
             </div>
             <div class="info-producto">
                 <h3 class="titulo-producto">${producto.nombre}</h3>
