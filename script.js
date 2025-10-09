@@ -296,7 +296,7 @@ const productos = [
         categoria: 'pasabocas',
         precio: 84000,
         descripcion: 'Incluye 100 deditos, 30 empanadas y 20 medallones. Ideal para eventos medianos.',
-        imagen: './Imagenes/Productos/combo_2.png',
+        imagen: './Imagenes/Productos/combo_3.png',
         emoji: '🍴',
         etiqueta: 'Recomendado',
         tipoEtiqueta: 'etiqueta-producto'
@@ -308,7 +308,7 @@ const productos = [
         precio: 95000,
         descripcion: 'Incluye 100 deditos, 50 empanadas y 20 medallones. Excelente opción para celebraciones.',
         emoji: '🎉',
-        imagen: './Imagenes/Productos/combo_2.png',
+        imagen: './Imagenes/Productos/combo_4.png',
         etiqueta: 'Favorito',
         tipoEtiqueta: 'etiqueta-producto'
     },
@@ -349,12 +349,129 @@ const productos = [
         id: 122,
         nombre: 'Deditos de Queso x18',
         categoria: 'deditos',
-        precio: 16900,
+        precio: 16990,
         descripcion: 'Crujientes deditos rellenos de queso mozzarella. Pack x18 unidades.',
         emoji: '🧀',
         etiqueta: 'Clásico',
         tipoEtiqueta: 'etiqueta-producto'
-    }
+    },
+    {
+        id: 123,
+        nombre: 'Deditos Mixtos x10',
+        categoria: 'deditos',
+        precio: 8990,
+        descripcion: 'Mezcla de deditos de queso y bocadillo. 5 queso y 5 bocadillo. Pack x10 unidades.',
+        emoji: '🧀',
+        imagen: './Imagenes/Productos/Deditos/deditos_mixtos.png',
+        etiqueta: 'Mixto',
+        tipoEtiqueta: 'etiqueta-producto'
+    },
+    {
+        id: 124,
+        nombre: 'Deditos Mixtos x13',
+        categoria: 'deditos',
+        precio: 11990,
+        descripcion: 'Mezcla de deditos de queso y bocadillo. 6 o 7 queso y 6 o 7 bocadillo. Pack x13 unidades.',
+        emoji: '🧀',
+        imagen: './Imagenes/Productos/Deditos/deditos_mixtos.png',
+        etiqueta: 'Mixto',
+        tipoEtiqueta: 'etiqueta-producto'
+    },
+    {
+        id: 125,
+        nombre: 'Deditos Mixtos x18',
+        categoria: 'deditos',
+        precio: 16990,
+        descripcion: 'Mezcla de deditos de queso y bocadillo. 9 queso y 9 bocadillo. Pack x18 unidades.',
+        emoji: '🧀',
+        imagen: './Imagenes/Productos/Deditos/deditos_mixtos.png',
+        etiqueta: 'Mixto',
+        tipoEtiqueta: 'etiqueta-producto'
+    },
+    {
+        id: 126,
+        nombre: 'Deditos de Combinados x10',
+        categoria: 'deditos',
+        precio: 8990,
+        descripcion: 'Mezcla de queso y bocadillo en cada dedito. Pack x10 unidades.',
+        emoji: '🧀',
+        imagen: './Imagenes/Productos/Deditos/deditos_combinados.png',
+        etiqueta: 'Combinado',
+        tipoEtiqueta: 'etiqueta-producto'
+    },
+    {
+        id: 127,
+        nombre: 'Deditos de Combinados x13',
+        categoria: 'deditos',
+        precio: 11990,
+        descripcion: 'Mezcla de queso y bocadillo en cada dedito. Pack x13 unidades.',
+        emoji: '🧀',
+        imagen: './Imagenes/Productos/Deditos/deditos_combinados.png',
+        etiqueta: 'Combinado',
+        tipoEtiqueta: 'etiqueta-producto'
+    },
+    {
+        id: 128,
+        nombre: 'Deditos de Combinados x18',
+        categoria: 'deditos',
+        precio: 16990,
+        descripcion: 'Mezcla de queso y bocadillo en cada dedito. Pack x18 unidades.',
+        emoji: '🧀',
+        imagen: './Imagenes/Productos/Deditos/deditos_combinados.png',
+        etiqueta: 'Combinado',
+        tipoEtiqueta: 'etiqueta-producto'
+    },
+    {
+        id: 129,
+        nombre: 'Deditos de Bocadillo x10',
+        categoria: 'deditos',
+        precio: 8990,
+        descripcion: 'Deditos rellenos de bocadillo. Pack x10 unidades.',
+        emoji: '🍬',
+        imagen: './Imagenes/Productos/Deditos/deditos_bocadillo.png',
+        etiqueta: 'Dulce',
+        tipoEtiqueta: 'etiqueta-producto'
+    },
+    {
+        id: 130,
+        nombre: 'Deditos de Bocadillo x13',
+        categoria: 'deditos',
+        precio: 11990,
+        descripcion: 'Deditos rellenos de bocadillo. Pack x13 unidades.',
+        emoji: '🍬',
+        imagen: './Imagenes/Productos/Deditos/deditos_bocadillo.png',
+        etiqueta: 'Dulce',
+        tipoEtiqueta: 'etiqueta-producto'
+    },
+    {
+        id: 131,
+        nombre: 'Deditos de Bocadillo x18',
+        categoria: 'deditos',
+        precio: 16990,
+        descripcion: 'Deditos rellenos de bocadillo. Pack x18 unidades.',
+        emoji: '🍬',
+        imagen: './Imagenes/Productos/Deditos/deditos_bocadillo.png',
+        etiqueta: 'Dulce',
+        tipoEtiqueta: 'etiqueta-producto'
+    },
+
+    // === MEDALLONES ===
+    {
+        id: 140,
+        nombre: 'Medallones de Carne x20',
+        categoria: 'medallones',
+        precio: 9990,
+        descripcion: 'Medallones de carne molida sazonada con especias tradicionales. Pack x20 unidades.',
+        emoji: '🍖',
+        imagen: './Imagenes/Productos/Medallones/medallones_carne.png',
+        etiqueta: 'Clásico',
+        tipoEtiqueta: 'etiqueta-producto'
+    },
+
+
+
+
+
 ];
 
 
