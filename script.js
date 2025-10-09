@@ -34,7 +34,7 @@ const productos = [
 
     // === CARNES ===
     {
-        id: 4,
+        id: 20,
         nombre: 'Carne de Res Marinada',
         categoria: 'carnes',
         precio: 35000,
@@ -44,7 +44,7 @@ const productos = [
         tipoEtiqueta: 'etiqueta-nuevo'
     },
     {
-        id: 5,
+        id: 21,
         nombre: 'Hamburguesas Artesanales',
         categoria: 'carnes',
         precio: 32000,
@@ -54,7 +54,7 @@ const productos = [
         tipoEtiqueta: 'etiqueta-producto'
     },
     {
-        id: 6,
+        id: 22,
         nombre: 'Lomo de Cerdo Marinado',
         categoria: 'carnes',
         precio: 29000,
@@ -64,9 +64,10 @@ const productos = [
         tipoEtiqueta: 'etiqueta-oferta'
     },
 
+
     // === PESCADO ===
     {
-        id: 7,
+        id: 40,
         nombre: 'Filete de Salmón Atlántico',
         categoria: 'pescado',
         precio: 42000,
@@ -76,7 +77,7 @@ const productos = [
         tipoEtiqueta: 'etiqueta-premium'
     },
     {
-        id: 8,
+        id: 41,
         nombre: 'Camarones Tigre Gigantes',
         categoria: 'pescado',
         precio: 38000,
@@ -88,7 +89,7 @@ const productos = [
 
     // === VERDURAS ===
     {
-        id: 9,
+        id: 60,
         nombre: 'Mix de Verduras Gourmet',
         categoria: 'verduras',
         precio: 15000,
@@ -98,7 +99,7 @@ const productos = [
         tipoEtiqueta: 'etiqueta-producto'
     },
     {
-        id: 10,
+        id: 61,
         nombre: 'Papas Criollas Baby',
         categoria: 'verduras',
         precio: 12000,
@@ -109,80 +110,199 @@ const productos = [
     },
 
     // === EMPANADAS ===
-    {
-        id: 11,
-        nombre: 'Empanadas de Carne',
-        categoria: 'empanadas',
-        precio: 20000,
-        descripcion: 'Empanadas rellenas de carne molida sazonada con especias tradicionales. Pack x6 unidades.',
-        emoji: '🥟',
-        etiqueta: 'Clásico',
-        tipoEtiqueta: 'etiqueta-producto'
-    },
-    {
-        id: 12,
-        nombre: 'Empanadas de Pollo',
-        categoria: 'empanadas',
-        precio: 20000,
-        descripcion: 'Empanadas rellenas de pollo desmechado con un toque de especias. Pack x6 unidades.',
-        emoji: '🥟',
-        etiqueta: 'Clásico',
-        tipoEtiqueta: 'etiqueta-producto'
-    },
-    {
-        id: 13,
-        nombre: 'Empanadas de Queso',
-        categoria: 'empanadas',
-        precio: 20000,
-        descripcion: 'Empanadas rellenas de mezcla de quesos fundidos. Pack x6 unidades.',
-        emoji: '🥟',
-        etiqueta: 'Clásico',
-        tipoEtiqueta: 'etiqueta-producto'
-    },
-    {
-        id: 14,
-        nombre: 'Empanadas de Jamón con Queso',
-        categoria: 'empanadas',
-        precio: 8990,
-        descripcion: 'Empanadas rellenas de jamón y queso fundido. Pack x7 Unidades.',
-        emoji: '🥟',
-        etiqueta: 'Delicioso',
-        tipoEtiqueta: 'etiqueta-producto'
-    },
+
+{
+    id: 80,
+    nombre: 'Empanadas de Carne x7',
+    categoria: 'empanadas',
+    precio: 8990,
+    descripcion: 'Empanadas rellenas de carne molida sazonada con especias tradicionales. Pack x7 unidades.',
+    emoji: '🥟',
+    etiqueta: 'Clásico',
+    tipoEtiqueta: 'etiqueta-producto'
+},
+{
+    id: 81,
+    nombre: 'Empanadas de Carne x10',
+    categoria: 'empanadas',
+    precio: 11990,
+    descripcion: 'Empanadas rellenas de carne, pollo y queso. Pack x10 unidades.',
+    emoji: '🥟',
+    etiqueta: 'Mixtas',
+    tipoEtiqueta: 'etiqueta-producto'
+},
+{
+    id: 82,
+    nombre: 'Empanadas de Carne x12',
+    categoria: 'empanadas',
+    precio: 14990,
+    descripcion: 'Empanadas rellenas de verduras frescas y queso. Pack x12 unidades.',
+    emoji: '🥟',
+    etiqueta: 'Vegetariano',
+    tipoEtiqueta: 'etiqueta-producto'
+},
+
+{
+    id: 83,
+    nombre: 'Empanadas de Pollo x7',
+    categoria: 'empanadas',
+    precio: 8990,
+    descripcion: 'Empanadas rellenas de pollo desmechado con un toque de especias. Pack x7 unidades.',
+    emoji: '🥟',
+    etiqueta: 'Clásico',
+    tipoEtiqueta: 'etiqueta-producto'
+},
+{
+    id: 84,
+    nombre: 'Empanadas de Pollo x10', 
+    categoria: 'empanadas',
+    precio: 11990,
+    descripcion: 'Empanadas rellenas de pollo desmechado con un toque de especias. Pack x10 unidades.',
+    emoji: '🥟',
+    etiqueta: 'Clásico',
+    tipoEtiqueta: 'etiqueta-producto'
+},
+{
+    id: 85,
+    nombre: 'Empanadas de Pollo x15', 
+    categoria: 'empanadas',
+    precio: 14990,
+    descripcion: 'Empanadas rellenas de pollo desmechado con un toque de especias. Pack x15 unidades.',
+    emoji: '🥟',
+    etiqueta: 'Clásico',
+    tipoEtiqueta: 'etiqueta-producto'
+},
+
+{
+    id: 86,
+    nombre: 'Empanadas de Queso x7',
+    categoria: 'empanadas',
+    precio: 8990,
+    descripcion: 'Empanadas rellenas de mezcla de quesos fundidos. Pack x7 unidades.',
+    emoji: '🥟',
+    etiqueta: 'Clásico',
+    tipoEtiqueta: 'etiqueta-producto'
+},
+{
+    id: 87,
+    nombre: 'Empanadas de Queso x10',
+    categoria: 'empanadas',
+    precio: 11990,
+    descripcion: 'Empanadas rellenas de mezcla de quesos fundidos. Pack x10 unidades.',
+    emoji: '🥟',
+    etiqueta: 'Clásico',
+    tipoEtiqueta: 'etiqueta-producto'
+},
+{
+    id: 88,
+    nombre: 'Empanadas de Queso x10',
+    categoria: 'empanadas',
+    precio: 14990,
+    descripcion: 'Empanadas rellenas de mezcla de quesos fundidos. Pack x15 unidades.',
+    emoji: '🥟',
+    etiqueta: 'Clásico',
+    tipoEtiqueta: 'etiqueta-producto'
+},
+
+{
+    id: 89,
+    nombre: 'Empanadas de Jamón con Queso x7',
+    categoria: 'empanadas',
+    precio: 8990,
+    descripcion: 'Empanadas rellenas de jamón y queso fundido. Pack x7 Unidades.',
+    emoji: '🥟',
+    etiqueta: 'Delicioso',
+    tipoEtiqueta: 'etiqueta-producto'
+},
+{
+    id: 90,
+    nombre: 'Empanadas de Jamón con Queso x10',
+    categoria: 'empanadas',
+    precio: 11990,
+    descripcion: 'Empanadas rellenas de jamón y queso fundido. Pack x10 Unidades.',
+    emoji: '🥟',
+    etiqueta: 'Delicioso',
+    tipoEtiqueta: 'etiqueta-producto'
+},
+{
+    id: 91,
+    nombre: 'Empanadas de Jamón con Queso x15',
+    categoria: 'empanadas',
+    precio: 14990,
+    descripcion: 'Empanadas rellenas de jamón y queso fundido. Pack x15 Unidades.',
+    emoji: '🥟',
+    etiqueta: 'Delicioso',
+    tipoEtiqueta: 'etiqueta-producto'
+},
+
+{
+    id: 92,
+    nombre: 'Empanadas Hawaianas x7',
+    categoria: 'empanadas',
+    precio: 8990,
+    descripcion: 'Empanadas rellenas de jamón, piña y queso fundido. Pack x7 Unidades.',
+    emoji: '🥟',   
+    etiqueta: 'Exótico',
+    tipoEtiqueta: 'etiqueta-producto'
+},
+{
+    id: 93,
+    nombre: 'Empanadas Hawaianas x10',
+    categoria: 'empanadas',
+    precio: 11990,
+    descripcion: 'Empanadas rellenas de jamón, piña y queso fundido. Pack x10 Unidades.',
+    emoji: '🥟',
+    etiqueta: 'Exótico',
+    tipoEtiqueta: 'etiqueta-producto'
+},
+{
+    id: 94,
+    nombre: 'Empanadas Hawaianas x15',
+    categoria: 'empanadas',
+    precio: 14990,
+    descripcion: 'Empanadas rellenas de jamón, piña y queso fundido. Pack x15 Unidades.',
+    emoji: '🥟',
+    etiqueta: 'Exótico',
+    tipoEtiqueta: 'etiqueta-producto'
+},
+
 
     // === PASABOCAS ===
     {
-        id: 15,
+        id: 100,
         nombre: 'Combo_01: 50 unidades',
         categoria: 'pasabocas',
         precio: 28000,
         descripcion: 'Incluye 25 deditos y 25 empanadas. Ideal para reuniones pequeñas.',
+        imagen: './Imagenes/Productos/combo_1.png',
         emoji: '🥟',
         etiqueta: 'Económico',
         tipoEtiqueta: 'etiqueta-producto'
     },
     {
-        id: 16,
+        id: 101,
         nombre: 'Combo_02: 100 unidades',
         categoria: 'pasabocas',
         precio: 56000,
         descripcion: 'Incluye 50 deditos, 30 empanadas y 20 medallones. Perfecto para compartir.',
+        imagen: './Imagenes/Productos/combo_2.png',
         emoji: '🍢',
         etiqueta: 'Popular',
         tipoEtiqueta: 'etiqueta-producto'
     },
     {
-        id: 17,
+        id: 102,
         nombre: 'Combo_03: 150 unidades',
         categoria: 'pasabocas',
         precio: 84000,
         descripcion: 'Incluye 100 deditos, 30 empanadas y 20 medallones. Ideal para eventos medianos.',
+        imagen: './Imagenes/Productos/combo_2.png',
         emoji: '🍴',
         etiqueta: 'Recomendado',
         tipoEtiqueta: 'etiqueta-producto'
     },
     {
-        id: 18,
+        id: 103,
         nombre: 'Combo_04: 170 unidades',
         categoria: 'pasabocas',
         precio: 95000,
@@ -192,7 +312,7 @@ const productos = [
         tipoEtiqueta: 'etiqueta-producto'
     },
     {
-        id: 19,
+        id: 104,
         nombre: 'Combo_05: 200 unidades',
         categoria: 'pasabocas',
         precio: 112000,
@@ -204,8 +324,8 @@ const productos = [
 
     // === DEDITOS ===
     {
-        id: 20,
-        nombre: 'Deditos de Queso (x10)',
+        id: 120,
+        nombre: 'Deditos de Queso x10',
         categoria: 'deditos',
         precio: 8990,
         descripcion: 'Crujientes deditos rellenos de queso mozzarella. Pack x10 unidades.',
@@ -214,8 +334,8 @@ const productos = [
         tipoEtiqueta: 'etiqueta-producto'
     },
     {
-        id: 21,
-        nombre: 'Deditos de Queso (x13)',
+        id: 121,
+        nombre: 'Deditos de Queso x13',
         categoria: 'deditos',
         precio: 12990,
         descripcion: 'Crujientes deditos rellenos de queso mozzarella. Pack x13 unidades.',
@@ -224,8 +344,8 @@ const productos = [
         tipoEtiqueta: 'etiqueta-producto'
     },
     {
-        id: 22,
-        nombre: 'Deditos de Queso (x18)',
+        id: 122,
+        nombre: 'Deditos de Queso x18',
         categoria: 'deditos',
         precio: 16900,
         descripcion: 'Crujientes deditos rellenos de queso mozzarella. Pack x18 unidades.',
@@ -297,6 +417,7 @@ function renderizarProductos() {
                 <div class="etiqueta-producto ${producto.tipoEtiqueta}">
                     ${producto.etiqueta}
                 </div>
+                
             </div>
             <div class="info-producto">
                 <h3 class="titulo-producto">${producto.nombre}</h3>
@@ -398,20 +519,28 @@ function actualizarCarrito() {
 
     // lista de productos
     itemsCarrito.innerHTML = carritoCompras.map(item => `
-        <div class="item-carrito">
-            <div class="imagen-item-carrito">${item.emoji}</div>
-            <div class="info-item-carrito">
-                <div class="titulo-item-carrito">${item.nombre}</div>
-                <div class="precio-item-carrito">$${(item.precio * item.cantidad).toLocaleString("es-CO")}</div>
-                <div class="controles-cantidad">
-                    <button class="btn-cantidad" onclick="cambiarCantidad('${item.id}', ${item.cantidad - 1})">−</button>
-                    <span class="cantidad-texto">${item.cantidad}</span>
-                    <button class="btn-cantidad" onclick="cambiarCantidad('${item.id}', ${item.cantidad + 1})">+</button>
-                    <button class="btn-cantidad btn-eliminar" onclick="removerDelCarrito('${item.id}')">🗑️</button>
-                </div>
-            </div>
-        </div>
-    `).join("");
+  <div class="item-carrito">
+    <div class="imagen-item-carrito">
+      <img src="${item.imagen ? item.imagen : ''}" 
+           alt="${item.nombre}" 
+           class="carrito-img"
+           onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+      <div class="emoji-fallback-carrito" style="display: ${item.imagen ? 'none' : 'flex'};">${item.emoji}</div>
+    </div>
+    <div class="info-item-carrito">
+      <div class="titulo-item-carrito">${item.nombre}</div>
+      <div class="precio-item-carrito">$${(item.precio * item.cantidad).toLocaleString("es-CO")}</div>
+      <div class="controles-cantidad">
+        <button class="btn-cantidad" onclick="cambiarCantidad('${item.id}', ${item.cantidad - 1})">−</button>
+        <span class="cantidad-texto">${item.cantidad}</span>
+        <button class="btn-cantidad" onclick="cambiarCantidad('${item.id}', ${item.cantidad + 1})">+</button>
+        <button class="btn-cantidad btn-eliminar" onclick="removerDelCarrito('${item.id}')">🗑️</button>
+      </div>
+    </div>
+  </div>
+`).join("");
+
+
 
     // total
     const total = carritoCompras.reduce((suma, item) => suma + item.precio * item.cantidad, 0);
@@ -1047,57 +1176,10 @@ window.AlimentoDelCielo = {
     analytics: enviarEventoAnalytics
 };
 
-// === MANIFEST.JSON DINÁMICO ===
-function crearManifestoDinamico() {
-    const manifestJson = {
-        "name": "Alimento del Cielo - Catálogo Digital",
-        "short_name": "Alimento del Cielo",
-        "description": "Catálogo digital de alimentos congelados premium",
-        "start_url": "/",
-        "display": "standalone",
-        "background_color": "#f8fafc",
-        "theme_color": "#2563eb",
-        "orientation": "portrait-primary",
-        "categories": ["food", "shopping", "business"],
-        "screenshots": [
-            {
-                "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 393 852'><rect width='393' height='852' fill='%23f8fafc'/><text x='196' y='100' font-size='24' text-anchor='middle' fill='%232563eb'>Alimento del Cielo</text><rect x='20' y='150' width='353' height='200' fill='%232563eb' rx='10'/><text x='196' y='260' font-size='18' text-anchor='middle' fill='white'>Catálogo de Productos</text></svg>",
-                "sizes": "393x852",
-                "type": "image/svg+xml",
-                "form_factor": "narrow"
-            }
-        ],
-        "icons": [
-            {
-                "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect width='192' height='192' fill='%232563eb' rx='20'/><text x='96' y='120' font-size='80' text-anchor='middle' fill='white'>🍽️</text></svg>",
-                "sizes": "192x192",
-                "type": "image/svg+xml",
-                "purpose": "any maskable"
-            },
-            {
-                "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><rect width='512' height='512' fill='%232563eb' rx='50'/><text x='256' y='320' font-size='200' text-anchor='middle' fill='white'>🍽️</text></svg>",
-                "sizes": "512x512",
-                "type": "image/svg+xml",
-                "purpose": "any maskable"
-            }
-        ]
-    };
 
-    // Crear y configurar el archivo manifest dinámicamente
-    const manifestBlob = new Blob([JSON.stringify(manifestJson, null, 2)], {type: 'application/json'});
-    const manifestURL = URL.createObjectURL(manifestBlob);
-    
-    const linkManifest = document.querySelector('link[rel="manifest"]');
-    if (linkManifest) {
-        linkManifest.href = manifestURL;
-    }
-}
 
 // === INICIALIZACIÓN FINAL ===
 document.addEventListener('DOMContentLoaded', function() {
-    // Crear manifest dinámico
-    crearManifestoDinamico();
-    
     // Optimizar imágenes
     optimizarImagenes();
     

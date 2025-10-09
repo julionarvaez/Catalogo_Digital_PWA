@@ -4,7 +4,6 @@
   "description": "Catálogo digital de alimentos congelados premium. Productos frescos, listos para preparar y disfrutar en familia.",
   "start_url": "index.html",
   "display": "standalone",
-  "display_override": ["standalone", "browser"],
   "background_color": "#f8fafc",
   "theme_color": "#2563eb",
   "orientation": "portrait-primary",
@@ -14,95 +13,70 @@
   "scope": "/",
   "icons": [
     {
-      "src": "/Imagenes/logo/Logo.png",
-      "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "any maskable"
-    },
-    {
-      "src": "/Imagenes/logo/Logo.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "any maskable"
-    },
-    {
-      "src": "/Imagenes/logo/Logo.png",
+      "src": "./Imagenes/logo/logo 72x72.png",
       "sizes": "72x72",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/Imagenes/logo/Logo.png",
+      "src": "./Imagenes/logo/Logo 96x96.png",
       "sizes": "96x96",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/Imagenes/logo/Logo.png",
+      "src": "./Imagenes/logo/logo 128x128.png",
       "sizes": "128x128",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/Imagenes/logo/Logo.png",
-      "sizes": "256x256",
+      "src": "./Imagenes/logo/logo 144x144.png",
+      "sizes": "144x144",
       "type": "image/png",
       "purpose": "any"
-    }
-  ],
-
-  "screenshots": [
-    {
-      "src": "/imagenes/screenshots/Screenshot_1.png",
-      "sizes": "393x852",
-      "type": "image/png",
-      "label": "Catálogo de productos"
     },
     {
-      "src": "/imagenes/screenshots/Screenshot_22.png",
-      "sizes": "393x852",
+      "src": "./Imagenes/logo/logo 152x152.png",
+      "sizes": "152x152",
       "type": "image/png",
-      "label": "Carrito de compras"
+      "purpose": "any"
+    },
+    {
+      "src": "./Imagenes/logo/logo 192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "./Imagenes/logo/logo 512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
     }
   ],
- "shortcuts": [
+  "screenshots": [
+    {
+      "src": "./imagenes/screenshots/Screenshot_1.png",
+      "sizes": "393x852",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Catálogo de productos"
+    }
+  ],
+  "shortcuts": [
     {
       "name": "Ver Catálogo",
       "short_name": "Catálogo",
       "description": "Ver todos los productos disponibles",
-      "url": "/index.html#catalogo",
+      "url": "/#catalogo",
       "icons": [
         {
-          "src": "/Imagenes/iconos/catalogo.png",
-          "sizes": "96x96",
-          "type": "image/png"
-        }
-      ]
-    },
-    {
-      "name": "Combos Especiales",
-      "short_name": "Combos",
-      "description": "Ver nuestros combos especiales",
-      "url": "/index.html#combos",
-      "icons": [
-        {
-          "src": "/Imagenes/iconos/combos.png",
+          "src": "./Imagenes/logo/Logo.png",
           "sizes": "96x96",
           "type": "image/png"
         }
       ]
     }
-  ],
-  
-  "related_applications": [],
-  "prefer_related_applications": false,
-  "protocol_handlers": [
-    {
-      "protocol": "web+alimentodelcielo",
-      "url": "/?action=%s"
-    }
-  ],
-  "edge_side_panel": {
-    "preferred_width": 400
-  }
+  ]
 }

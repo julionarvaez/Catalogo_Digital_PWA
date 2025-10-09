@@ -289,7 +289,7 @@ body.modo-oscuro .tarjeta-producto {
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 3rem;
+    
 }
 
 .etiqueta-producto {
@@ -451,7 +451,9 @@ body.modo-oscuro .item-carrito {
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.5rem;
+    overflow: hidden;
+    flex-shrink: 0;
+    
 }
 
 .info-item-carrito {
@@ -1081,4 +1083,85 @@ body.modo-oscuro .cerrar-modal:hover {
 
 
 
+}
+
+/* ========================================
+   ESTILOS PARA IMÁGENES DE PRODUCTOS
+   ======================================== */
+
+/* Imagen del producto en tarjetas */
+.producto-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    transition: transform 0.3s ease;
+}
+
+/* Efecto hover zoom en imagen */
+.tarjeta-producto:hover .producto-img {
+    transform: scale(1.05);
+}
+
+/* Emoji de respaldo (fallback) cuando imagen no carga */
+.emoji-fallback {
+    font-size: 3rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+}
+
+/* Imagen en el carrito lateral */
+.carrito-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    border-radius: 0.5rem;
+}
+
+/* Emoji fallback en carrito */
+.emoji-fallback-carrito {
+    font-size: 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+}
+
+/* Optimización de rendimiento (GPU acceleration) */
+.producto-img,
+.carrito-img {
+    will-change: transform;
+    transform: translateZ(0);
+}
+
+/* ========================================
+   RESPONSIVE - IMÁGENES
+   ======================================== */
+
+/* Tablets */
+@media (max-width: 768px) {
+    .producto-img {
+        object-fit: contain;
+        padding: 0.5rem;
+    }
+    
+    .emoji-fallback {
+        font-size: 2.5rem;
+    }
+}
+
+/* Móviles */
+@media (max-width: 480px) {
+    .emoji-fallback {
+        font-size: 2rem;
+    }
+    
+    .emoji-fallback-carrito {
+        font-size: 1.2rem;
+    }
 }

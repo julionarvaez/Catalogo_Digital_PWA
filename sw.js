@@ -9,9 +9,23 @@ const urlsToCache = [
     '/script.js',
     '/manifest.json',
     '/Imagenes/logo/Logo.png',
-    
-    
-    
+    // Imágenes de productos
+    '/Imagenes/productos/pollo-apanado.png',
+    '/Imagenes/productos/alitas-bbq.png',
+    '/Imagenes/productos/pavo-ahumado.png',
+    '/Imagenes/productos/carne-marinada.png',
+    '/Imagenes/productos/hamburguesas.png',
+    '/Imagenes/productos/lomo-cerdo.png',
+    '/Imagenes/productos/salmon.png',
+    '/Imagenes/productos/camarones.png',
+    '/Imagenes/productos/mix-verduras.png',
+    '/Imagenes/productos/papas-criollas.png',
+    '/Imagenes/productos/empanada-carne.png',
+    '/Imagenes/productos/empanada-pollo.png',
+    '/Imagenes/productos/empanada-queso.png',
+    '/Imagenes/productos/empanada-jamon-queso.png',
+    '/Imagenes/Productos/combo_1.png',
+    '/Imagenes/productos/deditos-queso.png'
 ];
 
 // === INSTALACIÓN DEL SERVICE WORKER ===
