@@ -322,6 +322,61 @@ const productos = [
         etiqueta: 'Premium',
         tipoEtiqueta: 'etiqueta-producto'
     },
+    // === PASABOCAS FRITOS===
+    {
+        id: 105,
+        nombre: 'Combo_01: 50 unidades',
+        categoria: 'pasabocas',
+        precio: 28000,
+        descripcion: 'Combo de 25 deditos y 25 empanadas fritas, servidos calientes en el lugar. Ideal para reuniones pequeñas o familiares.',
+        imagen: './Imagenes/Productos/combo_1.png',
+        emoji: '🥟',
+        etiqueta: 'Económico',
+        tipoEtiqueta: 'etiqueta-producto'
+    },
+    {
+        id: 106,
+        nombre: 'Combo_02: 100 unidades',
+        categoria: 'pasabocas',
+        precio: 56000,
+        descripcion: 'Incluye 50 deditos, 30 empanadas y 20 medallones. Perfecto para compartir.',
+        imagen: './Imagenes/Productos/combo_2.png',
+        emoji: '🍢',
+        etiqueta: 'Popular',
+        tipoEtiqueta: 'etiqueta-producto'
+    },
+    {
+        id: 107,
+        nombre: 'Combo_03: 150 unidades',
+        categoria: 'pasabocas',
+        precio: 84000,
+        descripcion: 'Incluye 100 deditos, 30 empanadas y 20 medallones. Ideal para eventos medianos.',
+        imagen: './Imagenes/Productos/combo_3.png',
+        emoji: '🍴',
+        etiqueta: 'Recomendado',
+        tipoEtiqueta: 'etiqueta-producto'
+    },
+    {
+        id: 108,
+        nombre: 'Combo_04: 170 unidades',
+        categoria: 'pasabocas',
+        precio: 95000,
+        descripcion: 'Incluye 100 deditos, 50 empanadas y 20 medallones. Excelente opción para celebraciones.',
+        emoji: '🎉',
+        imagen: './Imagenes/Productos/combo_4.png',
+        etiqueta: 'Favorito',
+        tipoEtiqueta: 'etiqueta-producto'
+    },
+    {
+        id: 109,
+        nombre: 'Combo_05: 200 unidades',
+        categoria: 'pasabocas',
+        precio: 112000,
+        descripcion: 'Incluye 100 deditos, 50 empanadas y 50 medallones. Ideal para eventos grandes.',
+        emoji: '🥳',
+        etiqueta: 'Premium',
+        tipoEtiqueta: 'etiqueta-producto'
+    },
 
     // === DEDITOS ===
     {
@@ -534,9 +589,9 @@ function renderizarProductos() {
             <div class="imagen-producto">
                 ${producto.imagen ? `
                     <img src="${producto.imagen}" 
-                         alt="${producto.nombre}" 
-                         class="producto-img"
-                         onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                        alt="${producto.nombre}" 
+                        class="producto-img"
+                        onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
                     <div class="emoji-fallback" style="display: none;">${producto.emoji}</div>
                 ` : `
                     <div class="emoji-fallback">${producto.emoji}</div>
@@ -556,8 +611,8 @@ function renderizarProductos() {
                         🛒 Agregar
                     </button>
                     <a href="${generarEnlaceWhatsApp(producto)}" 
-                       class="boton boton-whatsapp" 
-                       target="_blank">
+                    class="boton boton-whatsapp" 
+                    target="_blank">
                         💬 WhatsApp
                     </a>
                 </div>
@@ -645,25 +700,25 @@ function actualizarCarrito() {
 
     // lista de productos
     itemsCarrito.innerHTML = carritoCompras.map(item => `
-  <div class="item-carrito">
+<div class="item-carrito">
     <div class="imagen-item-carrito">
-      <img src="${item.imagen ? item.imagen : ''}" 
-           alt="${item.nombre}" 
-           class="carrito-img"
-           onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-      <div class="emoji-fallback-carrito" style="display: ${item.imagen ? 'none' : 'flex'};">${item.emoji}</div>
+    <img src="${item.imagen ? item.imagen : ''}" 
+        alt="${item.nombre}" 
+        class="carrito-img"
+        onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+    <div class="emoji-fallback-carrito" style="display: ${item.imagen ? 'none' : 'flex'};">${item.emoji}</div>
     </div>
     <div class="info-item-carrito">
-      <div class="titulo-item-carrito">${item.nombre}</div>
+    <div class="titulo-item-carrito">${item.nombre}</div>
       <div class="precio-item-carrito">$${(item.precio * item.cantidad).toLocaleString("es-CO")}</div>
-      <div class="controles-cantidad">
+    <div class="controles-cantidad">
         <button class="btn-cantidad" onclick="cambiarCantidad('${item.id}', ${item.cantidad - 1})">−</button>
         <span class="cantidad-texto">${item.cantidad}</span>
         <button class="btn-cantidad" onclick="cambiarCantidad('${item.id}', ${item.cantidad + 1})">+</button>
         <button class="btn-cantidad btn-eliminar" onclick="removerDelCarrito('${item.id}')">🗑️</button>
-      </div>
     </div>
-  </div>
+    </div>
+</div>
 `).join("");
 
 
