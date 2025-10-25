@@ -1379,3 +1379,419 @@ document.addEventListener('DOMContentLoaded', function() {
     console.log('  📊 Analytics básicas');
     console.log('Usa window.AlimentoDelCielo para acceder a la API');
 });
+
+
+
+// ========================================
+// INTEGRACIÓN DE WOMPI - FRONTEND
+// Agregar al final de script.js
+// ========================================
+
+// === CONFIGURACIÓN WOMPI ===
+const WOMPI_CONFIG = {
+    // ⚠️ CAMBIAR POR TU LLAVE PÚBLICA
+    publicKey: 'pub_test_QhUoFSL5mYyzHcfweWwfHT4JNI3jHujU', // Ejemplo de llave de prueba
+    apiUrl: 'https://production.wompi.co/v1',
+    // URL de tu backend serverless (Netlify Functions)
+    backendUrl: '/.netlify/functions', // O tu URL de producción
+    moneda: 'COP'
+};
+
+// === PROCESAR PAGO CON WOMPI ===
+async function procesarPago() {
+    if (carritoCompras.length === 0) {
+        mostrarNotificacion('⚠️ Tu carrito está vacío', 'error');
+        return;
+    }
+
+    // Calcular total
+    const total = carritoCompras.reduce((suma, item) => 
+        suma + (item.precio * item.cantidad), 0
+    );
+
+    // Mostrar modal de pago
+    mostrarModalDatosPago(total);
+}
+
+// === MODAL PARA DATOS DEL CLIENTE ===
+function mostrarModalDatosPago(total) {
+    const modal = document.createElement('div');
+    modal.className = 'modal-instalacion';
+    modal.id = 'modalPagoWompi';
+    modal.innerHTML = `
+        <div class="contenido-modal-instalacion" style="max-width: 500px;">
+            <button class="cerrar-modal" onclick="cerrarModalPago()">✕</button>
+            <h3>💳 Finalizar Compra</h3>
+            <p style="margin-bottom: 1rem;">Total a pagar: <strong style="color: var(--color-primario); font-size: 1.5rem;">$${total.toLocaleString('es-CO')}</strong></p>
+            
+            <form id="formDatosPago" style="display: flex; flex-direction: column; gap: 1rem;">
+                <div>
+                    <label style="display: block; margin-bottom: 0.5rem; font-weight: 500;">
+                        📧 Correo Electrónico *
+                    </label>
+                    <input 
+                        type="email" 
+                        id="emailPago" 
+                        class="caja-busqueda" 
+                        placeholder="tu@email.com"
+                        required
+                        style="margin: 0;"
+                    >
+                </div>
+                
+                <div>
+                    <label style="display: block; margin-bottom: 0.5rem; font-weight: 500;">
+                        👤 Nombre Completo *
+                    </label>
+                    <input 
+                        type="text" 
+                        id="nombrePago" 
+                        class="caja-busqueda" 
+                        placeholder="Juan Pérez"
+                        required
+                        style="margin: 0;"
+                    >
+                </div>
+                
+                <div>
+                    <label style="display: block; margin-bottom: 0.5rem; font-weight: 500;">
+                        📱 Teléfono *
+                    </label>
+                    <input 
+                        type="tel" 
+                        id="telefonoPago" 
+                        class="caja-busqueda" 
+                        placeholder="3001234567"
+                        required
+                        pattern="[0-9]{10}"
+                        style="margin: 0;"
+                    >
+                </div>
+                
+                <div>
+                    <label style="display: block; margin-bottom: 0.5rem; font-weight: 500;">
+                        📍 Dirección de Entrega
+                    </label>
+                    <textarea 
+                        id="direccionPago" 
+                        class="caja-busqueda" 
+                        placeholder="Calle 123 #45-67, Barrio, Ciudad"
+                        rows="2"
+                        style="margin: 0; resize: vertical;"
+                    ></textarea>
+                </div>
+                
+                <button 
+                    type="submit" 
+                    class="boton boton-primario" 
+                    style="width: 100%; margin-top: 1rem;"
+                >
+                    💳 Pagar con Wompi
+                </button>
+                
+                <button 
+                    type="button" 
+                    class="boton boton-whatsapp" 
+                    onclick="cerrarModalPago()"
+                    style="width: 100%;"
+                >
+                    ❌ Cancelar
+                </button>
+            </form>
+            
+            <div style="margin-top: 1rem; padding: 1rem; background: rgba(37, 99, 235, 0.1); border-radius: 0.5rem; font-size: 0.85rem;">
+                <p style="margin: 0;"><strong>🔒 Pago seguro con Wompi</strong></p>
+                <p style="margin: 0.5rem 0 0 0;">Acepta tarjetas débito/crédito, PSE, Nequi y más</p>
+            </div>
+        </div>
+    `;
+    
+    document.body.appendChild(modal);
+    
+    // Agregar evento al formulario
+    document.getElementById('formDatosPago').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        await iniciarPagoWompi(total);
+    });
+}
+
+function cerrarModalPago() {
+    const modal = document.getElementById('modalPagoWompi');
+    if (modal) {
+        modal.remove();
+    }
+}
+
+// === INICIAR PROCESO DE PAGO CON WOMPI ===
+async function iniciarPagoWompi(total) {
+    const email = document.getElementById('emailPago').value.trim();
+    const nombre = document.getElementById('nombrePago').value.trim();
+    const telefono = document.getElementById('telefonoPago').value.trim();
+    const direccion = document.getElementById('direccionPago').value.trim();
+
+    // Validar datos
+    if (!email || !validarEmail(email)) {
+        mostrarNotificacion('⚠️ Por favor ingresa un email válido', 'error');
+        return;
+    }
+
+    if (!nombre || nombre.length < 3) {
+        mostrarNotificacion('⚠️ Por favor ingresa tu nombre completo', 'error');
+        return;
+    }
+
+    if (!telefono || !validarTelefono(telefono)) {
+        mostrarNotificacion('⚠️ Por favor ingresa un teléfono válido (10 dígitos)', 'error');
+        return;
+    }
+
+    // Deshabilitar botón y mostrar loader
+    const botonPagar = document.querySelector('#formDatosPago button[type="submit"]');
+    const textoOriginal = botonPagar.innerHTML;
+    botonPagar.disabled = true;
+    botonPagar.innerHTML = '⏳ Procesando...';
+
+    try {
+        // Generar referencia única
+        const referencia = `ADC-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+
+        // Preparar datos del pedido
+        const datosPedido = {
+            monto: total,
+            moneda: WOMPI_CONFIG.moneda,
+            referencia: referencia,
+            email: email,
+            nombre: nombre,
+            telefono: telefono,
+            direccion: direccion,
+            productos: carritoCompras.map(item => ({
+                nombre: item.nombre,
+                cantidad: item.cantidad,
+                precio: item.precio
+            }))
+        };
+
+        // Llamar al backend serverless
+        const response = await fetch(`${WOMPI_CONFIG.backendUrl}/crear-transaccion-wompi`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(datosPedido)
+        });
+
+        const resultado = await response.json();
+
+        if (!response.ok || !resultado.exito) {
+            throw new Error(resultado.error || 'Error al crear transacción');
+        }
+
+        // Guardar información del pedido
+        guardarInfoPedido(referencia, datosPedido, resultado.transaccion);
+
+        // Cerrar modal
+        cerrarModalPago();
+
+        // Redirigir a Wompi Checkout
+        if (resultado.checkout_url) {
+            mostrarNotificacion('✅ Redirigiendo a la pasarela de pago...');
+            
+            // Redirigir después de 1 segundo
+            setTimeout(() => {
+                window.location.href = resultado.checkout_url;
+            }, 1000);
+        } else {
+            throw new Error('No se recibió URL de checkout');
+        }
+
+    } catch (error) {
+        console.error('Error al procesar pago:', error);
+        mostrarNotificacion(
+            `❌ Error: ${error.message}. Intenta nuevamente o usa WhatsApp`, 
+            'error'
+        );
+        
+        // Restaurar botón
+        botonPagar.disabled = false;
+        botonPagar.innerHTML = textoOriginal;
+    }
+}
+
+// === GUARDAR INFORMACIÓN DEL PEDIDO ===
+function guardarInfoPedido(referencia, datosPedido, transaccion) {
+    try {
+        const pedido = {
+            referencia: referencia,
+            fecha: new Date().toISOString(),
+            estado: 'pendiente',
+            datos: datosPedido,
+            transaccion: transaccion,
+            carrito: [...carritoCompras]
+        };
+
+        // Guardar en localStorage
+        const pedidosGuardados = JSON.parse(localStorage.getItem('pedidosWompi') || '[]');
+        pedidosGuardados.push(pedido);
+        
+        // Mantener solo los últimos 20 pedidos
+        if (pedidosGuardados.length > 20) {
+            pedidosGuardados.splice(0, pedidosGuardados.length - 20);
+        }
+        
+        localStorage.setItem('pedidosWompi', JSON.stringify(pedidosGuardados));
+        localStorage.setItem('ultimoPedido', JSON.stringify(pedido));
+
+        console.log('✅ Pedido guardado:', referencia);
+    } catch (error) {
+        console.error('Error al guardar pedido:', error);
+    }
+}
+
+// === VERIFICAR ESTADO DE PAGO ===
+async function verificarEstadoPago(transaccionId) {
+    try {
+        const response = await fetch(
+            `${WOMPI_CONFIG.backendUrl}/verificar-pago-wompi?id=${transaccionId}`
+        );
+        
+        const resultado = await response.json();
+        return resultado;
+    } catch (error) {
+        console.error('Error al verificar pago:', error);
+        return null;
+    }
+}
+
+// === PÁGINA DE CONFIRMACIÓN ===
+// Agregar esta función para manejar la confirmación después del pago
+function manejarConfirmacionPago() {
+    // Obtener parámetros de la URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const transaccionId = urlParams.get('id');
+    
+    if (transaccionId) {
+        verificarYMostrarEstadoPago(transaccionId);
+    }
+}
+
+async function verificarYMostrarEstadoPago(transaccionId) {
+    mostrarNotificacion('⏳ Verificando pago...');
+    
+    try {
+        const estado = await verificarEstadoPago(transaccionId);
+        
+        if (estado && estado.data) {
+            const status = estado.data.status;
+            
+            if (status === 'APPROVED') {
+                mostrarNotificacion('✅ ¡Pago aprobado! Gracias por tu compra');
+                limpiarCarrito();
+                
+                // Mostrar modal de éxito
+                mostrarModalExitoPago(estado.data);
+            } else if (status === 'DECLINED') {
+                mostrarNotificacion('❌ Pago rechazado. Intenta con otro método', 'error');
+            } else if (status === 'PENDING') {
+                mostrarNotificacion('⏳ Pago pendiente. Te notificaremos cuando se confirme', 'exito');
+            } else {
+                mostrarNotificacion(`ℹ️ Estado del pago: ${status}`, 'exito');
+            }
+        }
+    } catch (error) {
+        console.error('Error al verificar estado:', error);
+        mostrarNotificacion('⚠️ No se pudo verificar el estado del pago', 'error');
+    }
+}
+
+function mostrarModalExitoPago(datos) {
+    const modal = document.createElement('div');
+    modal.className = 'modal-instalacion';
+    modal.innerHTML = `
+        <div class="contenido-modal-instalacion">
+            <h3 style="color: var(--color-exito);">✅ ¡Pago Exitoso!</h3>
+            <p style="font-size: 1.1rem; margin: 1rem 0;">
+                Tu pedido ha sido confirmado
+            </p>
+            <div style="background: var(--fondo-claro); padding: 1rem; border-radius: 0.5rem; margin: 1rem 0;">
+                <p><strong>Referencia:</strong> ${datos.reference}</p>
+                <p><strong>Monto:</strong> $${(datos.amount_in_cents / 100).toLocaleString('es-CO')}</p>
+                <p><strong>Estado:</strong> Aprobado ✅</p>
+            </div>
+            <p style="margin: 1rem 0;">
+                Recibirás un correo de confirmación con los detalles de tu pedido.
+                Nos pondremos en contacto contigo pronto para coordinar la entrega.
+            </p>
+            <button 
+                class="boton boton-primario" 
+                onclick="this.closest('.modal-instalacion').remove(); window.location.href='/';"
+                style="width: 100%; margin-top: 1rem;"
+            >
+                🏠 Volver al inicio
+            </button>
+        </div>
+    `;
+    
+    document.body.appendChild(modal);
+}
+
+// === WIDGET WOMPI (ALTERNATIVA) ===
+// Si prefieres usar el widget embebido de Wompi en lugar de redirección
+function mostrarWidgetWompi(total, email, referencia) {
+    const modal = document.createElement('div');
+    modal.className = 'modal-instalacion';
+    modal.id = 'modalWidgetWompi';
+    modal.innerHTML = `
+        <div class="contenido-modal-instalacion" style="max-width: 600px;">
+            <button class="cerrar-modal" onclick="cerrarWidgetWompi()">✕</button>
+            <h3>💳 Pago Seguro con Wompi</h3>
+            <div id="wompi-widget-container"></div>
+        </div>
+    `;
+    
+    document.body.appendChild(modal);
+    
+    // Cargar script de Wompi
+    if (!document.getElementById('wompi-script')) {
+        const script = document.createElement('script');
+        script.id = 'wompi-script';
+        script.src = 'https://checkout.wompi.co/widget.js';
+        script.setAttribute('data-render', 'button');
+        script.setAttribute('data-public-key', WOMPI_CONFIG.publicKey);
+        script.setAttribute('data-currency', WOMPI_CONFIG.moneda);
+        script.setAttribute('data-amount-in-cents', total * 100);
+        script.setAttribute('data-reference', referencia);
+        script.setAttribute('data-customer-email', email);
+        
+        document.getElementById('wompi-widget-container').appendChild(script);
+    }
+}
+
+function cerrarWidgetWompi() {
+    const modal = document.getElementById('modalWidgetWompi');
+    if (modal) {
+        modal.remove();
+    }
+}
+
+// === INICIALIZAR VERIFICACIÓN AL CARGAR ===
+document.addEventListener('DOMContentLoaded', function() {
+    // Si estamos en la página de confirmación
+    if (window.location.pathname.includes('confirmacion-pago')) {
+        manejarConfirmacionPago();
+    }
+});
+
+// === HELPERS DE VALIDACIÓN ===
+// (Ya existen en tu código, pero los incluyo por completitud)
+function validarEmail(email) {
+    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return regex.test(email);
+}
+
+function validarTelefono(telefono) {
+    const regex = /^[0-9]{10}$/;
+    return regex.test(telefono.replace(/\s/g, ''));
+}
+
+console.log('✅ Integración de Wompi cargada correctamente');
+console.log('🔑 Llave pública:', WOMPI_CONFIG.publicKey);

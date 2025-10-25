@@ -1166,3 +1166,610 @@ body.modo-oscuro .cerrar-modal:hover {
     }
 }
 
+
+/* ========================================
+   ESTILOS PARA INTEGRACIÓN DE WOMPI
+   Agregar al final de styles.css
+   ======================================== */
+
+/* === MODAL DE INSTALACIÓN Y PAGO === */
+.modal-instalacion {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 3000;
+    animation: fadeIn 0.3s ease;
+    padding: 1rem;
+    overflow-y: auto;
+}
+
+.contenido-modal-instalacion {
+    background: var(--tarjeta-clara);
+    color: var(--texto-claro);
+    padding: 2rem;
+    border-radius: 1rem;
+    max-width: 500px;
+    width: 100%;
+    margin: auto;
+    position: relative;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    animation: slideUp 0.3s ease;
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+body.modo-oscuro .contenido-modal-instalacion {
+    background: var(--tarjeta-oscura);
+    color: var(--texto-oscuro);
+}
+
+.cerrar-modal {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: var(--texto-claro);
+    transition: var(--transicion);
+    padding: 0.5rem;
+    border-radius: 0.5rem;
+    z-index: 10;
+}
+
+body.modo-oscuro .cerrar-modal {
+    color: var(--texto-oscuro);
+}
+
+.cerrar-modal:hover {
+    background: var(--borde-claro);
+    transform: rotate(90deg);
+}
+
+body.modo-oscuro .cerrar-modal:hover {
+    background: var(--borde-oscuro);
+}
+
+.contenido-modal-instalacion h3 {
+    margin-bottom: 1rem;
+    color: var(--color-primario);
+    font-size: 1.5rem;
+}
+
+.contenido-modal-instalacion form {
+    margin-top: 1rem;
+}
+
+.contenido-modal-instalacion label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+    color: var(--texto-claro);
+}
+
+body.modo-oscuro .contenido-modal-instalacion label {
+    color: var(--texto-oscuro);
+}
+
+.contenido-modal-instalacion input,
+.contenido-modal-instalacion textarea {
+    width: 100%;
+    padding: 0.75rem;
+    border: 2px solid var(--borde-claro);
+    border-radius: 0.5rem;
+    font-size: 1rem;
+    transition: var(--transicion);
+    background: var(--fondo-claro);
+    color: var(--texto-claro);
+}
+
+body.modo-oscuro .contenido-modal-instalacion input,
+body.modo-oscuro .contenido-modal-instalacion textarea {
+    background: var(--fondo-oscuro);
+    border-color: var(--borde-oscuro);
+    color: var(--texto-oscuro);
+}
+
+.contenido-modal-instalacion input:focus,
+.contenido-modal-instalacion textarea:focus {
+    outline: none;
+    border-color: var(--color-primario);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.contenido-modal-instalacion input:invalid {
+    border-color: var(--color-error);
+}
+
+.contenido-modal-instalacion input:valid {
+    border-color: var(--color-exito);
+}
+
+/* === INDICADOR DE PAGO SEGURO === */
+.info-pago-seguro {
+    margin-top: 1rem;
+    padding: 1rem;
+    background: rgba(37, 99, 235, 0.1);
+    border-radius: 0.5rem;
+    font-size: 0.85rem;
+    border-left: 4px solid var(--color-primario);
+}
+
+.info-pago-seguro p {
+    margin: 0.25rem 0;
+}
+
+.info-pago-seguro strong {
+    color: var(--color-primario);
+}
+
+/* === BOTONES EN MODAL === */
+.contenido-modal-instalacion .boton {
+    margin-top: 0.5rem;
+}
+
+.contenido-modal-instalacion button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* === ANIMACIONES === */
+@keyframes fadeIn {
+    from { 
+        opacity: 0; 
+    }
+    to { 
+        opacity: 1; 
+    }
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* === LOADER EN BOTÓN === */
+@keyframes spin {
+    0% { 
+        transform: rotate(0deg); 
+    }
+    100% { 
+        transform: rotate(360deg); 
+    }
+}
+
+.boton-loading::after {
+    content: "";
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    margin-left: 0.5rem;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-top-color: white;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+
+/* === CONTENEDOR WIDGET WOMPI === */
+#wompi-widget-container {
+    min-height: 400px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+}
+
+/* === MODAL DE ÉXITO === */
+.modal-exito {
+    text-align: center;
+}
+
+.modal-exito .icono-exito {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+    animation: bounceIn 0.6s ease;
+}
+
+@keyframes bounceIn {
+    0% {
+        transform: scale(0);
+        opacity: 0;
+    }
+    50% {
+        transform: scale(1.1);
+    }
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+.modal-exito .detalles-pago {
+    background: var(--fondo-claro);
+    padding: 1.5rem;
+    border-radius: 0.5rem;
+    margin: 1.5rem 0;
+    text-align: left;
+}
+
+body.modo-oscuro .modal-exito .detalles-pago {
+    background: var(--fondo-oscuro);
+}
+
+.modal-exito .detalles-pago p {
+    margin: 0.5rem 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.modal-exito .detalles-pago strong {
+    color: var(--color-primario);
+}
+
+/* === BADGE DE ESTADO === */
+.badge-estado {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    border-radius: 1rem;
+    font-size: 0.85rem;
+    font-weight: bold;
+}
+
+.badge-aprobado {
+    background: var(--color-exito);
+    color: white;
+}
+
+.badge-pendiente {
+    background: var(--color-acento);
+    color: white;
+}
+
+.badge-rechazado {
+    background: var(--color-error);
+    color: white;
+}
+
+/* === LISTA DE MÉTODOS DE PAGO === */
+.metodos-pago {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin: 1rem 0;
+    padding: 1rem;
+    background: rgba(37, 99, 235, 0.05);
+    border-radius: 0.5rem;
+}
+
+.metodo-pago {
+    background: white;
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+    font-size: 0.85rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+body.modo-oscuro .metodo-pago {
+    background: var(--tarjeta-oscura);
+}
+
+/* === INFORMACIÓN DE CONTACTO EN MODAL === */
+.info-contacto-modal {
+    background: rgba(16, 185, 129, 0.1);
+    padding: 1rem;
+    border-radius: 0.5rem;
+    margin-top: 1rem;
+    border-left: 4px solid var(--color-exito);
+}
+
+.info-contacto-modal p {
+    margin: 0.25rem 0;
+    font-size: 0.9rem;
+}
+
+.info-contacto-modal strong {
+    color: var(--color-exito);
+}
+
+/* === RESPONSIVE - MODAL === */
+@media (max-width: 768px) {
+    .contenido-modal-instalacion {
+        padding: 1.5rem;
+        max-height: 95vh;
+    }
+    
+    .contenido-modal-instalacion h3 {
+        font-size: 1.25rem;
+    }
+    
+    .modal-instalacion {
+        padding: 0.5rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .contenido-modal-instalacion {
+        padding: 1rem;
+        border-radius: 0.75rem;
+    }
+    
+    .cerrar-modal {
+        top: 0.5rem;
+        right: 0.5rem;
+        padding: 0.25rem;
+    }
+    
+    .metodos-pago {
+        flex-direction: column;
+    }
+    
+    #wompi-widget-container {
+        min-height: 300px;
+        padding: 1rem;
+    }
+}
+
+/* === OVERLAY OSCURO === */
+.overlay-pago {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    z-index: 2999;
+    display: none;
+}
+
+.overlay-pago.activo {
+    display: block;
+}
+
+/* === TOOLTIP AYUDA === */
+.tooltip-ayuda {
+    position: relative;
+    display: inline-block;
+    cursor: help;
+}
+
+.tooltip-ayuda::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    bottom: 125%;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 0.5rem;
+    background: var(--texto-claro);
+    color: white;
+    border-radius: 0.5rem;
+    font-size: 0.75rem;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s;
+    z-index: 10;
+}
+
+.tooltip-ayuda:hover::after {
+    opacity: 1;
+}
+
+/* === BADGE DE SEGURIDAD === */
+.badge-seguridad {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    background: linear-gradient(135deg, var(--color-exito), #059669);
+    color: white;
+    border-radius: 2rem;
+    font-size: 0.85rem;
+    font-weight: bold;
+    margin: 0.5rem 0;
+}
+
+.badge-seguridad::before {
+    content: "🔒";
+    font-size: 1rem;
+}
+
+/* === PROGRESO DE PAGO === */
+.progreso-pago {
+    display: flex;
+    justify-content: space-between;
+    margin: 2rem 0;
+    position: relative;
+}
+
+.progreso-pago::before {
+    content: "";
+    position: absolute;
+    top: 1rem;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: var(--borde-claro);
+    z-index: 0;
+}
+
+.paso-pago {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    flex: 1;
+    position: relative;
+    z-index: 1;
+}
+
+.paso-pago .numero {
+    width: 2rem;
+    height: 2rem;
+    background: var(--borde-claro);
+    color: var(--texto-claro);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+}
+
+.paso-pago.activo .numero {
+    background: var(--color-primario);
+    color: white;
+}
+
+.paso-pago.completado .numero {
+    background: var(--color-exito);
+    color: white;
+}
+
+.paso-pago .texto {
+    font-size: 0.75rem;
+    text-align: center;
+}
+
+/* === ANIMACIÓN DE CARGA === */
+.loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+}
+
+.loading-content {
+    text-align: center;
+    color: white;
+}
+
+.loading-spinner {
+    width: 60px;
+    height: 60px;
+    border: 4px solid rgba(255, 255, 255, 0.3);
+    border-top-color: white;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 1rem;
+}
+
+.loading-text {
+    font-size: 1.2rem;
+    font-weight: bold;
+}
+
+/* === CONFIRMACIÓN DE PEDIDO === */
+.resumen-pedido {
+    background: var(--fondo-claro);
+    padding: 1rem;
+    border-radius: 0.5rem;
+    margin: 1rem 0;
+}
+
+body.modo-oscuro .resumen-pedido {
+    background: var(--fondo-oscuro);
+}
+
+.resumen-pedido .item-resumen {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid var(--borde-claro);
+}
+
+body.modo-oscuro .resumen-pedido .item-resumen {
+    border-color: var(--borde-oscuro);
+}
+
+.resumen-pedido .item-resumen:last-child {
+    border-bottom: none;
+}
+
+.resumen-pedido .total {
+    font-size: 1.25rem;
+    font-weight: bold;
+    color: var(--color-primario);
+    margin-top: 0.5rem;
+    padding-top: 0.5rem;
+    border-top: 2px solid var(--borde-claro);
+}
+
+body.modo-oscuro .resumen-pedido .total {
+    border-color: var(--borde-oscuro);
+}
+
+/* === TARJETAS DE PAGO === */
+.tarjetas-aceptadas {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: center;
+    margin: 1rem 0;
+    flex-wrap: wrap;
+}
+
+.tarjeta-icono {
+    width: 50px;
+    height: 32px;
+    background: white;
+    border-radius: 0.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    font-size: 0.7rem;
+    font-weight: bold;
+}
+
+/* === MENSAJE DE ERROR === */
+.mensaje-error {
+    background: rgba(239, 68, 68, 0.1);
+    border-left: 4px solid var(--color-error);
+    padding: 1rem;
+    border-radius: 0.5rem;
+    margin: 1rem 0;
+    color: var(--color-error);
+}
+
+.mensaje-error strong {
+    display: block;
+    margin-bottom: 0.5rem;
+}
+
+/* === MENSAJE DE ÉXITO === */
+.mensaje-exito {
+    background: rgba(16, 185, 129, 0.1);
+    border-left: 4px solid var(--color-exito);
+    padding: 1rem;
+    border-radius: 0.5rem;
+    margin: 1rem 0;
+    color: var(--color-exito);
+}
+
+.mensaje-exito strong {
+    display: block;
+    margin-bottom: 0.5rem;
+}

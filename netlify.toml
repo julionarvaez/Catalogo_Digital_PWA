@@ -1,0 +1,36 @@
+# netlify.toml
+# Configuración para desplegar en Netlify con funciones serverless
+
+[build]
+  publish = "."
+  functions = "netlify/functions"
+
+[[redirects]]
+  from = "/api/*"
+  to = "/.netlify/functions/:splat"
+  status = 200
+
+[context.production.environment]
+  WOMPI_PUBLIC_KEY = "pub_prod_tu_llave_publica_de_produccion"
+  WOMPI_PRIVATE_KEY = "prv_prod_tu_llave_privada_de_produccion"
+  WOMPI_EVENTS_SECRET = "prod_events_tu_evento_secreto"
+
+[context.development.environment]
+  WOMPI_PUBLIC_KEY = "pub_test_tu_llave_publica_de_prueba"
+  WOMPI_PRIVATE_KEY = "prv_test_tu_llave_privada_de_prueba"
+  WOMPI_EVENTS_SECRET = "test_events_tu_evento_secreto"
+
+# Headers de seguridad
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+
+[[headers]]
+  for = "/.netlify/functions/*"
+  [headers.values]
+    Access-Control-Allow-Origin = "*"
+    Access-Control-Allow-Methods = "GET, POST, OPTIONS"
+    Access-Control-Allow-Headers = "Content-Type"
