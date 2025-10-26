@@ -81,7 +81,7 @@ const productos = [
         nombre: 'Camarones Tigre Gigantes',
         categoria: 'pescado',
         precio: 38000,
-        descripcion: 'Camarones tigre extra grandes del Caribe, pelados y desvenados. 500g.',
+        descripcion: 'Camarones tigre extra grandes del Caribe, pelados y des
         emoji: '🦐',
         etiqueta: 'Gourmet',
         tipoEtiqueta: 'etiqueta-premium'
@@ -1523,98 +1523,68 @@ function cerrarModalPago() {
 }
 
 // === INICIAR PROCESO DE PAGO CON WOMPI ===
-async function iniciarPagoWompi(total) {
+function iniciarPagoWompi(total) {
     const email = document.getElementById('emailPago').value.trim();
     const nombre = document.getElementById('nombrePago').value.trim();
     const telefono = document.getElementById('telefonoPago').value.trim();
     const direccion = document.getElementById('direccionPago').value.trim();
 
-    // Validar datos
-    if (!email || !validarEmail(email)) {
-        mostrarNotificacion('⚠️ Por favor ingresa un email válido', 'error');
-        return;
-    }
-
-    if (!nombre || nombre.length < 3) {
-        mostrarNotificacion('⚠️ Por favor ingresa tu nombre completo', 'error');
-        return;
-    }
-
-    if (!telefono || !validarTelefono(telefono)) {
-        mostrarNotificacion('⚠️ Por favor ingresa un teléfono válido (10 dígitos)', 'error');
-        return;
-    }
-
-    // Deshabilitar botón y mostrar loader
+    // validaciones...
+    // Deshabilitar botón
     const botonPagar = document.querySelector('#formDatosPago button[type="submit"]');
     const textoOriginal = botonPagar.innerHTML;
     botonPagar.disabled = true;
     botonPagar.innerHTML = '⏳ Procesando...';
 
-    try {
-        // Generar referencia única
-        const referencia = `ADC-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    (async () => {
+        try {
+            const referencia = `ADC-${Date.now()}-${Math.random().toString(36).substr(2,9)}`;
 
-        // Preparar datos del pedido
-        const datosPedido = {
-            monto: total,
-            moneda: WOMPI_CONFIG.moneda,
-            referencia: referencia,
-            email: email,
-            nombre: nombre,
-            telefono: telefono,
-            direccion: direccion,
-            productos: carritoCompras.map(item => ({
-                nombre: item.nombre,
-                cantidad: item.cantidad,
-                precio: item.precio
-            }))
-        };
+            const datosPedido = {
+                monto: total,
+                moneda: WOMPI_CONFIG.moneda,
+                referencia: referencia,
+                email: email,
+                nombre: nombre,
+                telefono: telefono,
+                direccion: direccion,
+                productos: carritoCompras.map(item => ({ nombre: item.nombre, cantidad: item.cantidad, precio: item.precio }))
+            };
 
-        // Llamar al backend serverless
-        const response = await fetch(`${WOMPI_CONFIG.backendUrl}/crear-transaccion-wompi`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(datosPedido)
-        });
+            const response = await fetch(`${WOMPI_CONFIG.backendUrl}/crear-transaccion-wompi`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(datosPedido)
+            });
 
-        const resultado = await response.json();
+            const text = await response.text();
+            let resultado;
+            try { resultado = JSON.parse(text); } catch { throw new Error(`Respuesta no JSON: ${text}`); }
 
-        if (!response.ok || !resultado.exito) {
-            throw new Error(resultado.error || 'Error al crear transacción');
+            if (!response.ok || !resultado.exito) {
+                const errMsg = resultado?.error || resultado?.message || JSON.stringify(resultado);
+                throw new Error(errMsg);
+            }
+
+            // Guardar pedido
+            guardarInfoPedido(referencia, datosPedido, resultado.transaccion || resultado.transaccion);
+
+            cerrarModalPago();
+
+            if (resultado.checkout_url) {
+                mostrarNotificacion('✅ Redirigiendo a la pasarela de pago...');
+                setTimeout(()=> window.location.href = resultado.checkout_url, 800);
+            } else {
+                throw new Error('No se recibió URL de checkout');
+            }
+
+        } catch (error) {
+            console.error('Error al procesar pago:', error);
+            mostrarNotificacion(`❌ Error: ${error.message || 'Error creando transacción'}`, 'error');
+            botonPagar.disabled = false;
+            botonPagar.innerHTML = textoOriginal;
         }
-
-        // Guardar información del pedido
-        guardarInfoPedido(referencia, datosPedido, resultado.transaccion);
-
-        // Cerrar modal
-        cerrarModalPago();
-
-        // Redirigir a Wompi Checkout
-        if (resultado.checkout_url) {
-            mostrarNotificacion('✅ Redirigiendo a la pasarela de pago...');
-            
-            // Redirigir después de 1 segundo
-            setTimeout(() => {
-                window.location.href = resultado.checkout_url;
-            }, 1000);
-        } else {
-            throw new Error('No se recibió URL de checkout');
-        }
-
-    } catch (error) {
-        console.error('Error al procesar pago:', error);
-        mostrarNotificacion(
-            `❌ Error: ${error.message}. Intenta nuevamente o usa WhatsApp`, 
-            'error'
-        );
-        
-        // Restaurar botón
-        botonPagar.disabled = false;
-        botonPagar.innerHTML = textoOriginal;
-    }
+    })();
 }
 
 // === GUARDAR INFORMACIÓN DEL PEDIDO ===
