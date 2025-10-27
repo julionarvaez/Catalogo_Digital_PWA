@@ -6,7 +6,7 @@ const productos = [
         nombre: 'Pollo Semicriollo Entero',
         categoria: 'pollo',
         precio: 7500, 
-        descripcion: 'Pollo semicriollo entero, fresco y jugoso. Ideal para cualquier preparación.',
+        descripcion: 'Pollo semicriollo entero, fresco y jugoso. Ideal para cualquier preparación. Precio por kilogramo 15.000 COP.',
         emoji: '🍗',
         etiqueta: 'Bestseller',
         tipoEtiqueta: 'etiqueta-producto',
@@ -174,7 +174,7 @@ const productos = [
     },
     {
         id: 63,
-        nombre: 'Papas a la Francesa Congeladas 1kg',
+        nombre: 'Papas a la Francesa  1000g',
         categoria: 'verduras',
         precio: 12000,
         descripcion: 'Papas cortadas en bastones, listas para freír o hornear. ideal para acompañar tus comidas favoritas.',
