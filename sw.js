@@ -71,45 +71,53 @@ self.addEventListener('activate', function(event) {
 });
 
 // === INTERCEPTAR REQUESTS (ESTRATEGIA CACHE-FIRST) ===
-self.addEventListener('fetch', (event) => {
-  const req = event.request;
-  // Ignorar esquemas que no sean http(s)
-  try {
-    const protocol = new URL(req.url).protocol;
-    if (protocol !== 'http:' && protocol !== 'https:') {
-      return; // no manejar estas requests (ej. chrome-extension://)
+self.addEventListener('fetch', function(event) {
+    // Solo cachear requests HTTP/HTTPS
+    if (event.request.url.startsWith('http')) {
+        event.respondWith(
+            caches.match(event.request)
+                .then(function(response) {
+                    // Si está en cache, devolverlo
+                    if (response) {
+                        return response;
+                    }
+                    
+                    // Si no está en cache, hacer fetch
+                    return fetch(event.request)
+                        .then(function(response) {
+                            // Verificar si es una respuesta válida
+                            if (!response || response.status !== 200 || response.type !== 'basic') {
+                                return response;
+                            }
+                            
+                            // Clonar la respuesta
+                            const responseToCache = response.clone();
+                            
+                            // Agregar al cache dinámico
+                            caches.open(CACHE_NAME)
+                                .then(function(cache) {
+                                    cache.put(event.request, responseToCache);
+                                });
+                            
+                            return response;
+                        })
+                        .catch(function() {
+                            // Si falla el fetch, mostrar página offline
+                            if (event.request.destination === 'document') {
+                                return caches.match('/index.html');
+                            }
+                            
+                            // Para imágenes, mostrar imagen placeholder
+                            if (event.request.destination === 'image') {
+                                return new Response(
+                                    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200"><rect width="200" height="200" fill="#f3f4f6"/><text x="100" y="100" font-size="40" text-anchor="middle" fill="#9ca3af">📱</text><text x="100" y="140" font-size="12" text-anchor="middle" fill="#6b7280">Sin conexión</text></svg>',
+                                    { headers: { 'Content-Type': 'image/svg+xml' } }
+                                );
+                            }
+                        });
+                })
+        );
     }
-  } catch (e) {
-    // URL inválida -> no manejar
-    return;
-  }
-
-  // Ejemplo de strategy cache-first con manejo seguro
-  event.respondWith((async () => {
-    try {
-      const cache = await caches.open('alimento-del-cielo-v1');
-      const cached = await cache.match(req);
-      if (cached) return cached;
-
-      const networkResponse = await fetch(req);
-      // Sólo cachear respuestas válidas y métodos seguros
-      if (networkResponse && networkResponse.ok && req.method === 'GET') {
-        try {
-          await cache.put(req, networkResponse.clone());
-        } catch (err) {
-          // Evitar que errores de cache rompan la respuesta
-          console.warn('Cache put falló (se ignora):', err);
-        }
-      }
-      return networkResponse;
-    } catch (err) {
-      console.error('SW fetch error:', err);
-      // Fallback: intentar devolver algo del cache general si existe
-      const cache = await caches.open('alimento-del-cielo-v1');
-      const fallback = await cache.match('/index.html');
-      return fallback || new Response('Offline', { status: 503, statusText: 'Service Worker error' });
-    }
-  })());
 });
 
 // === NOTIFICACIONES PUSH ===

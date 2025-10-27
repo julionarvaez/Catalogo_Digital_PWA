@@ -3,30 +3,33 @@ const productos = [
     // === POLLO ===
     {
         id: 1,
-        nombre: 'Pollo Apanado Premium',
+        nombre: 'Pollo Semicriollo Entero',
         categoria: 'pollo',
-        precio: 28000,
-        descripcion: 'Pollo apanado artesanal con empanizado crujiente, perfecto para airfryer. Listo en 12 minutos.',
+        precio: 7500, 
+        descripcion: 'Pollo semicriollo entero, fresco y jugoso. Ideal para cualquier preparación.',
         emoji: '🍗',
         etiqueta: 'Bestseller',
-        tipoEtiqueta: 'etiqueta-producto'
+        tipoEtiqueta: 'etiqueta-producto',
+        unidadMedida: 'Peso aproximado',
+        pesoAproximado: '2400 - 3000 g',
+        precioPorKg: 15000,
     },
     {
         id: 2,
-        nombre: 'Alitas BBQ Especiales',
+        nombre: 'Bandeja de Menudencia 500g',
         categoria: 'pollo',
-        precio: 25000,
-        descripcion: 'Alitas de pollo marinadas en nuestra salsa BBQ casera con toques ahumados.',
+        precio: 4990,
+        descripcion: 'Bandeja con menudencias de pollo, ideal para sopas, guisos y más.',
         emoji: '🔥',
         etiqueta: 'Especial',
         tipoEtiqueta: 'etiqueta-oferta'
     },
     {
         id: 3,
-        nombre: 'Pechuga de Pavo Ahumada',
+        nombre: 'Bandeja de Vicera 500g',
         categoria: 'pollo',
-        precio: 33000,
-        descripcion: 'Pechuga de pavo ahumada naturalmente, baja en grasa y alta en proteína.',
+        precio: 4990,
+        descripcion: 'Bandeja con vísceras de pollo, ideal para sopas, guisos y más.',
         emoji: '🦃',
         etiqueta: 'Fitness',
         tipoEtiqueta: 'etiqueta-producto'
@@ -35,300 +38,280 @@ const productos = [
     // === CARNES ===
     {
         id: 20,
-        nombre: 'Carne de Res Marinada',
+        nombre: 'Carne de Res 1000g',
         categoria: 'carnes',
-        precio: 35000,
-        descripcion: 'Carne de res tierna marinada en especias naturales y hierbas aromáticas. Corte premium.',
+        precio: 14990,
+        descripcion: 'Carne de res fresca y jugosa, ideal para cualquier preparación.',
         emoji: '🥩',
         etiqueta: 'Nuevo',
-        tipoEtiqueta: 'etiqueta-nuevo'
+        tipoEtiqueta: 'etiqueta-nuevo',
     },
     {
         id: 21,
-        nombre: 'Hamburguesas Artesanales',
+        nombre: 'Carne de Cerdo 1000g',
         categoria: 'carnes',
-        precio: 32000,
-        descripcion: 'Hamburguesas 100% carne de res, condimentadas artesanalmente. Pack x6 unidades.',
+        precio: 13990,
+        descripcion: 'Carne de cerdo tierna y jugosa, ideal para cualquier preparación.',
         emoji: '🍔',
         etiqueta: 'Familiar',
         tipoEtiqueta: 'etiqueta-producto'
     },
     {
         id: 22,
-        nombre: 'Lomo de Cerdo Marinado',
+        nombre: 'Carne Molida de Res 1000g',
         categoria: 'carnes',
-        precio: 29000,
-        descripcion: 'Lomo de cerdo tierno marinado con especias mediterráneas.',
+        precio: 15490,
+        descripcion: 'Carne molida de res, ideal para cualquier preparación.',
+        emoji: '🐷',
+        etiqueta: 'Delicioso',
+        tipoEtiqueta: 'etiqueta-oferta'
+    },
+    {
+        id: 23,
+        nombre: 'Carne Molida de Cerdo 1000g',
+        categoria: 'carnes',
+        precio: 14490,
+        descripcion: 'Carne molida de cerdo, ideal para cualquier preparación.',
+        emoji: '🐷',
+        etiqueta: 'Delicioso',
+        tipoEtiqueta: 'etiqueta-oferta'
+    },
+    {
+        id: 23,
+        nombre: 'Carne Molida de Mixta 1000g',
+        categoria: 'carnes',
+        precio: 12990,
+        descripcion: 'Carne molida mixta res y cerdo, ideal para cualquier preparación.',
         emoji: '🐷',
         etiqueta: 'Delicioso',
         tipoEtiqueta: 'etiqueta-oferta'
     },
 
 
+
     // === PESCADO ===
     {
         id: 40,
-        nombre: 'Filete de Salmón Atlántico',
+        nombre: 'Filete de Salmón',
         categoria: 'pescado',
         precio: 42000,
-        descripcion: 'Salmón fresco del Atlántico, rico en omega-3. Porciones de 200g cada una.',
+        descripcion: 'Salmón fresco, rico en omega-3. Porciones de 200g cada una.',
         emoji: '🐟',
         etiqueta: 'Premium',
         tipoEtiqueta: 'etiqueta-premium'
     },
     {
         id: 41,
-        nombre: 'Camarones Tigre Gigantes',
+        nombre: 'Camarones Precocido',
         categoria: 'pescado',
         precio: 38000,
-        descripcion: 'Camarones tigre extra grandes del Caribe, pelados y des
+        descripcion: 'Camarones precociso, pelados y desvenados.',
         emoji: '🦐',
         etiqueta: 'Gourmet',
+        tipoEtiqueta: 'etiqueta-premium'
+    },
+    {
+        id: 42,
+        nombre: 'Cachama Entera x3 unidades',
+        categoria: 'pescado',
+        precio: 42000,
+        descripcion: 'Cachama fresca y limpia, lista para cocinar. Su sabor suave y natural es perfecto para disfrutar en familia.',
+        emoji: '🐟',
+        etiqueta: 'Premium',
+        tipoEtiqueta: 'etiqueta-premium'
+    },
+    {
+        id: 43,
+        nombre: 'Tilapia Roja Entera x3 unidades',
+        categoria: 'pescado',
+        precio: 42000,
+        descripcion: 'Tilapia roja fresca y limpia, lista para cocinar. Ideal para cualquier preparación y disfrutar en familia.',
+        emoji: '🐟',
+        etiqueta: 'Premium',
+        tipoEtiqueta: 'etiqueta-premium'
+    },
+    {
+        id: 44,
+        nombre: 'Mojarra Entera x3 unidades ',
+        categoria: 'pescado',
+        precio: 42000,
+        descripcion: 'Mojarra fresca y limpia, lista para cocinar. Ideal para cualquier preparación y disfrutar en familia.',
+        emoji: '🐟',
+        etiqueta: 'Premium',
         tipoEtiqueta: 'etiqueta-premium'
     },
 
     // === VERDURAS ===
     {
         id: 60,
-        nombre: 'Mix de Verduras Gourmet',
+        nombre: 'Mix Gourmet - Verduras Congeladas 500g',
         categoria: 'verduras',
-        precio: 15000,
-        descripcion: 'Mezcla selecta de verduras frescas: brócoli, zanahoria, apio y pimentón.',
+        precio: 6490,
+        descripcion: 'Selección gourmet de brócoli, arveja, apio, cebollín y maíz tierno. Congelado al instante para preservar nutrientes, color y textura.',
+        emoji: '🥬',
+        etiqueta: 'Saludable',
+        tipoEtiqueta: 'etiqueta-producto'
+    },
+        {
+        id: 61,
+        nombre: 'Mix Primavera - Verduras Congeladas 500g',
+        categoria: 'verduras',
+        precio: 6490,
+        descripcion: 'Mezcla colorida de arveja, zanahoria, maíz y pimentón rojo, lista para saltear o acompañar tus comidas. Congelado al instante para mantener su frescura y sabor natural.',
+        emoji: '🥬',
+        etiqueta: 'Saludable',
+        tipoEtiqueta: 'etiqueta-producto'
+    },
+        {
+        id: 62,
+        nombre: 'Salteado Campestre - Verduras Congeladas 500g',
+        categoria: 'verduras',
+        precio: 6490,
+        descripcion: 'Deliciosa combinación de brócoli, zanahoria, pimentón y cebolla, perfecta para comidas saludables. Producto 100% natural sin conservantes.',
         emoji: '🥬',
         etiqueta: 'Saludable',
         tipoEtiqueta: 'etiqueta-producto'
     },
     {
-        id: 61,
-        nombre: 'Papas Criollas Baby',
+        id: 63,
+        nombre: 'Papas a la Francesa Congeladas 1kg',
         categoria: 'verduras',
         precio: 12000,
-        descripcion: 'Papas criollas pequeñas y tiernas, perfectas para acompañar cualquier plato.',
+        descripcion: 'Papas cortadas en bastones, listas para freír o hornear. ideal para acompañar tus comidas favoritas.',
         emoji: '🥔',
         etiqueta: 'Tradicional',
         tipoEtiqueta: 'etiqueta-producto'
     },
 
     // === EMPANADAS ===
-
-{
-    id: 80,
-    nombre: 'Empanadas de Carne x7',
-    categoria: 'empanadas',
-    precio: 8990,
-    descripcion: 'Empanadas rellenas de carne molida sazonada con especias tradicionales. Pack x7 unidades.',
-    emoji: '🥟',
-    etiqueta: 'Clásico',
-    tipoEtiqueta: 'etiqueta-producto'
-},
-{
-    id: 81,
-    nombre: 'Empanadas de Carne x10',
-    categoria: 'empanadas',
-    precio: 11990,
-    descripcion: 'Empanadas rellenas de carne, pollo y queso. Pack x10 unidades.',
-    emoji: '🥟',
-    etiqueta: 'Mixtas',
-    tipoEtiqueta: 'etiqueta-producto'
-},
-{
-    id: 82,
-    nombre: 'Empanadas de Carne x12',
-    categoria: 'empanadas',
-    precio: 14990,
-    descripcion: 'Empanadas rellenas de verduras frescas y queso. Pack x12 unidades.',
-    emoji: '🥟',
-    etiqueta: 'Vegetariano',
-    tipoEtiqueta: 'etiqueta-producto'
-},
-
-{
-    id: 83,
-    nombre: 'Empanadas de Pollo x7',
-    categoria: 'empanadas',
-    precio: 8990,
-    descripcion: 'Empanadas rellenas de pollo desmechado con un toque de especias. Pack x7 unidades.',
-    emoji: '🥟',
-    etiqueta: 'Clásico',
-    tipoEtiqueta: 'etiqueta-producto'
-},
-{
-    id: 84,
-    nombre: 'Empanadas de Pollo x10', 
-    categoria: 'empanadas',
-    precio: 11990,
-    descripcion: 'Empanadas rellenas de pollo desmechado con un toque de especias. Pack x10 unidades.',
-    emoji: '🥟',
-    etiqueta: 'Clásico',
-    tipoEtiqueta: 'etiqueta-producto'
-},
-{
-    id: 85,
-    nombre: 'Empanadas de Pollo x15', 
-    categoria: 'empanadas',
-    precio: 14990,
-    descripcion: 'Empanadas rellenas de pollo desmechado con un toque de especias. Pack x15 unidades.',
-    emoji: '🥟',
-    etiqueta: 'Clásico',
-    tipoEtiqueta: 'etiqueta-producto'
-},
-
-{
-    id: 86,
-    nombre: 'Empanadas de Queso x7',
-    categoria: 'empanadas',
-    precio: 8990,
-    descripcion: 'Empanadas rellenas de mezcla de quesos fundidos. Pack x7 unidades.',
-    emoji: '🥟',
-    etiqueta: 'Clásico',
-    tipoEtiqueta: 'etiqueta-producto'
-},
-{
-    id: 87,
-    nombre: 'Empanadas de Queso x10',
-    categoria: 'empanadas',
-    precio: 11990,
-    descripcion: 'Empanadas rellenas de mezcla de quesos fundidos. Pack x10 unidades.',
-    emoji: '🥟',
-    etiqueta: 'Clásico',
-    tipoEtiqueta: 'etiqueta-producto'
-},
-{
-    id: 88,
-    nombre: 'Empanadas de Queso x10',
-    categoria: 'empanadas',
-    precio: 14990,
-    descripcion: 'Empanadas rellenas de mezcla de quesos fundidos. Pack x15 unidades.',
-    emoji: '🥟',
-    etiqueta: 'Clásico',
-    tipoEtiqueta: 'etiqueta-producto'
-},
-
-{
-    id: 89,
-    nombre: 'Empanadas de Jamón con Queso x7',
-    categoria: 'empanadas',
-    precio: 8990,
-    descripcion: 'Empanadas rellenas de jamón y queso fundido. Pack x7 Unidades.',
-    emoji: '🥟',
-    etiqueta: 'Delicioso',
-    tipoEtiqueta: 'etiqueta-producto'
-},
-{
-    id: 90,
-    nombre: 'Empanadas de Jamón con Queso x10',
-    categoria: 'empanadas',
-    precio: 11990,
-    descripcion: 'Empanadas rellenas de jamón y queso fundido. Pack x10 Unidades.',
-    emoji: '🥟',
-    etiqueta: 'Delicioso',
-    tipoEtiqueta: 'etiqueta-producto'
-},
-{
-    id: 91,
-    nombre: 'Empanadas de Jamón con Queso x15',
-    categoria: 'empanadas',
-    precio: 14990,
-    descripcion: 'Empanadas rellenas de jamón y queso fundido. Pack x15 Unidades.',
-    emoji: '🥟',
-    etiqueta: 'Delicioso',
-    tipoEtiqueta: 'etiqueta-producto'
-},
-
-{
-    id: 92,
-    nombre: 'Empanadas Hawaianas x7',
-    categoria: 'empanadas',
-    precio: 8990,
-    descripcion: 'Empanadas rellenas de jamón, piña y queso fundido. Pack x7 Unidades.',
-    emoji: '🥟',   
-    etiqueta: 'Exótico',
-    tipoEtiqueta: 'etiqueta-producto'
-},
-{
-    id: 93,
-    nombre: 'Empanadas Hawaianas x10',
-    categoria: 'empanadas',
-    precio: 11990,
-    descripcion: 'Empanadas rellenas de jamón, piña y queso fundido. Pack x10 Unidades.',
-    emoji: '🥟',
-    etiqueta: 'Exótico',
-    tipoEtiqueta: 'etiqueta-producto'
-},
-{
-    id: 94,
-    nombre: 'Empanadas Hawaianas x15',
-    categoria: 'empanadas',
-    precio: 14990,
-    descripcion: 'Empanadas rellenas de jamón, piña y queso fundido. Pack x15 Unidades.',
-    emoji: '🥟',
-    etiqueta: 'Exótico',
-    tipoEtiqueta: 'etiqueta-producto'
-},
-
-
-    // === PASABOCAS ===
     {
-        id: 100,
-        nombre: 'Combo_01: 50 unidades',
-        categoria: 'pasabocas',
-        precio: 28000,
-        descripcion: 'Incluye 25 deditos y 25 empanadas. Ideal para reuniones pequeñas.',
-        imagen: './Imagenes/Productos/combo_1.png',
+        id: 80,
+        nombre: 'Empanadas Hawaianas x7',
+        categoria: 'empanadas',
+        precio: 8990,
+        descripcion: 'Empanadas rellenas de jamón, piña y queso fundido. Pack x7 Unidades.',
+        emoji: '🥟',   
+        etiqueta: 'Exótico',
+        tipoEtiqueta: 'etiqueta-producto'
+    },
+    {
+        id: 81,
+        nombre: 'Empanadas Hawaianas x10',
+        categoria: 'empanadas',
+        precio: 11990,
+        descripcion: 'Empanadas rellenas de jamón, piña y queso fundido. Pack x10 Unidades.',
         emoji: '🥟',
-        etiqueta: 'Económico',
+        etiqueta: 'Exótico',
         tipoEtiqueta: 'etiqueta-producto'
     },
     {
-        id: 101,
-        nombre: 'Combo_02: 100 unidades',
-        categoria: 'pasabocas',
-        precio: 56000,
-        descripcion: 'Incluye 50 deditos, 30 empanadas y 20 medallones. Perfecto para compartir.',
-        imagen: './Imagenes/Productos/combo_2.png',
-        emoji: '🍢',
-        etiqueta: 'Popular',
+        id: 82,
+        nombre: 'Empanadas Hawaianas x15',
+        categoria: 'empanadas',
+        precio: 14990,
+        descripcion: 'Empanadas rellenas de jamón, piña y queso fundido. Pack x15 Unidades.',
+        emoji: '🥟',
+        etiqueta: 'Exótico',
+        tipoEtiqueta: 'etiqueta-producto'
+    },
+    
+    {
+        id: 83,
+        nombre: 'Empanadas de Jamón con Queso x7',
+        categoria: 'empanadas',
+        precio: 8990,
+        descripcion: 'Empanadas rellenas de jamón y queso fundido. Pack x7 Unidades.',
+        emoji: '🥟',
+        etiqueta: 'Delicioso',
         tipoEtiqueta: 'etiqueta-producto'
     },
     {
-        id: 102,
-        nombre: 'Combo_03: 150 unidades',
-        categoria: 'pasabocas',
-        precio: 84000,
-        descripcion: 'Incluye 100 deditos, 30 empanadas y 20 medallones. Ideal para eventos medianos.',
-        imagen: './Imagenes/Productos/combo_3.png',
-        emoji: '🍴',
-        etiqueta: 'Recomendado',
+        id: 84,
+        nombre: 'Empanadas de Jamón con Queso x10',
+        categoria: 'empanadas',
+        precio: 11990,
+        descripcion: 'Empanadas rellenas de jamón y queso fundido. Pack x10 Unidades.',
+        emoji: '🥟',
+        etiqueta: 'Delicioso',
         tipoEtiqueta: 'etiqueta-producto'
     },
     {
-        id: 103,
-        nombre: 'Combo_04: 170 unidades',
-        categoria: 'pasabocas',
-        precio: 95000,
-        descripcion: 'Incluye 100 deditos, 50 empanadas y 20 medallones. Excelente opción para celebraciones.',
-        emoji: '🎉',
-        imagen: './Imagenes/Productos/combo_4.png',
-        etiqueta: 'Favorito',
+        id: 85,
+        nombre: 'Empanadas de Jamón con Queso x15',
+        categoria: 'empanadas',
+        precio: 14990,
+        descripcion: 'Empanadas rellenas de jamón y queso fundido. Pack x15 Unidades.',
+        emoji: '🥟',
+        etiqueta: 'Delicioso',
         tipoEtiqueta: 'etiqueta-producto'
     },
     {
-        id: 104,
-        nombre: 'Combo_05: 200 unidades',
-        categoria: 'pasabocas',
-        precio: 112000,
-        descripcion: 'Incluye 100 deditos, 50 empanadas y 50 medallones. Ideal para eventos grandes.',
-        emoji: '🥳',
-        etiqueta: 'Premium',
+        id: 86,
+        nombre: 'Empanadas de Pollo x7',
+        categoria: 'empanadas',
+        precio: 8990,
+        descripcion: 'Empanadas rellenas de pollo desmechado con un toque de especias. Pack x7 unidades.',
+        emoji: '🥟',
+        etiqueta: 'Clásico',
         tipoEtiqueta: 'etiqueta-producto'
     },
-    // === PASABOCAS FRITOS===
+    {
+        id: 87,
+        nombre: 'Empanadas de Pollo x10', 
+        categoria: 'empanadas',
+        precio: 11990,
+        descripcion: 'Empanadas rellenas de pollo desmechado con un toque de especias. Pack x10 unidades.',
+        emoji: '🥟',
+        etiqueta: 'Clásico',
+        tipoEtiqueta: 'etiqueta-producto'
+    },
+    {
+        id: 88,
+        nombre: 'Empanadas de Pollo x15', 
+        categoria: 'empanadas',
+        precio: 14990,
+        descripcion: 'Empanadas rellenas de pollo desmechado con un toque de especias. Pack x15 unidades.',
+        emoji: '🥟',
+        etiqueta: 'Clásico',
+        tipoEtiqueta: 'etiqueta-producto'
+    },
+    {
+        id: 89,
+        nombre: 'Empanadas de Carne x7',
+        categoria: 'empanadas',
+        precio: 8990,
+        descripcion: 'Empanadas rellenas de carne molida sazonada con especias tradicionales. Pack x7 unidades.',
+        emoji: '🥟',
+        etiqueta: 'Clásico',
+        tipoEtiqueta: 'etiqueta-producto'
+    },
+    {
+        id: 90,
+        nombre: 'Empanadas de Carne x10',
+        categoria: 'empanadas',
+        precio: 11990,
+        descripcion: 'Empanadas rellenas de carne molida sazonada con especias tradicionales. Pack x10 unidades.',
+        emoji: '🥟',
+        etiqueta: 'Mixtas',
+        tipoEtiqueta: 'etiqueta-producto'
+    },
+    {
+        id: 91,
+        nombre: 'Empanadas de Carne x12',
+        categoria: 'empanadas',
+        precio: 14990,
+        descripcion: 'Empanadas rellenas de carne molida sazonada con especias tradicionales. Pack x12 unidades.',
+        emoji: '🥟',
+        etiqueta: 'Vegetariano',
+        tipoEtiqueta: 'etiqueta-producto'
+    },
+// === PASABOCAS SIN FRITOS===
     {
         id: 105,
-        nombre: 'Combo_01: 50 unidades',
+        nombre: 'Combo_01: 50 unidades sin Fritar',
         categoria: 'pasabocas',
-        precio: 28000,
-        descripcion: 'Combo de 25 deditos y 25 empanadas fritas, servidos calientes en el lugar. Ideal para reuniones pequeñas o familiares.',
+        precio: 28990,
+        descripcion: 'Incluye 25 deditos y 25 empanadas en tamaño pasaboca sin Fritar. Ideal para reuniones pequeñas.',
         imagen: './Imagenes/Productos/combo_1.png',
         emoji: '🥟',
         etiqueta: 'Económico',
@@ -336,10 +319,10 @@ const productos = [
     },
     {
         id: 106,
-        nombre: 'Combo_02: 100 unidades',
+        nombre: 'Combo_02: 100 unidades sin Fritar',
         categoria: 'pasabocas',
-        precio: 56000,
-        descripcion: 'Incluye 50 deditos, 30 empanadas y 20 medallones. Perfecto para compartir.',
+        precio: 55990,
+        descripcion: 'Incluye 50 deditos, 30 empanadas y 20 medallones en tamaño pasaboca sin Fritar. Perfecto para compartir.',
         imagen: './Imagenes/Productos/combo_2.png',
         emoji: '🍢',
         etiqueta: 'Popular',
@@ -347,10 +330,10 @@ const productos = [
     },
     {
         id: 107,
-        nombre: 'Combo_03: 150 unidades',
+        nombre: 'Combo_03: 150 unidades sin Fritar',
         categoria: 'pasabocas',
-        precio: 84000,
-        descripcion: 'Incluye 100 deditos, 30 empanadas y 20 medallones. Ideal para eventos medianos.',
+        precio: 83990,
+        descripcion: 'Incluye 100 deditos, 30 empanadas y 20 medallones en tamaño pasaboca sin Fritar. Ideal para eventos medianos.',
         imagen: './Imagenes/Productos/combo_3.png',
         emoji: '🍴',
         etiqueta: 'Recomendado',
@@ -358,10 +341,10 @@ const productos = [
     },
     {
         id: 108,
-        nombre: 'Combo_04: 170 unidades',
+        nombre: 'Combo_04: 170 unidades sin Fritar',
         categoria: 'pasabocas',
-        precio: 95000,
-        descripcion: 'Incluye 100 deditos, 50 empanadas y 20 medallones. Excelente opción para celebraciones.',
+        precio: 94990,
+        descripcion: 'Incluye 100 deditos, 50 empanadas y 20 medallones en tamaño pasaboca sin Fritar. Excelente opción para celebraciones.',
         emoji: '🎉',
         imagen: './Imagenes/Productos/combo_4.png',
         etiqueta: 'Favorito',
@@ -369,22 +352,98 @@ const productos = [
     },
     {
         id: 109,
-        nombre: 'Combo_05: 200 unidades',
+        nombre: 'Combo_05: 200 unidades sin Fritar',
         categoria: 'pasabocas',
-        precio: 112000,
-        descripcion: 'Incluye 100 deditos, 50 empanadas y 50 medallones. Ideal para eventos grandes.',
+        precio: 111990,
+        descripcion: 'Incluye 100 deditos, 50 empanadas y 50 medallones en tamaño pasaboca sin Fritar. Ideal para eventos grandes.',
+        emoji: '🥳',
+        etiqueta: 'Premium',
+        tipoEtiqueta: 'etiqueta-producto'
+    },
+    {
+        id: 111,
+        nombre: 'Combo_06: 300 unidades sin Fritar ',
+        categoria: 'pasabocas',
+        precio: 167990,
+        descripcion: 'Incluye 200 deditos, 100 empanadas y 100 medallones en tamaño pasaboca sin Fritar. Ideal para eventos grandes.',
         emoji: '🥳',
         etiqueta: 'Premium',
         tipoEtiqueta: 'etiqueta-producto'
     },
 
+        // === PASABOCAS FRITOS===
+    {
+        id: 100,
+        nombre: 'Combo_01: 50 unidades Fritos',
+        categoria: 'pasabocas',
+        precio: 34990,
+        descripcion: 'Incluye 25 deditos y 25 empanadas en tamaño pasaboca ya Fritos. Ideal para reuniones pequeñas.',
+        imagen: './Imagenes/Productos/combo_1.png',
+        emoji: '🥟',
+        etiqueta: 'Económico',
+        tipoEtiqueta: 'etiqueta-producto'
+    },
+    {
+        id: 101,
+        nombre: 'Combo_02: 100 unidades Fritos',
+        categoria: 'pasabocas',
+        precio: 64990,
+        descripcion: 'Incluye 50 deditos, 30 empanadas y 20 medallones en tamaño pasaboca ya Fritos. Perfecto para compartir.',
+        imagen: './Imagenes/Productos/combo_2.png',
+        emoji: '🍢',
+        etiqueta: 'Popular',
+        tipoEtiqueta: 'etiqueta-producto'
+    },
+    {
+        id: 102,
+        nombre: 'Combo_03: 150 unidades Fritos',
+        categoria: 'pasabocas',
+        precio: 97990,
+        descripcion: 'Incluye 100 deditos, 30 empanadas y 20 medallones en tamaño pasaboca ya Fritos. Ideal para eventos medianos.',
+        imagen: './Imagenes/Productos/combo_3.png',
+        emoji: '🍴',
+        etiqueta: 'Recomendado',
+        tipoEtiqueta: 'etiqueta-producto'
+    },
+    {
+        id: 103,
+        nombre: 'Combo_04: 170 unidades Fritos',
+        categoria: 'pasabocas',
+        precio: 111990,
+        descripcion: 'Incluye 100 deditos, 50 empanadas y 20 medallones en tamaño pasaboca ya Fritos. Excelente opción para celebraciones.',
+        emoji: '🎉',
+        imagen: './Imagenes/Productos/combo_4.png',
+        etiqueta: 'Favorito',
+        tipoEtiqueta: 'etiqueta-producto'
+    },
+    {
+        id: 104,
+        nombre: 'Combo_05: 200 unidades Fritos',
+        categoria: 'pasabocas',
+        precio: 128990,
+        descripcion: 'Incluye 100 deditos, 50 empanadas y 50 medallones en tamaño pasaboca ya Fritos. Ideal para eventos grandes.',
+        emoji: '🥳',
+        etiqueta: 'Premium',
+        tipoEtiqueta: 'etiqueta-producto'
+    },
+    {
+        id: 110,
+        nombre: 'Combo_06: 300 unidades Fritos',
+        categoria: 'pasabocas',
+        precio: 194990,
+        descripcion: 'Incluye 200 deditos, 100 empanadas y 100 medallones en tamaño pasaboca ya Fritos. Ideal para eventos grandes.',
+        emoji: '🥳',
+        etiqueta: 'Premium',
+        tipoEtiqueta: 'etiqueta-producto'
+    },
+    
     // === DEDITOS ===
     {
         id: 120,
         nombre: 'Deditos de Queso x10',
         categoria: 'deditos',
         precio: 8990,
-        descripcion: 'Crujientes deditos rellenos de queso mozzarella. Pack x10 unidades.',
+        descripcion: 'Crujientes deditos rellenos de queso. Pack x10 unidades.',
         emoji: '🧀',
         imagen: './Imagenes/Productos/Deditos/deditos.png',
         etiqueta: 'Clásico',
@@ -395,7 +454,7 @@ const productos = [
         nombre: 'Deditos de Queso x13',
         categoria: 'deditos',
         precio: 12990,
-        descripcion: 'Crujientes deditos rellenos de queso mozzarella. Pack x13 unidades.',
+        descripcion: 'Crujientes deditos rellenos de queso. Pack x13 unidades.',
         emoji: '🧀',
         etiqueta: 'Clásico',
         tipoEtiqueta: 'etiqueta-producto'
@@ -405,7 +464,7 @@ const productos = [
         nombre: 'Deditos de Queso x18',
         categoria: 'deditos',
         precio: 16990,
-        descripcion: 'Crujientes deditos rellenos de queso mozzarella. Pack x18 unidades.',
+        descripcion: 'Crujientes deditos rellenos de queso. Pack x18 unidades.',
         emoji: '🧀',
         etiqueta: 'Clásico',
         tipoEtiqueta: 'etiqueta-producto'
@@ -449,7 +508,7 @@ const productos = [
         categoria: 'deditos',
         precio: 8990,
         descripcion: 'Mezcla de queso y bocadillo en cada dedito. Pack x10 unidades.',
-        emoji: '🧀',
+       
         imagen: './Imagenes/Productos/Deditos/deditos_combinados.png',
         etiqueta: 'Combinado',
         tipoEtiqueta: 'etiqueta-producto'
@@ -471,7 +530,7 @@ const productos = [
         categoria: 'deditos',
         precio: 16990,
         descripcion: 'Mezcla de queso y bocadillo en cada dedito. Pack x18 unidades.',
-        emoji: '🧀',
+       
         imagen: './Imagenes/Productos/Deditos/deditos_combinados.png',
         etiqueta: 'Combinado',
         tipoEtiqueta: 'etiqueta-producto'
@@ -513,19 +572,26 @@ const productos = [
     // === MEDALLONES ===
     {
         id: 140,
-        nombre: 'Medallones de Carne x20',
+        nombre: 'Medallones x20',
         categoria: 'medallones',
-        precio: 9990,
-        descripcion: 'Medallones de carne molida sazonada con especias tradicionales. Pack x20 unidades.',
+        precio: 11990,
+        descripcion: 'Medallones tradicionales. Pack x20 unidades.',
         emoji: '🍖',
         imagen: './Imagenes/Productos/Medallones/medallones_carne.png',
         etiqueta: 'Clásico',
         tipoEtiqueta: 'etiqueta-producto'
     },
-
-
-
-
+    {
+        id: 141,
+        nombre: 'Medallones x30',
+        categoria: 'medallones',
+        precio: 16990,
+        descripcion: 'Medallones tradicionales. Pack x20 unidades.',
+        emoji: '🍖',
+        imagen: './Imagenes/Productos/Medallones/medallones_carne.png',
+        etiqueta: 'Clásico',
+        tipoEtiqueta: 'etiqueta-producto'
+    },
 
 ];
 
@@ -584,6 +650,8 @@ function renderizarProductos() {
         return;
     }
 
+
+
     grilla.innerHTML = productosFiltrados.map(producto => `
         <article class="tarjeta-producto entrada-animada">
             <div class="imagen-producto">
@@ -597,12 +665,18 @@ function renderizarProductos() {
                     <div class="emoji-fallback">${producto.emoji}</div>
                 `}
                 <div class="etiqueta-producto ${producto.tipoEtiqueta}">
-                    ${producto.etiqueta}
+                    ${producto.etiqueta || ''}
                 </div>
             </div>
             <div class="info-producto">
                 <h3 class="titulo-producto">${producto.nombre}</h3>
                 <p class="descripcion-producto">${producto.descripcion}</p>
+
+                <div class="meta-producto">
+                    ${producto.unidadMedida ? `<span class="unidad-medida">${producto.unidadMedida}</span>` : ''}
+                    ${producto.pesoAproximado ? `<span class="peso-aproximado">${producto.pesoAproximado}</span>` : ''}
+                </div>
+
                 <div class="precio-producto">
                     ${producto.precio.toLocaleString('es-CO')}
                 </div>
@@ -615,6 +689,13 @@ function renderizarProductos() {
                     target="_blank">
                         💬 WhatsApp
                     </a>
+
+                    <!-- BOTÓN DESTACADO solo para producto id 1 -->
+                    ${producto.id === 1 ? `
+                      <button class="boton boton-destacado" onclick="mostrarSimuladorPollo(${producto.id})">
+                        🔢 Simular peso (Pollo)
+                      </button>
+                    ` : ''}
                 </div>
             </div>
         </article>
@@ -1765,3 +1846,145 @@ function validarTelefono(telefono) {
 
 console.log('✅ Integración de Wompi cargada correctamente');
 console.log('🔑 Llave pública:', WOMPI_CONFIG.publicKey);
+
+
+// === SIMULADOR DE PRECIO POR PESO (Pollo entero) ===
+
+function mostrarSimuladorPollo() {
+    // Buscar producto pollo (id 1)
+    const producto = productos.find(p => p.id === 1) || productos.find(p => p.categoria === 'pollo');
+    if (!producto) {
+        mostrarNotificacion('❌ Producto pollo no encontrado', 'error');
+        return;
+    }
+
+    // Intentar derivar peso medio desde pesoAproximado (ej: "2400 - 3000 g")
+    const pesoMedioKg = obtenerPesoMedioKg(producto.pesoAproximado);
+    // Derivar precio/kg si se puede (si producto.precio se refiere a unidad)
+    const precioKgDerivado = pesoMedioKg ? (Number(producto.precio) / pesoMedioKg) : null;
+
+    const modal = document.createElement('div');
+    modal.className = 'modal-instalacion';
+    modal.id = 'modalSimuladorPollo';
+    modal.innerHTML = `
+    <div class="contenido-modal-instalacion" style="max-width:720px;">
+        <button class="cerrar-modal" onclick="cerrarSimuladorPollo()">✕</button>
+        <h3>🔢 Simulador: Pollo Semicriollo Entero</h3>
+        <p class="simulador-ayuda">Usa el control para elegir el peso estimado del pollo. Puedes editar el precio por kg si conoces el valor real.</p>
+
+        <div class="simulador-grid" style="margin-top:1rem;">
+            <div class="simulador-control">
+            <label>Peso (kg): <strong id="sim-peso-valor">${pesoMedioKg ? pesoMedioKg.toFixed(2) : '2.70' } kg</strong></label>
+            <input id="sim-peso" type="range" min="0.8" max="4.0" step="0.1" value="${pesoMedioKg ? pesoMedioKg.toFixed(2) : '2.7'}">
+            <div style="display:flex; gap:0.5rem; margin-top:0.5rem;">
+                <input id="sim-peso-num" type="number" min="0.8" max="4.0" step="0.1" value="${pesoMedioKg ? pesoMedioKg.toFixed(2) : '2.7'}" style="flex:1; padding:0.5rem; border-radius:0.4rem; border:1px solid var(--borde-claro);">
+                <button class="boton boton-whatsapp" onclick="simularPesoPorDefecto(${producto.id})" style="flex:0 0 auto;">🔄 Usar peso medio</button>
+            </div>
+
+            <label style="margin-top:0.75rem;">Precio por kg (COP):</label>
+            <input id="sim-precio-kg" type="number" min="0" step="10" value="${precioKgDerivado ? Math.round(precioKgDerivado) : ''}" placeholder="Ej: 12000" style="padding:0.5rem; border-radius:0.4rem; border:1px solid var(--borde-claro);">
+            <div class="simulador-ayuda">Precio derivado desde producto: ${precioKgDerivado ? `${Math.round(precioKgDerivado).toLocaleString('es-CO')} COP/kg` : 'no disponible'}</div>
+            </div>
+
+            <div>
+            <div class="simulador-result">
+                <div>Producto: <strong>${producto.nombre}</strong></div>
+                <div style="margin-top:0.5rem;">Peso elegido: <strong id="sim-peso-resumen">${pesoMedioKg ? pesoMedioKg.toFixed(2) : '2.70'} kg</strong></div>
+                <div style="margin-top:0.5rem;">Precio/kg usado: <strong id="sim-precio-kg-resumen">${precioKgDerivado ? Math.round(precioKgDerivado).toLocaleString('es-CO') : '—'} COP</strong></div>
+
+                <div style="margin-top:1rem;">
+                <div class="precio-final" id="sim-precio-final">$${'0'.toLocaleString('es-CO')}</div>
+                <div class="simulador-ayuda" style="margin-top:0.5rem;">Estimación aproximada. La cotización final puede variar según peso real y surtido.</div>
+
+                <div class="simulador-botones">
+                    <button class="boton boton-primario" id="sim-calcular">Calcular estimado</button>
+                    <button class="boton boton-whatsapp" onclick="cerrarSimuladorPollo()">Cerrar</button>
+                </div>
+                </div>
+            </div>
+            </div>
+        </div>
+        </div>
+    `;
+    document.body.appendChild(modal);
+
+    // Elementos
+    const range = document.getElementById('sim-peso');
+    const pesoNum = document.getElementById('sim-peso-num');
+    const pesoTexto = document.getElementById('sim-peso-valor');
+    const precioKgInput = document.getElementById('sim-precio-kg');
+    const precioKgResumen = document.getElementById('sim-precio-kg-resumen');
+    const pesoResumen = document.getElementById('sim-peso-resumen');
+    const precioFinalEl = document.getElementById('sim-precio-final');
+    const btnCalcular = document.getElementById('sim-calcular');
+
+    function actualizarUI() {
+      const peso = Number(pesoNum.value);
+      pesoTexto.textContent = `${peso.toFixed(2)} kg`;
+      pesoResumen.textContent = `${peso.toFixed(2)} kg`;
+      const precioKg = Number(precioKgInput.value) || (precioKgDerivado ? Math.round(precioKgDerivado) : 0);
+      precioKgResumen.textContent = precioKg ? `${precioKg.toLocaleString('es-CO')} COP` : '—';
+      // actualizar cálculo automático
+      const total = Math.round((precioKg * peso));
+      precioFinalEl.textContent = `$${total.toLocaleString('es-CO')}`;
+    }
+
+    // enlazar controles
+    range.addEventListener('input', () => {
+      pesoNum.value = range.value;
+      actualizarUI();
+    });
+    pesoNum.addEventListener('input', () => {
+      range.value = pesoNum.value;
+      actualizarUI();
+    });
+    precioKgInput.addEventListener('input', actualizarUI);
+
+    btnCalcular.addEventListener('click', () => {
+      // opción: animación / confirmación
+      actualizarUI();
+      mostrarNotificacion('✅ Estimación actualizada');
+    });
+
+    // cálculo inicial
+    actualizarUI();
+}
+
+function cerrarSimuladorPollo() {
+    const modal = document.getElementById('modalSimuladorPollo');
+    if (modal) modal.remove();
+}
+
+// ayuda: poner peso medio desde producto
+function simularPesoPorDefecto(productoId) {
+    const producto = productos.find(p => p.id === productoId);
+    const pesoMedioKg = obtenerPesoMedioKg(producto.pesoAproximado) || 2.7;
+    const pesoNum = document.getElementById('sim-peso-num');
+    const range = document.getElementById('sim-peso');
+    if (pesoNum && range) {
+        pesoNum.value = pesoMedioKg.toFixed(2);
+        range.value = pesoMedioKg.toFixed(2);
+        // disparar actualización manual
+        document.getElementById('sim-precio-kg').dispatchEvent(new Event('input'));
+    }
+}
+
+// parsea "2400 - 3000 g" -> devuelve kg medio (2.7)
+function obtenerPesoMedioKg(text) {
+    if (!text || typeof text !== 'string') return null;
+    const nums = text.match(/(\d+(\.\d+)?)/g);
+    if (!nums || nums.length === 0) return null;
+    if (nums.length === 1) {
+        // si está en gramos y es un solo número
+        const n = Number(nums[0]);
+        if (n > 10) return n / 1000;
+        return n;
+    }
+    // tomar min y max
+    const a = Number(nums[0]);
+    const b = Number(nums[1]);
+    const medio = ((a + b) / 2);
+    // si parece gramos (mayor que 10), convertir a kg
+    return medio > 10 ? medio / 1000 : medio;
+}
+// ...existing code...
