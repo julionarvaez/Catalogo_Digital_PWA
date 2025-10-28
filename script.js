@@ -2191,3 +2191,207 @@ function forzarMostrarBanner() {
         console.log('🔧 Banner forzado a mostrarse');
     }
 }
+
+// ===== SECCIÓN BENEFICIOS VISUALES =====
+
+/**
+ * Configuración del Intersection Observer para animar beneficios
+ */
+class BeneficiosAnimator {
+    constructor() {
+        this.cards = [];
+        this.observer = null;
+        this.animationDelay = 100;
+        this.init();
+    }
+
+    init() {
+        // Verificar si el usuario prefiere animaciones reducidas
+        const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        
+        if (prefersReducedMotion) {
+            this.showAllCardsImmediately();
+            return;
+        }
+
+        this.setupObserver();
+        this.observeCards();
+    }
+
+    setupObserver() {
+        const options = {
+            root: null,
+            rootMargin: '0px 0px -50px 0px',
+            threshold: 0.2
+        };
+
+        this.observer = new IntersectionObserver((entries) => {
+            entries.forEach((entry) => {
+                if (entry.isIntersecting) {
+                    this.animateCard(entry.target);
+                    this.observer.unobserve(entry.target);
+                }
+            });
+        }, options);
+    }
+
+    observeCards() {
+        this.cards = document.querySelectorAll('.beneficio-card');
+        this.cards.forEach(card => {
+            this.observer.observe(card);
+        });
+    }
+
+    animateCard(card) {
+        const delay = Array.from(this.cards).indexOf(card) * this.animationDelay;
+        
+        setTimeout(() => {
+            card.classList.add('visible');
+            
+            // Animación adicional del ícono
+            const icono = card.querySelector('.beneficio-icono');
+            if (icono) {
+                icono.style.animation = 'iconoEntrada 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards';
+            }
+        }, delay);
+    }
+
+    showAllCardsImmediately() {
+        this.cards = document.querySelectorAll('.beneficio-card');
+        this.cards.forEach(card => {
+            card.classList.add('visible');
+            card.style.opacity = '1';
+            card.style.transform = 'translateY(0)';
+        });
+    }
+}
+
+/**
+ * Sistema de efectos adicionales para los beneficios
+ */
+class BeneficiosEffects {
+    constructor() {
+        this.cards = [];
+        this.init();
+    }
+
+    init() {
+        this.cards = document.querySelectorAll('.beneficio-card');
+        this.addHoverEffects();
+        this.addClickEffects();
+    }
+
+    addHoverEffects() {
+        this.cards.forEach(card => {
+            const icono = card.querySelector('.icono-emoji');
+            
+            card.addEventListener('mouseenter', () => {
+                if (icono) {
+                    icono.style.transform = 'scale(1.2) rotate(10deg)';
+                    icono.style.transition = 'transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)';
+                }
+            });
+
+            card.addEventListener('mouseleave', () => {
+                if (icono) {
+                    icono.style.transform = 'scale(1) rotate(0deg)';
+                }
+            });
+        });
+    }
+
+    addClickEffects() {
+        this.cards.forEach(card => {
+            card.addEventListener('click', () => {
+                // Efecto de pulso al hacer click
+                card.style.animation = 'pulsoBeneficio 0.3s ease-in-out';
+                
+                setTimeout(() => {
+                    card.style.animation = '';
+                }, 300);
+            });
+        });
+    }
+}
+
+/**
+ * Inicialización de los beneficios cuando el DOM esté listo
+ */
+function inicializarBeneficios() {
+    // Esperar a que la sección de beneficios esté en el DOM
+    const seccionBeneficios = document.querySelector('.seccion-beneficios');
+    
+    if (seccionBeneficios) {
+        // Inicializar animaciones
+        new BeneficiosAnimator();
+        
+        // Inicializar efectos adicionales
+        new BeneficiosEffects();
+        
+        console.log('✨ Sección de beneficios inicializada correctamente');
+    } else {
+        // Si no se encuentra, intentar de nuevo en un momento
+        setTimeout(inicializarBeneficios, 100);
+    }
+}
+
+// Agregar las animaciones CSS dinámicamente
+function agregarAnimacionesBeneficios() {
+    const style = document.createElement('style');
+    style.textContent = `
+        @keyframes iconoEntrada {
+            0% {
+                transform: scale(0) rotate(-180deg);
+                opacity: 0;
+            }
+            50% {
+                transform: scale(1.3) rotate(-90deg);
+                opacity: 0.8;
+            }
+            100% {
+                transform: scale(1) rotate(0deg);
+                opacity: 1;
+            }
+        }
+
+        @keyframes pulsoBeneficio {
+            0% {
+                transform: translateY(-8px) scale(1.02);
+            }
+            50% {
+                transform: translateY(-12px) scale(1.05);
+            }
+            100% {
+                transform: translateY(-8px) scale(1.02);
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            @keyframes iconoEntrada {
+                0%, 100% {
+                    transform: scale(1) rotate(0deg);
+                    opacity: 1;
+                }
+            }
+            
+            @keyframes pulsoBeneficio {
+                0%, 100% {
+                    transform: none;
+                }
+            }
+        }
+    `;
+    document.head.appendChild(style);
+}
+
+// Ejecutar cuando el DOM esté completamente cargado
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => {
+        agregarAnimacionesBeneficios();
+        inicializarBeneficios();
+    });
+} else {
+    // El DOM ya está cargado
+    agregarAnimacionesBeneficios();
+    inicializarBeneficios();
+}
