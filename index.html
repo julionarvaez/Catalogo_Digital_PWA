@@ -36,6 +36,49 @@
         </div>
     </header>
 
+    <!-- Banner Promocional Animado -->
+    <div class="banner-promocional" id="bannerPromocional">
+        <button class="btn-cerrar-banner" onclick="cerrarBanner()" title="Cerrar banner">✕</button>
+        
+        <div class="banner-contenido">
+            <div class="banner-animacion">
+                <!-- SVG animado decorativo -->
+                <svg class="icono-animado" viewBox="0 0 100 100" width="40" height="40">
+                    <circle cx="50" cy="50" r="20" fill="#FFA726" opacity="0.3">
+                        <animate attributeName="r" values="15;25;15" dur="2s" repeatCount="indefinite"/>
+                        <animate attributeName="opacity" values="0.3;0.1;0.3" dur="2s" repeatCount="indefinite"/>
+                    </circle>
+                    <circle cx="50" cy="50" r="10" fill="#FF7043"/>
+                </svg>
+            </div>
+            
+            <div class="banner-texto">
+                <div class="promocion-principal">
+                    <span class="texto-promocion">🚚 Envío gratis en todo Montelíbano</span>
+                    <span class="texto-promocion">🎁 10% de descuento en tu primer pedido</span>
+                </div>
+                <div class="subtexto-promocion">
+                    📱 Instala nuestra App y disfruta tus productos más rápido
+                </div>
+            </div>
+            
+            <div class="banner-acciones">
+                <button class="btn-instalar-banner" onclick="accionInstalarApp()">
+                    📱 Instalar App
+                </button>
+                <button class="btn-ver-promociones" onclick="accionVerPromociones()">
+                    🎁 Ver Promociones
+                </button>
+            </div>
+        </div>
+        
+        <div class="banner-decoracion">
+            <div class="particula particula-1"></div>
+            <div class="particula particula-2"></div>
+            <div class="particula particula-3"></div>
+        </div>
+    </div>
+
     <!-- Contenido Principal -->
     <main class="contenedor">
         <!-- Sección Hero -->

@@ -1987,4 +1987,207 @@ function obtenerPesoMedioKg(text) {
     // si parece gramos (mayor que 10), convertir a kg
     return medio > 10 ? medio / 1000 : medio;
 }
-// ...existing code...
+
+// ===== BANNER PROMOCIONAL ANIMADO =====
+
+// Inicializar banner cuando se carga la página
+document.addEventListener('DOMContentLoaded', function() {
+    inicializarBannerPromocional();
+});
+
+/**
+ * Inicializa el banner promocional
+ * Solo se muestra una vez por sesión
+ */
+function inicializarBannerPromocional() {
+    // Verificar si ya se mostró en esta sesión
+    const bannerMostrado = sessionStorage.getItem('banner-promocional-mostrado');
+    
+    if (!bannerMostrado) {
+        mostrarBannerPromocional();
+    } else {
+        // Si ya se mostró, ocultar el banner
+        const banner = document.getElementById('bannerPromocional');
+        if (banner) {
+            banner.style.display = 'none';
+        }
+    }
+}
+
+/**
+ * Muestra el banner promocional con animación
+ */
+function mostrarBannerPromocional() {
+    const banner = document.getElementById('bannerPromocional');
+    if (!banner) return;
+    
+    // Mostrar el banner
+    banner.style.display = 'block';
+    
+    // Log para analytics
+    console.log('📊 Banner promocional mostrado');
+    
+    // Marcar como mostrado en esta sesión
+    sessionStorage.setItem('banner-promocional-mostrado', 'true');
+    
+    // Enviar evento personalizado
+    dispatchEvent(new CustomEvent('bannerPromocionalMostrado', {
+        detail: {
+            timestamp: new Date().toISOString(),
+            sessionId: generarIdSesion()
+        }
+    }));
+}
+
+/**
+ * Cierra el banner promocional con animación suave
+ */
+function cerrarBanner() {
+    const banner = document.getElementById('bannerPromocional');
+    if (!banner) return;
+    
+    // Añadir clase de animación de salida
+    banner.classList.add('cerrando');
+    
+    // Log para analytics
+    console.log('📊 Banner promocional cerrado por el usuario');
+    
+    // Ocultar después de la animación
+    setTimeout(() => {
+        banner.style.display = 'none';
+    }, 500);
+    
+    // Enviar evento personalizado
+    dispatchEvent(new CustomEvent('bannerPromocionalCerrado', {
+        detail: {
+            timestamp: new Date().toISOString(),
+            accion: 'boton_cerrar'
+        }
+    }));
+}
+
+/**
+ * Acción del botón "Instalar App"
+ * Integra con la función existente instalarPWA()
+ */
+function accionInstalarApp() {
+    // Log para analytics
+    console.log('📊 Click en botón "Instalar App" del banner promocional');
+    
+    // Ejecutar la función existente de instalación
+    if (typeof instalarPWA === 'function') {
+        instalarPWA();
+    } else {
+        // Fallback si la función no existe
+        console.warn('⚠️ Función instalarPWA() no encontrada');
+        mostrarNotificacion('Para instalar la app, usa el menú de tu navegador', 'info');
+    }
+    
+    // Enviar evento personalizado
+    dispatchEvent(new CustomEvent('bannerPromocionalInteraccion', {
+        detail: {
+            timestamp: new Date().toISOString(),
+            accion: 'instalar_app',
+            elemento: 'btn_instalar_banner'
+        }
+    }));
+    
+    // Cerrar el banner después de la acción
+    setTimeout(() => {
+        cerrarBanner();
+    }, 1000);
+}
+
+/**
+ * Acción del botón "Ver Promociones"
+ * Integra con la función existente scrollearAProductos()
+ */
+function accionVerPromociones() {
+    // Log para analytics
+    console.log('📊 Click en botón "Ver Promociones" del banner promocional');
+    
+    // Ejecutar la función existente de scroll a productos
+    if (typeof scrollearAProductos === 'function') {
+        scrollearAProductos();
+    } else {
+        // Fallback si la función no existe
+        console.warn('⚠️ Función scrollearAProductos() no encontrada');
+        // Scroll manual al catálogo
+        const grillaProductos = document.getElementById('grillaProductos');
+        if (grillaProductos) {
+            grillaProductos.scrollIntoView({ 
+                behavior: 'smooth',
+                block: 'start'
+            });
+        }
+    }
+    
+    // Enviar evento personalizado
+    dispatchEvent(new CustomEvent('bannerPromocionalInteraccion', {
+        detail: {
+            timestamp: new Date().toISOString(),
+            accion: 'ver_promociones',
+            elemento: 'btn_ver_promociones'
+        }
+    }));
+    
+    // Cerrar el banner después de la acción
+    setTimeout(() => {
+        cerrarBanner();
+    }, 800);
+}
+
+/**
+ * Genera un ID único para la sesión
+ * @returns {string} ID de sesión único
+ */
+function generarIdSesion() {
+    let sessionId = sessionStorage.getItem('session-id');
+    if (!sessionId) {
+        sessionId = 'sess_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+        sessionStorage.setItem('session-id', sessionId);
+    }
+    return sessionId;
+}
+
+/**
+ * Reinicia el banner promocional (útil para desarrollo/testing)
+ * Elimina la marca de "ya mostrado" del sessionStorage
+ */
+function reiniciarBannerPromocional() {
+    sessionStorage.removeItem('banner-promocional-mostrado');
+    console.log('🔄 Banner promocional reiniciado - se mostrará en la próxima carga');
+}
+
+// ===== EVENT LISTENERS ADICIONALES =====
+
+// Escuchar eventos personalizados del banner (opcional para analytics)
+addEventListener('bannerPromocionalMostrado', function(event) {
+    // Aquí podrías enviar datos a Google Analytics, Facebook Pixel, etc.
+    console.log('📈 Evento: Banner mostrado', event.detail);
+});
+
+addEventListener('bannerPromocionalCerrado', function(event) {
+    // Aquí podrías enviar datos a Google Analytics, Facebook Pixel, etc.
+    console.log('📈 Evento: Banner cerrado', event.detail);
+});
+
+addEventListener('bannerPromocionalInteraccion', function(event) {
+    // Aquí podrías enviar datos a Google Analytics, Facebook Pixel, etc.
+    console.log('📈 Evento: Interacción con banner', event.detail);
+});
+
+// ===== FUNCIONES DE UTILIDAD =====
+
+/**
+ * Permite mostrar manualmente el banner (útil para testing)
+ */
+function forzarMostrarBanner() {
+    sessionStorage.removeItem('banner-promocional-mostrado');
+    const banner = document.getElementById('bannerPromocional');
+    if (banner) {
+        banner.classList.remove('cerrando');
+        banner.style.display = 'block';
+        console.log('🔧 Banner forzado a mostrarse');
+    }
+}
