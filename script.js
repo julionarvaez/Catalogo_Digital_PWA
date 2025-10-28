@@ -2390,12 +2390,14 @@ if (document.readyState === 'loading') {
         agregarAnimacionesBeneficios();
         inicializarBeneficios();
         inicializarRecetas();
+        inicializarResenas();
     });
 } else {
     // El DOM ya está cargado
     agregarAnimacionesBeneficios();
     inicializarBeneficios();
     inicializarRecetas();
+    inicializarResenas();
 }
 
 // ===== SECCIÓN INSPIRACIÓN Y RECETAS =====
@@ -2816,5 +2818,1218 @@ function inicializarRecetas() {
     } else {
         // Si no se encuentra, intentar de nuevo en un momento
         setTimeout(inicializarRecetas, 100);
+    }
+}
+
+// ===== SISTEMA DE RESEÑAS ===== 
+
+/**
+ * Sistema completo de reseñas con IndexedDB, Firestore y Optimistic UI
+ * Incluye carrusel, formularios, validación, offline sync y analytics
+ */
+
+class SistemaResenas {
+    constructor() {
+        // Configuración
+        this.config = {
+            dbName: 'AlimentoDelCieloReviews',
+            dbVersion: 1,
+            storeName: 'pendingReviews',
+            apiBase: '/.netlify/functions',
+            rateLimitDelay: 2000, // 2 segundos entre envíos
+            maxRetries: 3
+        };
+
+        // Estado
+        this.db = null;
+        this.resenas = [];
+        this.currentIndex = 0;
+        this.isLoading = false;
+        this.lastSubmit = 0;
+        
+        // Elementos del DOM
+        this.elementos = {};
+        
+        // Bindings
+        this.init = this.init.bind(this);
+        this.setupEventListeners = this.setupEventListeners.bind(this);
+        this.handleSubmit = this.handleSubmit.bind(this);
+        this.syncPendingReviews = this.syncPendingReviews.bind(this);
+        
+        this.init();
+    }
+
+    /**
+     * Inicialización del sistema
+     */
+    async init() {
+        try {
+            // Inicializar IndexedDB
+            await this.initDB();
+            
+            // Obtener elementos del DOM
+            this.getElements();
+            
+            // Configurar event listeners
+            this.setupEventListeners();
+            
+            // Cargar productos en el select
+            this.loadProductOptions();
+            
+            // Cargar reseñas públicas
+            await this.loadReviews();
+            
+            // Sincronizar reseñas pendientes
+            await this.syncPendingReviews();
+            
+            // Configurar monitoreo de conexión
+            this.setupOnlineListener();
+            
+            // Disparar evento de analytics
+            this.trackEvent('review_view', {
+                section: 'reseñas',
+                timestamp: Date.now()
+            });
+            
+            console.log('✅ Sistema de reseñas inicializado correctamente');
+            
+        } catch (error) {
+            console.error('❌ Error inicializando sistema de reseñas:', error);
+            this.showError('Error inicializando el sistema de reseñas. Por favor, recarga la página.');
+        }
+    }
+
+    /**
+     * Inicializar IndexedDB para reseñas offline
+     */
+    async initDB() {
+        return new Promise((resolve, reject) => {
+            const request = indexedDB.open(this.config.dbName, this.config.dbVersion);
+            
+            request.onerror = () => {
+                console.warn('IndexedDB no disponible, usando localStorage como fallback');
+                this.db = null;
+                resolve();
+            };
+            
+            request.onsuccess = (event) => {
+                this.db = event.target.result;
+                console.log('📦 IndexedDB inicializado para reseñas');
+                resolve();
+            };
+            
+            request.onupgradeneeded = (event) => {
+                const db = event.target.result;
+                
+                if (!db.objectStoreNames.contains(this.config.storeName)) {
+                    const store = db.createObjectStore(this.config.storeName, {
+                        keyPath: 'id',
+                        autoIncrement: true
+                    });
+                    
+                    store.createIndex('timestamp', 'timestamp', { unique: false });
+                    store.createIndex('status', 'status', { unique: false });
+                    
+                    console.log('🗄️ Store de reseñas pendientes creado');
+                }
+            };
+        });
+    }
+
+    /**
+     * Obtener referencias a elementos del DOM
+     */
+    getElements() {
+        this.elementos = {
+            // Carrusel
+            track: document.getElementById('resenasTrack'),
+            btnPrev: document.getElementById('btnPrevResenas'),
+            btnNext: document.getElementById('btnNextResenas'),
+            indicadores: document.getElementById('indicadoresResenas'),
+            
+            // Estadísticas
+            totalResenas: document.getElementById('totalResenas'),
+            ratingPromedio: document.getElementById('ratingPromedio'),
+            estrellasPromedio: document.getElementById('estrellasPromedio'),
+            
+            // Formulario
+            form: document.getElementById('resenaForm'),
+            nombreInput: document.getElementById('nombreResena'),
+            productoSelect: document.getElementById('productoResena'),
+            textoTextarea: document.getElementById('textoResena'),
+            ratingSelector: document.getElementById('ratingSelector'),
+            contadorCaracteres: document.getElementById('contadorCaracteres'),
+            btnEnviar: document.getElementById('btnEnviarResena'),
+            btnCancelar: document.getElementById('btnCancelarResena'),
+            
+            // Estados y mensajes
+            mensajeEstado: document.getElementById('mensajeEstado'),
+            mensajeContenido: document.getElementById('mensajeContenido'),
+            estadoOffline: document.getElementById('estadoOffline'),
+            contadorPendientes: document.getElementById('contadorPendientes'),
+            
+            // Errores
+            errorNombre: document.getElementById('errorNombre'),
+            errorRating: document.getElementById('errorRating'),
+            errorTexto: document.getElementById('errorTexto'),
+            
+            // Schema JSON-LD
+            schemaScript: document.getElementById('schemaResenas')
+        };
+        
+        // Verificar elementos críticos
+        const elementosCriticos = ['track', 'form', 'btnEnviar'];
+        const faltantes = elementosCriticos.filter(key => !this.elementos[key]);
+        
+        if (faltantes.length > 0) {
+            throw new Error(`Elementos críticos no encontrados: ${faltantes.join(', ')}`);
+        }
+    }
+
+    /**
+     * Configurar event listeners
+     */
+    setupEventListeners() {
+        // Formulario
+        if (this.elementos.form) {
+            this.elementos.form.addEventListener('submit', this.handleSubmit);
+        }
+        
+        // Contador de caracteres
+        if (this.elementos.textoTextarea) {
+            this.elementos.textoTextarea.addEventListener('input', (e) => {
+                if (this.elementos.contadorCaracteres) {
+                    this.elementos.contadorCaracteres.textContent = e.target.value.length;
+                }
+                this.clearError('errorTexto');
+            });
+        }
+        
+        // Rating selector
+        if (this.elementos.ratingSelector) {
+            this.elementos.ratingSelector.addEventListener('change', () => {
+                this.clearError('errorRating');
+                this.updateRatingDisplay();
+            });
+            
+            // Hover effects para estrellas
+            const estrellas = this.elementos.ratingSelector.querySelectorAll('.estrella');
+            estrellas.forEach((estrella, index) => {
+                estrella.addEventListener('mouseenter', () => {
+                    this.highlightStars(index + 1);
+                });
+                
+                estrella.addEventListener('mouseleave', () => {
+                    this.resetStarHighlight();
+                });
+            });
+        }
+        
+        // Limpiar errores al escribir
+        if (this.elementos.nombreInput) {
+            this.elementos.nombreInput.addEventListener('input', () => {
+                this.clearError('errorNombre');
+            });
+        }
+        
+        // Navegación del carrusel
+        if (this.elementos.btnPrev) {
+            this.elementos.btnPrev.addEventListener('click', () => this.previousReview());
+        }
+        
+        if (this.elementos.btnNext) {
+            this.elementos.btnNext.addEventListener('click', () => this.nextReview());
+        }
+        
+        // Touch/swipe para móviles en el carrusel
+        if (this.elementos.track) {
+            this.setupTouchEvents();
+        }
+        
+        // Navegación por teclado
+        document.addEventListener('keydown', (e) => {
+            if (e.target.closest('.seccion-resenas')) {
+                if (e.key === 'ArrowLeft') {
+                    e.preventDefault();
+                    this.previousReview();
+                } else if (e.key === 'ArrowRight') {
+                    e.preventDefault();
+                    this.nextReview();
+                }
+            }
+        });
+    }
+
+    /**
+     * Configurar eventos táctiles para móviles
+     */
+    setupTouchEvents() {
+        let startX = 0;
+        let endX = 0;
+        
+        this.elementos.track.addEventListener('touchstart', (e) => {
+            startX = e.touches[0].clientX;
+        }, { passive: true });
+        
+        this.elementos.track.addEventListener('touchend', (e) => {
+            endX = e.changedTouches[0].clientX;
+            const difference = startX - endX;
+            const threshold = 50;
+            
+            if (Math.abs(difference) > threshold) {
+                if (difference > 0) {
+                    this.nextReview();
+                } else {
+                    this.previousReview();
+                }
+            }
+        }, { passive: true });
+    }
+
+    /**
+     * Cargar opciones de productos en el select
+     */
+    loadProductOptions() {
+        if (!this.elementos.productoSelect || typeof productos === 'undefined') {
+            return;
+        }
+        
+        // Limpiar opciones existentes excepto la primera
+        while (this.elementos.productoSelect.children.length > 1) {
+            this.elementos.productoSelect.removeChild(this.elementos.productoSelect.lastChild);
+        }
+        
+        // Agregar productos
+        productos.forEach(producto => {
+            const option = document.createElement('option');
+            option.value = producto.id;
+            option.textContent = `${producto.emoji} ${producto.nombre}`;
+            this.elementos.productoSelect.appendChild(option);
+        });
+    }
+
+    /**
+     * Cargar reseñas públicas desde el servidor
+     */
+    async loadReviews() {
+        try {
+            this.setLoadingState(true);
+            
+            const response = await this.obtenerResenasPublicas();
+            
+            if (response.ok && response.reviews) {
+                this.resenas = response.reviews;
+                this.renderReviews();
+                this.updateStatistics();
+                this.updateSchema();
+            } else {
+                console.warn('No se pudieron cargar las reseñas:', response.error);
+                this.showPlaceholder();
+            }
+            
+        } catch (error) {
+            console.error('Error cargando reseñas:', error);
+            this.showPlaceholder();
+        } finally {
+            this.setLoadingState(false);
+        }
+    }
+
+    /**
+     * Renderizar reseñas en el carrusel
+     */
+    renderReviews() {
+        if (!this.elementos.track) return;
+        
+        this.elementos.track.innerHTML = '';
+        
+        if (this.resenas.length === 0) {
+            this.showPlaceholder();
+            return;
+        }
+        
+        this.resenas.forEach((resena, index) => {
+            const card = this.createReviewCard(resena, index);
+            this.elementos.track.appendChild(card);
+        });
+        
+        this.updateCarouselControls();
+        this.createIndicators();
+        
+        // Mostrar primera reseña
+        this.currentIndex = 0;
+        this.showReview(0);
+    }
+
+    /**
+     * Crear tarjeta de reseña
+     */
+    createReviewCard(resena, index) {
+        const card = document.createElement('div');
+        card.className = 'resena-card';
+        card.setAttribute('data-index', index);
+        
+        // Avatar con iniciales
+        const iniciales = resena.nombre.split(' ')
+            .map(word => word[0])
+            .join('')
+            .substring(0, 2)
+            .toUpperCase();
+        
+        // Producto si está disponible
+        let productoInfo = '';
+        if (resena.productoId && typeof productos !== 'undefined') {
+            const producto = productos.find(p => p.id == resena.productoId);
+            if (producto) {
+                productoInfo = `<div class="resena-producto">${producto.emoji} ${producto.nombre}</div>`;
+            }
+        }
+        
+        // Fecha formateada
+        const fecha = resena.createdAt ? new Date(resena.createdAt.seconds * 1000 || resena.createdAt) : new Date();
+        const fechaFormateada = fecha.toLocaleDateString('es-CO', {
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric'
+        });
+        
+        // Estado de la reseña
+        let estadoInfo = '';
+        if (resena.status) {
+            const estados = {
+                'pending': 'Enviando...',
+                'offline': 'Pendiente (sin conexión)', 
+                'published': 'Publicado',
+                'moderation': 'En espera de moderación'
+            };
+            estadoInfo = `<div class="resena-estado ${resena.status}">${estados[resena.status] || 'Publicado'}</div>`;
+        }
+        
+        card.innerHTML = `
+            <div class="resena-header">
+                <div class="resena-avatar">${iniciales}</div>
+                <div class="resena-info">
+                    <div class="resena-nombre">${this.sanitizeHTML(resena.nombre)}</div>
+                    <div class="resena-fecha">${fechaFormateada}</div>
+                    ${productoInfo}
+                </div>
+            </div>
+            <div class="resena-rating">
+                ${this.generateStars(resena.rating)}
+            </div>
+            <div class="resena-texto">${this.sanitizeHTML(resena.texto)}</div>
+            ${estadoInfo}
+        `;
+        
+        return card;
+    }
+
+    /**
+     * Generar estrellas para rating
+     */
+    generateStars(rating) {
+        let stars = '';
+        for (let i = 1; i <= 5; i++) {
+            const className = i <= rating ? 'estrella' : 'estrella empty';
+            stars += `<span class="${className}">★</span>`;
+        }
+        return stars;
+    }
+
+    /**
+     * Mostrar placeholder cuando no hay reseñas
+     */
+    showPlaceholder() {
+        if (!this.elementos.track) return;
+        
+        this.elementos.track.innerHTML = `
+            <div class="resena-placeholder">
+                <div class="placeholder-icono">💬</div>
+                <p>Sé el primero en compartir tu experiencia con nuestros productos.</p>
+            </div>
+        `;
+        
+        if (this.elementos.indicadores) {
+            this.elementos.indicadores.innerHTML = '';
+        }
+        
+        this.updateCarouselControls();
+    }
+
+    /**
+     * Actualizar estadísticas de reseñas
+     */
+    updateStatistics() {
+        const total = this.resenas.length;
+        const promedio = total > 0 ? 
+            this.resenas.reduce((sum, r) => sum + r.rating, 0) / total : 0;
+        
+        if (this.elementos.totalResenas) {
+            this.elementos.totalResenas.textContent = total;
+        }
+        
+        if (this.elementos.ratingPromedio) {
+            const ratingNumber = this.elementos.ratingPromedio.querySelector('.rating-numero');
+            if (ratingNumber) {
+                ratingNumber.textContent = promedio.toFixed(1);
+            }
+        }
+        
+        if (this.elementos.estrellasPromedio) {
+            this.elementos.estrellasPromedio.innerHTML = this.generateStars(Math.round(promedio));
+        }
+    }
+
+    /**
+     * Actualizar JSON-LD Schema
+     */
+    updateSchema() {
+        if (!this.elementos.schemaScript) return;
+        
+        const total = this.resenas.length;
+        const promedio = total > 0 ? 
+            this.resenas.reduce((sum, r) => sum + r.rating, 0) / total : 0;
+        
+        const schema = {
+            "@context": "https://schema.org",
+            "@type": "Organization",
+            "name": "Alimento del Cielo",
+            "aggregateRating": {
+                "@type": "AggregateRating",
+                "ratingValue": promedio.toFixed(1),
+                "reviewCount": total.toString()
+            },
+            "review": this.resenas.slice(0, 5).map(resena => ({
+                "@type": "Review",
+                "author": {
+                    "@type": "Person",
+                    "name": resena.nombre
+                },
+                "reviewRating": {
+                    "@type": "Rating",
+                    "ratingValue": resena.rating.toString()
+                },
+                "reviewBody": resena.texto,
+                "datePublished": resena.createdAt ? 
+                    new Date(resena.createdAt.seconds * 1000 || resena.createdAt).toISOString() : 
+                    new Date().toISOString()
+            }))
+        };
+        
+        this.elementos.schemaScript.textContent = JSON.stringify(schema, null, 2);
+    }
+
+    /**
+     * Manejar envío del formulario
+     */
+    async handleSubmit(event) {
+        event.preventDefault();
+        
+        // Rate limiting
+        const now = Date.now();
+        if (now - this.lastSubmit < this.config.rateLimitDelay) {
+            this.showError(`Por favor espera ${Math.ceil((this.config.rateLimitDelay - (now - this.lastSubmit)) / 1000)} segundos antes de enviar otra reseña.`);
+            return;
+        }
+        
+        // Validar formulario
+        if (!this.validateForm()) {
+            return;
+        }
+        
+        // Recopilar datos
+        const formData = new FormData(this.elementos.form);
+        const resenaData = {
+            nombre: formData.get('nombre').trim(),
+            texto: formData.get('texto').trim(),
+            rating: parseInt(formData.get('rating')),
+            productoId: formData.get('productoId') || null,
+            timestamp: Date.now(),
+            status: 'pending'
+        };
+        
+        // Optimistic UI - agregar inmediatamente a la vista
+        this.addOptimisticReview(resenaData);
+        
+        // Intentar enviar al servidor
+        try {
+            this.setSubmitState(true);
+            this.lastSubmit = now;
+            
+            const response = await this.enviarResenaAlServidor(resenaData);
+            
+            if (response.ok) {
+                // Éxito - actualizar estado
+                this.updateReviewStatus(resenaData.timestamp, 'published', response.id);
+                this.showSuccess('¡Gracias por tu reseña! Se ha enviado correctamente.');
+                this.resetForm();
+                
+                // Analytics
+                this.trackEvent('review_submit', {
+                    rating: resenaData.rating,
+                    has_product: !!resenaData.productoId,
+                    text_length: resenaData.texto.length
+                });
+                
+            } else {
+                throw new Error(response.error || 'Error desconocido');
+            }
+            
+        } catch (error) {
+            console.error('Error enviando reseña:', error);
+            
+            // Guardar para retry offline
+            await this.saveForOffline(resenaData);
+            this.updateReviewStatus(resenaData.timestamp, 'offline');
+            
+            this.showError('No se pudo enviar tu reseña ahora. Se guardó y se enviará automáticamente cuando tengas conexión.');
+            
+            // Analytics
+            this.trackEvent('review_error', {
+                error: error.message,
+                offline: !navigator.onLine
+            });
+            
+        } finally {
+            this.setSubmitState(false);
+        }
+    }
+
+    /**
+     * Validar formulario
+     */
+    validateForm() {
+        let isValid = true;
+        
+        // Limpiar errores previos
+        this.clearAllErrors();
+        
+        // Validar nombre
+        const nombre = this.elementos.nombreInput.value.trim();
+        if (!nombre || nombre.length < 2) {
+            this.showFieldError('errorNombre', 'El nombre debe tener al menos 2 caracteres');
+            isValid = false;
+        } else if (nombre.length > 50) {
+            this.showFieldError('errorNombre', 'El nombre no puede exceder 50 caracteres');
+            isValid = false;
+        }
+        
+        // Validar rating
+        const rating = this.elementos.form.querySelector('input[name="rating"]:checked');
+        if (!rating) {
+            this.showFieldError('errorRating', 'Por favor selecciona una calificación');
+            isValid = false;
+        }
+        
+        // Validar texto
+        const texto = this.elementos.textoTextarea.value.trim();
+        if (!texto || texto.length < 10) {
+            this.showFieldError('errorTexto', 'Tu opinión debe tener al menos 10 caracteres');
+            isValid = false;
+        } else if (texto.length > 500) {
+            this.showFieldError('errorTexto', 'Tu opinión no puede exceder 500 caracteres');
+            isValid = false;
+        }
+        
+        return isValid;
+    }
+
+    /**
+     * Mostrar error de campo
+     */
+    showFieldError(errorId, message) {
+        const errorElement = this.elementos[errorId];
+        if (errorElement) {
+            errorElement.textContent = message;
+            errorElement.classList.add('visible');
+        }
+    }
+
+    /**
+     * Limpiar error específico
+     */
+    clearError(errorId) {
+        const errorElement = this.elementos[errorId];
+        if (errorElement) {
+            errorElement.classList.remove('visible');
+        }
+    }
+
+    /**
+     * Limpiar todos los errores
+     */
+    clearAllErrors() {
+        ['errorNombre', 'errorRating', 'errorTexto'].forEach(errorId => {
+            this.clearError(errorId);
+        });
+    }
+
+    /**
+     * Agregar reseña con Optimistic UI
+     */
+    addOptimisticReview(resenaData) {
+        // Agregar al principio del array
+        this.resenas.unshift({
+            ...resenaData,
+            id: `temp_${resenaData.timestamp}`,
+            createdAt: new Date()
+        });
+        
+        // Re-renderizar
+        this.renderReviews();
+        this.updateStatistics();
+    }
+
+    /**
+     * Actualizar estado de reseña
+     */
+    updateReviewStatus(timestamp, status, serverId = null) {
+        const index = this.resenas.findIndex(r => 
+            r.timestamp === timestamp || r.id === `temp_${timestamp}`
+        );
+        
+        if (index !== -1) {
+            this.resenas[index].status = status;
+            if (serverId) {
+                this.resenas[index].id = serverId;
+                delete this.resenas[index].timestamp;
+            }
+            
+            // Actualizar solo la tarjeta específica
+            const card = this.elementos.track.querySelector(`[data-index="${index}"]`);
+            if (card) {
+                const estadoElement = card.querySelector('.resena-estado');
+                if (estadoElement) {
+                    const estados = {
+                        'pending': 'Enviando...',
+                        'offline': 'Pendiente (sin conexión)',
+                        'published': 'Publicado',
+                        'moderation': 'En espera de moderación'
+                    };
+                    estadoElement.textContent = estados[status] || 'Publicado';
+                    estadoElement.className = `resena-estado ${status}`;
+                }
+            }
+        }
+    }
+
+    /**
+     * Guardar reseña para envío offline
+     */
+    async saveForOffline(resenaData) {
+        try {
+            if (this.db) {
+                // Usar IndexedDB
+                const transaction = this.db.transaction([this.config.storeName], 'readwrite');
+                const store = transaction.objectStore(this.config.storeName);
+                await store.add(resenaData);
+            } else {
+                // Fallback a localStorage
+                const pendientes = JSON.parse(localStorage.getItem('reseñas_pendientes') || '[]');
+                pendientes.push(resenaData);
+                localStorage.setItem('reseñas_pendientes', JSON.stringify(pendientes));
+            }
+            
+            this.updatePendingCounter();
+            
+        } catch (error) {
+            console.error('Error guardando reseña offline:', error);
+        }
+    }
+
+    /**
+     * Sincronizar reseñas pendientes
+     */
+    async sincronizarResenasPendientes() {
+        if (!navigator.onLine) {
+            console.log('Sin conexión - sincronización aplazada');
+            return;
+        }
+        
+        let pendientes = [];
+        
+        try {
+            if (this.db) {
+                // Obtener de IndexedDB
+                const transaction = this.db.transaction([this.config.storeName], 'readonly');
+                const store = transaction.objectStore(this.config.storeName);
+                const request = store.getAll();
+                
+                request.onsuccess = async () => {
+                    pendientes = request.result;
+                    await this.processPendingReviews(pendientes);
+                };
+            } else {
+                // Obtener de localStorage
+                pendientes = JSON.parse(localStorage.getItem('reseñas_pendientes') || '[]');
+                await this.processPendingReviews(pendientes);
+            }
+        } catch (error) {
+            console.error('Error sincronizando reseñas pendientes:', error);
+        }
+    }
+
+    /**
+     * Procesar reseñas pendientes
+     */
+    async processPendingReviews(pendientes) {
+        if (pendientes.length === 0) return;
+        
+        console.log(`Sincronizando ${pendientes.length} reseñas pendientes...`);
+        
+        let synchronized = 0;
+        
+        for (const resena of pendientes) {
+            try {
+                const response = await this.enviarResenaAlServidor(resena);
+                
+                if (response.ok) {
+                    // Eliminar de almacén offline
+                    await this.removeFromOfflineStore(resena);
+                    
+                    // Actualizar estado en UI si está visible
+                    this.updateReviewStatus(resena.timestamp, 'published', response.id);
+                    
+                    synchronized++;
+                } else {
+                    console.warn('No se pudo sincronizar reseña:', response.error);
+                }
+                
+            } catch (error) {
+                console.error('Error sincronizando reseña individual:', error);
+            }
+            
+            // Pequeña pausa entre envíos
+            await new Promise(resolve => setTimeout(resolve, 500));
+        }
+        
+        if (synchronized > 0) {
+            console.log(`✅ ${synchronized} reseñas sincronizadas correctamente`);
+            this.updatePendingCounter();
+            
+            // Recargar reseñas para mostrar las nuevas
+            await this.loadReviews();
+            
+            // Analytics
+            this.trackEvent('review_sync', {
+                synchronized_count: synchronized,
+                total_pending: pendientes.length
+            });
+        }
+    }
+
+    /**
+     * Eliminar reseña del almacén offline
+     */
+    async removeFromOfflineStore(resena) {
+        try {
+            if (this.db) {
+                const transaction = this.db.transaction([this.config.storeName], 'readwrite');
+                const store = transaction.objectStore(this.config.storeName);
+                
+                // Buscar por timestamp ya que no tenemos el ID exacto
+                const index = store.index('timestamp');
+                const request = index.get(resena.timestamp);
+                
+                request.onsuccess = () => {
+                    if (request.result) {
+                        store.delete(request.result.id);
+                    }
+                };
+            } else {
+                const pendientes = JSON.parse(localStorage.getItem('reseñas_pendientes') || '[]');
+                const filtered = pendientes.filter(p => p.timestamp !== resena.timestamp);
+                localStorage.setItem('reseñas_pendientes', JSON.stringify(filtered));
+            }
+        } catch (error) {
+            console.error('Error eliminando reseña del almacén offline:', error);
+        }
+    }
+
+    /**
+     * Actualizar contador de reseñas pendientes
+     */
+    updatePendingCounter() {
+        if (!this.elementos.contadorPendientes) return;
+        
+        const getPendingCount = async () => {
+            if (this.db) {
+                const transaction = this.db.transaction([this.config.storeName], 'readonly');
+                const store = transaction.objectStore(this.config.storeName);
+                const request = store.count();
+                
+                request.onsuccess = () => {
+                    this.elementos.contadorPendientes.textContent = request.result;
+                    this.elementos.estadoOffline.style.display = request.result > 0 ? 'block' : 'none';
+                };
+            } else {
+                const pendientes = JSON.parse(localStorage.getItem('reseñas_pendientes') || '[]');
+                this.elementos.contadorPendientes.textContent = pendientes.length;
+                this.elementos.estadoOffline.style.display = pendientes.length > 0 ? 'block' : 'none';
+            }
+        };
+        
+        getPendingCount();
+    }
+
+    /**
+     * Configurar listener de conexión online/offline
+     */
+    setupOnlineListener() {
+        window.addEventListener('online', async () => {
+            console.log('🌐 Conexión restaurada - sincronizando reseñas...');
+            await this.sincronizarResenasPendientes();
+        });
+        
+        window.addEventListener('offline', () => {
+            console.log('📡 Sin conexión - las reseñas se guardarán para envío posterior');
+        });
+    }
+
+    // ===== FUNCIONES PÚBLICAS DE LA API =====
+
+    /**
+     * Enviar reseña al servidor (función pública)
+     */
+    async enviarResenaAlServidor(resenaData) {
+        const url = `${this.config.apiBase}/reviews`;
+        
+        try {
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(resenaData)
+            });
+            
+            const data = await response.json();
+            
+            if (!response.ok) {
+                throw new Error(data.error || `HTTP ${response.status}`);
+            }
+            
+            return data;
+            
+        } catch (error) {
+            console.error('Error en enviarResenaAlServidor:', error);
+            throw error;
+        }
+    }
+
+    /**
+     * Obtener reseñas públicas (función pública)
+     */
+    async obtenerResenasPublicas() {
+        const url = `${this.config.apiBase}/getReviews`;
+        
+        try {
+            const response = await fetch(url, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            });
+            
+            const data = await response.json();
+            
+            if (!response.ok) {
+                throw new Error(data.error || `HTTP ${response.status}`);
+            }
+            
+            return data;
+            
+        } catch (error) {
+            console.error('Error en obtenerResenasPublicas:', error);
+            return { ok: false, error: error.message, reviews: [] };
+        }
+    }
+
+    // ===== NAVEGACIÓN DEL CARRUSEL =====
+
+    /**
+     * Mostrar reseña anterior
+     */
+    previousReview() {
+        if (this.resenas.length <= 1) return;
+        
+        this.currentIndex = this.currentIndex > 0 ? this.currentIndex - 1 : this.resenas.length - 1;
+        this.showReview(this.currentIndex);
+    }
+
+    /**
+     * Mostrar siguiente reseña
+     */
+    nextReview() {
+        if (this.resenas.length <= 1) return;
+        
+        this.currentIndex = this.currentIndex < this.resenas.length - 1 ? this.currentIndex + 1 : 0;
+        this.showReview(this.currentIndex);
+    }
+
+    /**
+     * Mostrar reseña específica
+     */
+    showReview(index) {
+        if (!this.elementos.track || index < 0 || index >= this.resenas.length) return;
+        
+        const cardWidth = 350 + 24; // ancho de card + gap
+        const translateX = -(index * cardWidth);
+        
+        this.elementos.track.style.transform = `translateX(${translateX}px)`;
+        this.currentIndex = index;
+        
+        this.updateCarouselControls();
+        this.updateIndicators();
+    }
+
+    /**
+     * Actualizar controles del carrusel
+     */
+    updateCarouselControls() {
+        if (!this.elementos.btnPrev || !this.elementos.btnNext) return;
+        
+        const hasReviews = this.resenas.length > 1;
+        
+        this.elementos.btnPrev.disabled = !hasReviews;
+        this.elementos.btnNext.disabled = !hasReviews;
+    }
+
+    /**
+     * Crear indicadores
+     */
+    createIndicators() {
+        if (!this.elementos.indicadores) return;
+        
+        this.elementos.indicadores.innerHTML = '';
+        
+        if (this.resenas.length <= 1) return;
+        
+        this.resenas.forEach((_, index) => {
+            const indicator = document.createElement('button');
+            indicator.className = 'indicador';
+            indicator.setAttribute('aria-label', `Ir a reseña ${index + 1}`);
+            indicator.addEventListener('click', () => this.showReview(index));
+            
+            this.elementos.indicadores.appendChild(indicator);
+        });
+        
+        this.updateIndicators();
+    }
+
+    /**
+     * Actualizar indicadores
+     */
+    updateIndicators() {
+        if (!this.elementos.indicadores) return;
+        
+        const indicators = this.elementos.indicadores.querySelectorAll('.indicador');
+        indicators.forEach((indicator, index) => {
+            if (index === this.currentIndex) {
+                indicator.classList.add('activo');
+            } else {
+                indicator.classList.remove('activo');
+            }
+        });
+    }
+
+    // ===== UTILIDADES =====
+
+    /**
+     * Establecer estado de carga
+     */
+    setLoadingState(loading) {
+        this.isLoading = loading;
+        // Aquí puedes agregar indicadores visuales de carga
+    }
+
+    /**
+     * Establecer estado de envío
+     */
+    setSubmitState(submitting) {
+        if (!this.elementos.btnEnviar) return;
+        
+        const btnTexto = this.elementos.btnEnviar.querySelector('.btn-texto');
+        const btnLoading = this.elementos.btnEnviar.querySelector('.btn-loading');
+        
+        if (submitting) {
+            btnTexto.style.display = 'none';
+            btnLoading.style.display = 'flex';
+            this.elementos.btnEnviar.disabled = true;
+        } else {
+            btnTexto.style.display = 'inline';
+            btnLoading.style.display = 'none';
+            this.elementos.btnEnviar.disabled = false;
+        }
+    }
+
+    /**
+     * Mostrar mensaje de éxito
+     */
+    showSuccess(message) {
+        this.showMessage(message, 'success');
+    }
+
+    /**
+     * Mostrar mensaje de error
+     */
+    showError(message) {
+        this.showMessage(message, 'error');
+    }
+
+    /**
+     * Mostrar mensaje genérico
+     */
+    showMessage(message, type = 'info') {
+        if (!this.elementos.mensajeEstado || !this.elementos.mensajeContenido) return;
+        
+        this.elementos.mensajeContenido.textContent = message;
+        this.elementos.mensajeEstado.className = `mensaje-estado ${type}`;
+        this.elementos.mensajeEstado.style.display = 'block';
+        
+        // Auto-ocultar después de 5 segundos
+        setTimeout(() => {
+            this.elementos.mensajeEstado.style.display = 'none';
+        }, 5000);
+    }
+
+    /**
+     * Resetear formulario
+     */
+    resetForm() {
+        if (!this.elementos.form) return;
+        
+        this.elementos.form.reset();
+        
+        if (this.elementos.contadorCaracteres) {
+            this.elementos.contadorCaracteres.textContent = '0';
+        }
+        
+        this.clearAllErrors();
+        this.resetStarHighlight();
+    }
+
+    /**
+     * Resaltar estrellas en hover
+     */
+    highlightStars(count) {
+        const estrellas = this.elementos.ratingSelector.querySelectorAll('.estrella');
+        estrellas.forEach((estrella, index) => {
+            if (index < count) {
+                estrella.classList.add('active');
+            } else {
+                estrella.classList.remove('active');
+            }
+        });
+    }
+
+    /**
+     * Resetear resaltado de estrellas
+     */
+    resetStarHighlight() {
+        const checkedInput = this.elementos.ratingSelector.querySelector('input:checked');
+        const checkedValue = checkedInput ? parseInt(checkedInput.value) : 0;
+        
+        const estrellas = this.elementos.ratingSelector.querySelectorAll('.estrella');
+        estrellas.forEach((estrella, index) => {
+            if (index < checkedValue) {
+                estrella.classList.add('active');
+            } else {
+                estrella.classList.remove('active');
+            }
+        });
+    }
+
+    /**
+     * Actualizar display de rating
+     */
+    updateRatingDisplay() {
+        this.resetStarHighlight();
+    }
+
+    /**
+     * Sanitizar HTML para prevenir XSS
+     */
+    sanitizeHTML(str) {
+        const temp = document.createElement('div');
+        temp.textContent = str;
+        return temp.innerHTML;
+    }
+
+    /**
+     * Disparar evento de analytics
+     */
+    trackEvent(eventName, parameters = {}) {
+        try {
+            // Google Analytics (gtag)
+            if (typeof gtag !== 'undefined') {
+                gtag('event', eventName, {
+                    custom_parameter: parameters,
+                    ...parameters
+                });
+            }
+            
+            // Sistema interno de analytics
+            if (typeof window.AlimentoDelCielo !== 'undefined' && window.AlimentoDelCielo.analytics) {
+                window.AlimentoDelCielo.analytics.track(eventName, parameters);
+            }
+            
+            console.log(`📊 Analytics: ${eventName}`, parameters);
+            
+        } catch (error) {
+            console.warn('Error enviando evento de analytics:', error);
+        }
+    }
+}
+
+// ===== INICIALIZACIÓN =====
+
+/**
+ * Inicializar sistema de reseñas cuando el DOM esté listo
+ */
+function inicializarResenas() {
+    const seccionResenas = document.querySelector('.seccion-resenas');
+    
+    if (seccionResenas) {
+        // Crear instancia global del sistema de reseñas
+        window.sistemaResenas = new SistemaResenas();
+        
+        console.log('⭐ Sistema de reseñas inicializado correctamente');
+    } else {
+        // Si no se encuentra, intentar de nuevo en un momento
+        setTimeout(inicializarResenas, 100);
+    }
+}
+
+// ===== FUNCIONES GLOBALES PÚBLICAS =====
+
+/**
+ * Funciones públicas esperadas para integración externa
+ */
+
+// Enviar reseña al servidor (función global)
+async function enviarResenaAlServidor(resenaData) {
+    if (window.sistemaResenas) {
+        return await window.sistemaResenas.enviarResenaAlServidor(resenaData);
+    } else {
+        throw new Error('Sistema de reseñas no inicializado');
+    }
+}
+
+// Obtener reseñas públicas (función global)
+async function obtenerResenasPublicas() {
+    if (window.sistemaResenas) {
+        return await window.sistemaResenas.obtenerResenasPublicas();
+    } else {
+        throw new Error('Sistema de reseñas no inicializado');
+    }
+}
+
+// Sincronizar reseñas pendientes (función global)
+async function sincronizarResenasPendientes() {
+    if (window.sistemaResenas) {
+        return await window.sistemaResenas.sincronizarResenasPendientes();
+    } else {
+        throw new Error('Sistema de reseñas no inicializado');
     }
 }

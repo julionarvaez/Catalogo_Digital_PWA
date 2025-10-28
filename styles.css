@@ -3126,3 +3126,832 @@ body.modo-oscuro .receta-video-placeholder {
 body.modo-oscuro .placeholder-text {
     color: #60a5fa;
 }
+
+/* ===== SECCIÓN DE RESEÑAS ===== */
+
+:root {
+    /* Variables específicas para reseñas */
+    --resena-radius: 16px;
+    --resena-shadow: 0 4px 20px rgba(37, 99, 235, 0.1);
+    --resena-shadow-hover: 0 8px 30px rgba(37, 99, 235, 0.2);
+    --estrella-color: #fbbf24;
+    --estrella-color-empty: #e5e7eb;
+    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.seccion-resenas {
+    padding: 5rem 0;
+    background: linear-gradient(135deg, 
+        rgba(248, 250, 252, 0.95) 0%, 
+        rgba(241, 245, 249, 0.98) 50%, 
+        rgba(248, 250, 252, 0.95) 100%);
+    position: relative;
+    overflow: hidden;
+}
+
+.seccion-resenas::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 800"><defs><pattern id="reviews-pattern" x="0" y="0" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="50" cy="50" r="2" fill="%232563eb" opacity="0.1"/><circle cx="25" cy="25" r="1.5" fill="%2338bdf8" opacity="0.15"/><circle cx="75" cy="75" r="1" fill="%232563eb" opacity="0.12"/></pattern></defs><rect width="1200" height="800" fill="url(%23reviews-pattern)"/></svg>');
+    pointer-events: none;
+    z-index: 1;
+}
+
+.resenas-contenedor {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 1rem;
+    position: relative;
+    z-index: 2;
+}
+
+/* ===== HEADER DE RESEÑAS ===== */
+
+.resenas-header {
+    text-align: center;
+    margin-bottom: 3rem;
+}
+
+.resenas-titulo {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: var(--color-primario);
+    margin-bottom: 1rem;
+    background: linear-gradient(135deg, var(--color-primario), #1e40af);
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-family: 'Poppins', 'Inter', system-ui, sans-serif;
+    position: relative;
+}
+
+.resenas-titulo::after {
+    content: '';
+    position: absolute;
+    bottom: -0.5rem;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 120px;
+    height: 4px;
+    background: linear-gradient(90deg, var(--color-primario), var(--estrella-color));
+    border-radius: 2px;
+}
+
+.resenas-subtitulo {
+    font-size: 1.1rem;
+    color: var(--color-texto-secundario);
+    line-height: 1.6;
+    max-width: 600px;
+    margin: 0 auto;
+    font-weight: 400;
+}
+
+/* ===== ESTADÍSTICAS DE RESEÑAS ===== */
+
+.resenas-estadisticas {
+    display: flex;
+    justify-content: center;
+    gap: 3rem;
+    margin-bottom: 3rem;
+    padding: 2rem;
+    background: white;
+    border-radius: var(--resena-radius);
+    box-shadow: var(--resena-shadow);
+    border: 1px solid rgba(37, 99, 235, 0.1);
+}
+
+.estadistica-item {
+    text-align: center;
+}
+
+.estadistica-numero {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: var(--color-primario);
+    line-height: 1;
+}
+
+.estadistica-rating {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.rating-numero {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: var(--color-primario);
+}
+
+.estrellas-display {
+    display: flex;
+    gap: 0.2rem;
+}
+
+.estrellas-display .estrella {
+    font-size: 1.5rem;
+    color: var(--estrella-color);
+}
+
+.estadistica-label {
+    font-size: 0.9rem;
+    color: var(--color-texto-secundario);
+    margin-top: 0.5rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* ===== CARRUSEL DE RESEÑAS ===== */
+
+.resenas-carrusel {
+    position: relative;
+    margin-bottom: 4rem;
+}
+
+.carrusel-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: white;
+    border: 2px solid var(--color-primario);
+    color: var(--color-primario);
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: var(--transition-smooth);
+    z-index: 10;
+    box-shadow: var(--resena-shadow);
+    backdrop-filter: blur(10px);
+}
+
+.carrusel-btn:hover:not(:disabled) {
+    background: var(--color-primario);
+    color: white;
+    transform: translateY(-50%) scale(1.1);
+    box-shadow: var(--resena-shadow-hover);
+}
+
+.carrusel-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: translateY(-50%) scale(0.9);
+}
+
+.carrusel-prev {
+    left: -25px;
+}
+
+.carrusel-next {
+    right: -25px;
+}
+
+.resenas-track {
+    display: flex;
+    gap: 1.5rem;
+    overflow-x: auto;
+    scroll-behavior: smooth;
+    padding: 1rem 0;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.resenas-track::-webkit-scrollbar {
+    display: none;
+}
+
+/* ===== TARJETAS DE RESEÑAS ===== */
+
+.resena-card {
+    flex: 0 0 350px;
+    background: white;
+    border-radius: var(--resena-radius);
+    padding: 1.5rem;
+    box-shadow: var(--resena-shadow);
+    border: 1px solid rgba(37, 99, 235, 0.1);
+    transition: var(--transition-smooth);
+    scroll-snap-align: start;
+    position: relative;
+    overflow: hidden;
+    
+    /* Animación inicial */
+    opacity: 0;
+    transform: translateY(30px) scale(0.95);
+}
+
+.resena-card.visible {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+}
+
+.resena-card:hover {
+    transform: translateY(-8px) scale(1.02);
+    box-shadow: var(--resena-shadow-hover);
+    border-color: rgba(37, 99, 235, 0.25);
+}
+
+.resena-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--color-primario), var(--estrella-color));
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.4s ease;
+}
+
+.resena-card:hover::before {
+    transform: scaleX(1);
+}
+
+.resena-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.resena-avatar {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--color-primario), var(--color-secundario));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 700;
+    font-size: 1.2rem;
+    text-transform: uppercase;
+}
+
+.resena-info {
+    flex: 1;
+}
+
+.resena-nombre {
+    font-weight: 600;
+    color: var(--color-primario);
+    margin-bottom: 0.25rem;
+    font-size: 1rem;
+}
+
+.resena-fecha {
+    font-size: 0.85rem;
+    color: var(--color-texto-secundario);
+}
+
+.resena-producto {
+    font-size: 0.8rem;
+    color: var(--color-acento);
+    font-weight: 500;
+    margin-top: 0.25rem;
+}
+
+.resena-rating {
+    display: flex;
+    gap: 0.2rem;
+    margin-bottom: 1rem;
+}
+
+.resena-rating .estrella {
+    font-size: 1.2rem;
+    color: var(--estrella-color);
+    transition: var(--transition-smooth);
+}
+
+.resena-rating .estrella.empty {
+    color: var(--estrella-color-empty);
+}
+
+.resena-texto {
+    color: var(--color-texto);
+    line-height: 1.6;
+    font-size: 0.95rem;
+    position: relative;
+}
+
+.resena-texto::before {
+    content: '"';
+    font-size: 3rem;
+    color: var(--color-primario);
+    opacity: 0.2;
+    position: absolute;
+    top: -1rem;
+    left: -0.5rem;
+    font-family: Georgia, serif;
+}
+
+.resena-estado {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-top: 1rem;
+}
+
+.resena-estado.pending {
+    background: rgba(251, 191, 36, 0.2);
+    color: #d97706;
+}
+
+.resena-estado.offline {
+    background: rgba(156, 163, 175, 0.2);
+    color: #6b7280;
+}
+
+.resena-estado.published {
+    background: rgba(34, 197, 94, 0.2);
+    color: #16a34a;
+}
+
+.resena-estado.moderation {
+    background: rgba(59, 130, 246, 0.2);
+    color: #2563eb;
+}
+
+/* ===== PLACEHOLDER DE RESEÑAS ===== */
+
+.resena-placeholder {
+    flex: 0 0 350px;
+    background: white;
+    border-radius: var(--resena-radius);
+    padding: 2rem;
+    text-align: center;
+    box-shadow: var(--resena-shadow);
+    border: 2px dashed rgba(37, 99, 235, 0.3);
+}
+
+.placeholder-icono {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    opacity: 0.7;
+    animation: pulseIcon 2s ease-in-out infinite;
+}
+
+@keyframes pulseIcon {
+    0%, 100% { transform: scale(1); opacity: 0.7; }
+    50% { transform: scale(1.1); opacity: 1; }
+}
+
+/* ===== FORMULARIO DE RESEÑA ===== */
+
+.formulario-resena {
+    background: white;
+    border-radius: var(--resena-radius);
+    padding: 2rem;
+    box-shadow: var(--resena-shadow);
+    border: 1px solid rgba(37, 99, 235, 0.1);
+    margin-bottom: 2rem;
+}
+
+.formulario-titulo {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--color-primario);
+    margin-bottom: 1.5rem;
+    text-align: center;
+}
+
+.resena-form {
+    display: grid;
+    gap: 1.5rem;
+}
+
+.campo-grupo {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.campo-label {
+    font-weight: 600;
+    color: var(--color-texto);
+    font-size: 0.9rem;
+}
+
+.campo-input,
+.campo-select,
+.campo-textarea {
+    padding: 0.75rem 1rem;
+    border: 2px solid #e5e7eb;
+    border-radius: 8px;
+    font-size: 1rem;
+    transition: var(--transition-smooth);
+    background: #fafafa;
+}
+
+.campo-input:focus,
+.campo-select:focus,
+.campo-textarea:focus {
+    outline: none;
+    border-color: var(--color-primario);
+    background: white;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.campo-textarea {
+    resize: vertical;
+    min-height: 100px;
+    font-family: inherit;
+}
+
+.campo-contador {
+    text-align: right;
+    font-size: 0.8rem;
+    color: var(--color-texto-secundario);
+}
+
+.campo-error {
+    color: #dc2626;
+    font-size: 0.85rem;
+    margin-top: 0.25rem;
+    display: none;
+}
+
+.campo-error.visible {
+    display: block;
+}
+
+/* ===== SELECTOR DE RATING ===== */
+
+.rating-selector {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+.rating-input {
+    display: none;
+}
+
+.rating-selector .estrella {
+    font-size: 2rem;
+    color: var(--estrella-color-empty);
+    cursor: pointer;
+    transition: var(--transition-smooth);
+    user-select: none;
+}
+
+.rating-selector .estrella:hover,
+.rating-selector .estrella.active {
+    color: var(--estrella-color);
+    transform: scale(1.1);
+}
+
+.rating-input:checked ~ .estrella,
+.rating-input:checked ~ .estrella ~ .estrella {
+    color: var(--estrella-color-empty);
+}
+
+.rating-input:checked + .estrella,
+.rating-input:checked + .estrella ~ .estrella:nth-of-type(-n+5) {
+    color: var(--estrella-color);
+}
+
+/* ===== BOTONES DEL FORMULARIO ===== */
+
+.formulario-acciones {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    margin-top: 1rem;
+}
+
+.btn-enviar-resena {
+    background: linear-gradient(135deg, var(--color-primario), var(--color-secundario));
+    color: white;
+    border: none;
+    padding: 0.75rem 2rem;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: var(--transition-smooth);
+    position: relative;
+    overflow: hidden;
+    min-width: 150px;
+}
+
+.btn-enviar-resena:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: var(--resena-shadow-hover);
+}
+
+.btn-enviar-resena:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.btn-enviar-resena .btn-loading {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    justify-content: center;
+}
+
+.spinner {
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+.btn-cancelar-resena {
+    background: transparent;
+    color: var(--color-texto-secundario);
+    border: 2px solid #e5e7eb;
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: var(--transition-smooth);
+}
+
+.btn-cancelar-resena:hover {
+    border-color: var(--color-primario);
+    color: var(--color-primario);
+}
+
+/* ===== MENSAJES DE ESTADO ===== */
+
+.mensaje-estado {
+    margin-top: 1rem;
+    padding: 1rem;
+    border-radius: 8px;
+    text-align: center;
+}
+
+.mensaje-estado.success {
+    background: rgba(34, 197, 94, 0.1);
+    border: 1px solid rgba(34, 197, 94, 0.3);
+    color: #16a34a;
+}
+
+.mensaje-estado.error {
+    background: rgba(239, 68, 68, 0.1);
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    color: #dc2626;
+}
+
+.mensaje-estado.info {
+    background: rgba(59, 130, 246, 0.1);
+    border: 1px solid rgba(59, 130, 246, 0.3);
+    color: #2563eb;
+}
+
+/* ===== ESTADO OFFLINE ===== */
+
+.estado-offline {
+    background: rgba(156, 163, 175, 0.1);
+    border: 2px dashed #9ca3af;
+    border-radius: var(--resena-radius);
+    padding: 2rem;
+    text-align: center;
+    margin-top: 2rem;
+}
+
+.offline-icono {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    opacity: 0.7;
+}
+
+.estado-offline h4 {
+    color: var(--color-texto);
+    margin-bottom: 0.5rem;
+}
+
+.estado-offline p {
+    color: var(--color-texto-secundario);
+    margin-bottom: 1rem;
+}
+
+.reseñas-pendientes {
+    background: rgba(251, 191, 36, 0.2);
+    padding: 0.75rem;
+    border-radius: 8px;
+    color: #d97706;
+    font-weight: 500;
+}
+
+/* ===== INDICADORES DEL CARRUSEL ===== */
+
+.carrusel-indicadores {
+    display: flex;
+    justify-content: center;
+    gap: 0.5rem;
+    margin-top: 2rem;
+}
+
+.indicador {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: rgba(37, 99, 235, 0.3);
+    cursor: pointer;
+    transition: var(--transition-smooth);
+}
+
+.indicador.activo {
+    background: var(--color-primario);
+    transform: scale(1.3);
+}
+
+.indicador:hover {
+    background: var(--color-secundario);
+    transform: scale(1.1);
+}
+
+/* ===== RESPONSIVE DESIGN ===== */
+
+@media (max-width: 768px) {
+    .seccion-resenas {
+        padding: 3rem 0;
+    }
+    
+    .resenas-titulo {
+        font-size: 2rem;
+    }
+    
+    .resenas-estadisticas {
+        flex-direction: column;
+        gap: 1.5rem;
+        padding: 1.5rem;
+    }
+    
+    .estadistica-numero,
+    .rating-numero {
+        font-size: 2rem;
+    }
+    
+    .carrusel-btn {
+        display: none; /* Ocultar en móvil, usar swipe */
+    }
+    
+    .resena-card {
+        flex: 0 0 300px;
+    }
+    
+    .resenas-track {
+        gap: 1rem;
+        padding: 0.5rem 0;
+    }
+    
+    .formulario-resena {
+        padding: 1.5rem;
+    }
+    
+    .formulario-acciones {
+        flex-direction: column;
+    }
+    
+    .btn-enviar-resena,
+    .btn-cancelar-resena {
+        width: 100%;
+    }
+}
+
+@media (max-width: 480px) {
+    .seccion-resenas {
+        padding: 2rem 0;
+    }
+    
+    .resenas-titulo {
+        font-size: 1.7rem;
+    }
+    
+    .resenas-subtitulo {
+        font-size: 1rem;
+    }
+    
+    .resena-card {
+        flex: 0 0 280px;
+    }
+    
+    .resenas-track {
+        gap: 0.75rem;
+    }
+    
+    .formulario-resena {
+        padding: 1rem;
+        margin: 0 -0.5rem 2rem -0.5rem;
+    }
+    
+    .rating-selector .estrella {
+        font-size: 1.8rem;
+    }
+}
+
+/* ===== ACCESIBILIDAD ===== */
+
+@media (prefers-reduced-motion: reduce) {
+    .resena-card,
+    .carrusel-btn,
+    .rating-selector .estrella,
+    .placeholder-icono,
+    .spinner {
+        animation: none !important;
+        transition: none !important;
+    }
+    
+    .resena-card:hover,
+    .carrusel-btn:hover,
+    .btn-enviar-resena:hover {
+        transform: none !important;
+    }
+}
+
+/* ===== MODO OSCURO ===== */
+
+body.modo-oscuro .seccion-resenas {
+    background: linear-gradient(135deg, 
+        rgba(15, 23, 42, 0.95) 0%, 
+        rgba(30, 41, 59, 0.9) 50%, 
+        rgba(51, 65, 85, 0.95) 100%);
+}
+
+body.modo-oscuro .resenas-estadisticas,
+body.modo-oscuro .resena-card,
+body.modo-oscuro .formulario-resena {
+    background: rgba(30, 41, 59, 0.8);
+    border-color: rgba(148, 163, 184, 0.2);
+    backdrop-filter: blur(10px);
+}
+
+body.modo-oscuro .resenas-titulo {
+    color: white;
+    background: linear-gradient(135deg, #60a5fa, #38bdf8);
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+body.modo-oscuro .resenas-subtitulo {
+    color: rgba(203, 213, 225, 0.8);
+}
+
+body.modo-oscuro .resena-nombre,
+body.modo-oscuro .formulario-titulo,
+body.modo-oscuro .campo-label {
+    color: white;
+}
+
+body.modo-oscuro .resena-fecha,
+body.modo-oscuro .resena-texto {
+    color: rgba(203, 213, 225, 0.7);
+}
+
+body.modo-oscuro .campo-input,
+body.modo-oscuro .campo-select,
+body.modo-oscuro .campo-textarea {
+    background: rgba(51, 65, 85, 0.5);
+    border-color: rgba(148, 163, 184, 0.3);
+    color: white;
+}
+
+body.modo-oscuro .campo-input:focus,
+body.modo-oscuro .campo-select:focus,
+body.modo-oscuro .campo-textarea:focus {
+    background: rgba(51, 65, 85, 0.8);
+    border-color: #60a5fa;
+}
+
+body.modo-oscuro .carrusel-btn {
+    background: rgba(30, 41, 59, 0.9);
+    border-color: rgba(148, 163, 184, 0.3);
+    color: #60a5fa;
+}
+
+body.modo-oscuro .carrusel-btn:hover:not(:disabled) {
+    background: rgba(96, 165, 250, 0.2);
+    color: white;
+}
+
+body.modo-oscuro .indicador {
+    background: rgba(148, 163, 184, 0.3);
+}
+
+body.modo-oscuro .indicador.activo {
+    background: #60a5fa;
+}

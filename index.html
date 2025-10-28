@@ -239,7 +239,7 @@
                                 <div class="receta-video-placeholder">
                                     <div class="placeholder-content">
                                         <span class="placeholder-emoji">🍗</span>
-                                        <span class="placeholder-text">Pollo<br>al Horno</span>
+                                        <span class="placeholder-text">Pollo<br>en arroz revuelto</span>
                                     </div>
                                 </div>
                                 <div class="receta-overlay">
@@ -247,11 +247,11 @@
                                 </div>
                             </div>
                             <div class="receta-contenido">
-                                <h3 class="receta-nombre">Pollo Semicriollo al Horno</h3>
+                                <h3 class="receta-nombre">Pollo Semicriollo en Arroz Revuelto</h3>
                                 <p class="receta-descripcion">Jugoso, dorado y lleno de sabor casero tradicional.</p>
                                 <button class="btn-ver-productos" 
-                                        onclick="filtrarReceta('pollo', 'Pollo Semicriollo al Horno')"
-                                        aria-label="Ver productos para Pollo Semicriollo al Horno">
+                                        onclick="filtrarReceta('pollo', 'Pollo Semicriollo en Arroz Revuelto')"
+                                        aria-label="Ver productos para Pollo Semicriollo en Arroz Revuelto">
                                     🛒 Ver productos para esta receta
                                 </button>
                             </div>
@@ -639,6 +639,187 @@
                 💳 Pagar en línea
             </button>
         </div>
+        </section>
+
+        <!-- Sección de Reseñas -->
+        <section id="reseñas" class="seccion-resenas" aria-label="Reseñas de clientes">
+            <div class="resenas-contenedor">
+                <!-- Header de la sección -->
+                <div class="resenas-header">
+                    <h2 class="resenas-titulo">⭐ Opiniones de Clientes</h2>
+                    <p class="resenas-subtitulo">Lo que dicen quienes ya probaron nuestros productos</p>
+                </div>
+
+                <!-- Estadísticas de reseñas -->
+                <div class="resenas-estadisticas" id="resenasEstadisticas">
+                    <div class="estadistica-item">
+                        <div class="estadistica-numero" id="totalResenas">0</div>
+                        <div class="estadistica-label">Reseñas</div>
+                    </div>
+                    <div class="estadistica-item">
+                        <div class="estadistica-rating" id="ratingPromedio">
+                            <span class="rating-numero">0.0</span>
+                            <div class="estrellas-display" id="estrellasPromedio"></div>
+                        </div>
+                        <div class="estadistica-label">Promedio</div>
+                    </div>
+                </div>
+
+                <!-- Carrusel de reseñas -->
+                <div class="resenas-carrusel" id="resenasCarrusel">
+                    <!-- Controles de navegación -->
+                    <button class="carrusel-btn carrusel-prev" id="btnPrevResenas" 
+                            aria-label="Reseña anterior" disabled>
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                            <path d="M15 18L9 12L15 6" stroke="currentColor" stroke-width="2" 
+                                    stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </button>
+                    
+                    <button class="carrusel-btn carrusel-next" id="btnNextResenas" 
+                            aria-label="Siguiente reseña" disabled>
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                            <path d="M9 18L15 12L9 6" stroke="currentColor" stroke-width="2" 
+                                    stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </button>
+
+                    <!-- Track de reseñas -->
+                    <div class="resenas-track" id="resenasTrack">
+                        <!-- Las reseñas se cargarán dinámicamente aquí -->
+                        <div class="resena-placeholder">
+                            <div class="placeholder-icono">💬</div>
+                            <p>Cargando reseñas de nuestros clientes...</p>
+                        </div>
+                    </div>
+
+                    <!-- Indicadores -->
+                    <div class="carrusel-indicadores" id="indicadoresResenas">
+                        <!-- Los indicadores se generarán dinámicamente -->
+                    </div>
+                </div>
+
+                <!-- Formulario para nueva reseña -->
+                <div class="formulario-resena" id="formularioResena">
+                    <h3 class="formulario-titulo">💬 Comparte tu Experiencia</h3>
+                    
+                    <form class="resena-form" id="resenaForm" novalidate>
+                        <!-- Nombre -->
+                        <div class="campo-grupo">
+                            <label for="nombreResena" class="campo-label">Nombre</label>
+                            <input type="text" id="nombreResena" name="nombre" 
+                                   class="campo-input" placeholder="Tu nombre o iniciales" 
+                                   required maxlength="50" autocomplete="name">
+                            <div class="campo-error" id="errorNombre"></div>
+                        </div>
+
+                        <!-- Producto (opcional) -->
+                        <div class="campo-grupo">
+                            <label for="productoResena" class="campo-label">
+                                Producto (opcional)
+                            </label>
+                            <select id="productoResena" name="productoId" class="campo-select">
+                                <option value="">Selecciona un producto...</option>
+                                <!-- Las opciones se cargarán dinámicamente desde la base de productos -->
+                            </select>
+                        </div>
+
+                        <!-- Rating -->
+                        <div class="campo-grupo">
+                            <label class="campo-label">Calificación</label>
+                            <div class="rating-selector" id="ratingSelector" role="radiogroup" 
+                                 aria-label="Selecciona tu calificación de 1 a 5 estrellas">
+                                <input type="radio" name="rating" value="1" id="star1" class="rating-input">
+                                <label for="star1" class="estrella" aria-label="1 estrella">★</label>
+                                
+                                <input type="radio" name="rating" value="2" id="star2" class="rating-input">
+                                <label for="star2" class="estrella" aria-label="2 estrellas">★</label>
+                                
+                                <input type="radio" name="rating" value="3" id="star3" class="rating-input">
+                                <label for="star3" class="estrella" aria-label="3 estrellas">★</label>
+                                
+                                <input type="radio" name="rating" value="4" id="star4" class="rating-input">
+                                <label for="star4" class="estrella" aria-label="4 estrellas">★</label>
+                                
+                                <input type="radio" name="rating" value="5" id="star5" class="rating-input">
+                                <label for="star5" class="estrella" aria-label="5 estrellas">★</label>
+                            </div>
+                            <div class="campo-error" id="errorRating"></div>
+                        </div>
+
+                        <!-- Texto de la reseña -->
+                        <div class="campo-grupo">
+                            <label for="textoResena" class="campo-label">Tu Opinión</label>
+                            <textarea id="textoResena" name="texto" class="campo-textarea" 
+                                      placeholder="Cuéntanos qué te pareció nuestro producto o servicio (mínimo 10 caracteres)" 
+                                      required minlength="10" maxlength="500" rows="4"></textarea>
+                            <div class="campo-contador">
+                                <span id="contadorCaracteres">0</span>/500 caracteres
+                            </div>
+                            <div class="campo-error" id="errorTexto"></div>
+                        </div>
+
+                        <!-- Botones -->
+                        <div class="formulario-acciones">
+                            <button type="submit" class="btn-enviar-resena" id="btnEnviarResena">
+                                <span class="btn-texto">Enviar Reseña</span>
+                                <span class="btn-loading" style="display: none;">
+                                    <svg class="spinner" width="16" height="16" viewBox="0 0 24 24">
+                                        <circle cx="12" cy="12" r="10" stroke="currentColor" 
+                                                stroke-width="2" fill="none" 
+                                                stroke-dasharray="31.416" stroke-dashoffset="31.416">
+                                            <animate attributeName="stroke-dasharray" 
+                                                     dur="2s" values="0 31.416;15.708 15.708;0 31.416" 
+                                                     repeatCount="indefinite"/>
+                                            <animate attributeName="stroke-dashoffset" 
+                                                     dur="2s" values="0;-15.708;-31.416" 
+                                                     repeatCount="indefinite"/>
+                                        </circle>
+                                    </svg>
+                                    Enviando...
+                                </span>
+                            </button>
+                            
+                            <button type="button" class="btn-cancelar-resena" id="btnCancelarResena" 
+                                    style="display: none;">
+                                Cancelar
+                            </button>
+                        </div>
+                    </form>
+
+                    <!-- Mensaje de estado -->
+                    <div class="mensaje-estado" id="mensajeEstado" style="display: none;">
+                        <div class="mensaje-contenido" id="mensajeContenido"></div>
+                    </div>
+                </div>
+
+                <!-- Estado offline -->
+                <div class="estado-offline" id="estadoOffline" style="display: none;">
+                    <div class="offline-icono">📡</div>
+                    <h4>Sin conexión</h4>
+                    <p>Tu reseña se guardará y se enviará automáticamente cuando tengas conexión.</p>
+                    <div class="reseñas-pendientes" id="resenasPendientes">
+                        <span>Reseñas pendientes: <strong id="contadorPendientes">0</strong></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- JSON-LD Schema -->
+            <script type="application/ld+json" id="schemaResenas">
+            {
+                "@context": "https://schema.org",
+                "@type": "Organization",
+                "name": "Alimento del Cielo",
+                "aggregateRating": {
+                    "@type": "AggregateRating",
+                    "ratingValue": "0",
+                    "reviewCount": "0"
+                },
+                "review": []
+            }
+            </script>
+        </section>
+
     </div>
 
     <!-- Pie de Página -->
