@@ -2389,9 +2389,432 @@ if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', () => {
         agregarAnimacionesBeneficios();
         inicializarBeneficios();
+        inicializarRecetas();
     });
 } else {
     // El DOM ya está cargado
     agregarAnimacionesBeneficios();
     inicializarBeneficios();
+    inicializarRecetas();
+}
+
+// ===== SECCIÓN INSPIRACIÓN Y RECETAS =====
+
+/**
+ * Clase para manejar el carrusel de recetas
+ */
+class CarruselRecetas {
+    constructor() {
+        this.track = null;
+        this.cards = [];
+        this.indicadores = [];
+        this.btnPrev = null;
+        this.btnNext = null;
+        this.currentIndex = 0;
+        this.cardsVisible = 1;
+        this.isAnimating = false;
+        this.touchStartX = 0;
+        this.touchEndX = 0;
+        
+        this.init();
+    }
+
+    init() {
+        this.track = document.getElementById('recetasTrack');
+        this.cards = document.querySelectorAll('.receta-card');
+        this.btnPrev = document.getElementById('btnPrev');
+        this.btnNext = document.getElementById('btnNext');
+        
+        if (!this.track || this.cards.length === 0) {
+            console.warn('⚠️ Elementos del carrusel de recetas no encontrados');
+            return;
+        }
+
+        this.calcularCardsVisible();
+        this.crearIndicadores();
+        this.setupEventListeners();
+        this.actualizarEstado();
+        
+        // Configurar lazy loading y animaciones
+        this.configurarAnimaciones();
+        
+        console.log('🎠 Carrusel de recetas inicializado');
+    }
+
+    calcularCardsVisible() {
+        const width = window.innerWidth;
+        if (width <= 480) {
+            this.cardsVisible = 1;
+        } else if (width <= 768) {
+            this.cardsVisible = 2;
+        } else if (width <= 1024) {
+            this.cardsVisible = 3;
+        } else {
+            this.cardsVisible = 4;
+        }
+    }
+
+    crearIndicadores() {
+        const contenedor = document.getElementById('carruselIndicadores');
+        if (!contenedor) return;
+
+        contenedor.innerHTML = '';
+        this.indicadores = [];
+
+        const totalPaginas = Math.ceil(this.cards.length / this.cardsVisible);
+
+        for (let i = 0; i < totalPaginas; i++) {
+            const indicador = document.createElement('button');
+            indicador.className = 'indicador';
+            indicador.setAttribute('aria-label', `Ir a la página ${i + 1} de recetas`);
+            indicador.addEventListener('click', () => this.irAPagina(i));
+            
+            contenedor.appendChild(indicador);
+            this.indicadores.push(indicador);
+        }
+    }
+
+    setupEventListeners() {
+        // Botones de navegación
+        if (this.btnPrev) {
+            this.btnPrev.addEventListener('click', () => this.anterior());
+        }
+        
+        if (this.btnNext) {
+            this.btnNext.addEventListener('click', () => this.siguiente());
+        }
+
+        // Eventos de toque para móviles
+        this.track.addEventListener('touchstart', (e) => this.handleTouchStart(e), { passive: true });
+        this.track.addEventListener('touchend', (e) => this.handleTouchEnd(e), { passive: true });
+
+        // Redimensionar ventana
+        window.addEventListener('resize', () => this.handleResize());
+
+        // Navegación con teclado
+        this.track.addEventListener('keydown', (e) => this.handleKeyDown(e));
+    }
+
+    handleTouchStart(e) {
+        this.touchStartX = e.touches[0].clientX;
+    }
+
+    handleTouchEnd(e) {
+        this.touchEndX = e.changedTouches[0].clientX;
+        this.handleSwipe();
+    }
+
+    handleSwipe() {
+        const swipeThreshold = 50;
+        const difference = this.touchStartX - this.touchEndX;
+
+        if (Math.abs(difference) > swipeThreshold) {
+            if (difference > 0) {
+                this.siguiente();
+            } else {
+                this.anterior();
+            }
+        }
+    }
+
+    handleKeyDown(e) {
+        switch (e.key) {
+            case 'ArrowLeft':
+                e.preventDefault();
+                this.anterior();
+                break;
+            case 'ArrowRight':
+                e.preventDefault();
+                this.siguiente();
+                break;
+        }
+    }
+
+    handleResize() {
+        const oldVisible = this.cardsVisible;
+        this.calcularCardsVisible();
+        
+        if (oldVisible !== this.cardsVisible) {
+            this.crearIndicadores();
+            this.currentIndex = 0;
+            this.actualizarEstado();
+        }
+    }
+
+    anterior() {
+        if (this.isAnimating || this.currentIndex === 0) return;
+        
+        this.currentIndex--;
+        this.actualizarCarrusel();
+    }
+
+    siguiente() {
+        const maxIndex = Math.ceil(this.cards.length / this.cardsVisible) - 1;
+        if (this.isAnimating || this.currentIndex >= maxIndex) return;
+        
+        this.currentIndex++;
+        this.actualizarCarrusel();
+    }
+
+    irAPagina(pagina) {
+        if (this.isAnimating) return;
+        
+        this.currentIndex = pagina;
+        this.actualizarCarrusel();
+    }
+
+    actualizarCarrusel() {
+        this.isAnimating = true;
+        
+        const cardWidth = this.cards[0].offsetWidth + 24; // incluir gap
+        const translateX = -(this.currentIndex * this.cardsVisible * cardWidth);
+        
+        this.track.style.transform = `translateX(${translateX}px)`;
+        
+        setTimeout(() => {
+            this.isAnimating = false;
+        }, 400);
+
+        this.actualizarEstado();
+    }
+
+    actualizarEstado() {
+        const maxIndex = Math.ceil(this.cards.length / this.cardsVisible) - 1;
+        
+        // Actualizar botones
+        if (this.btnPrev) {
+            this.btnPrev.disabled = this.currentIndex === 0;
+            this.btnPrev.style.opacity = this.currentIndex === 0 ? '0.5' : '1';
+        }
+        
+        if (this.btnNext) {
+            this.btnNext.disabled = this.currentIndex >= maxIndex;
+            this.btnNext.style.opacity = this.currentIndex >= maxIndex ? '0.5' : '1';
+        }
+
+        // Actualizar indicadores
+        this.indicadores.forEach((indicador, index) => {
+            if (index === this.currentIndex) {
+                indicador.classList.add('activo');
+            } else {
+                indicador.classList.remove('activo');
+            }
+        });
+    }
+
+    configurarAnimaciones() {
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach((entry) => {
+                if (entry.isIntersecting) {
+                    const delay = Array.from(this.cards).indexOf(entry.target) * 100;
+                    
+                    setTimeout(() => {
+                        entry.target.classList.add('visible');
+                    }, delay);
+                    
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, {
+            threshold: 0.2,
+            rootMargin: '0px 0px -50px 0px'
+        });
+
+        // Verificar si el usuario prefiere animaciones reducidas
+        const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        
+        if (prefersReducedMotion) {
+            this.cards.forEach(card => {
+                card.classList.add('visible');
+            });
+        } else {
+            this.cards.forEach(card => {
+                observer.observe(card);
+            });
+        }
+    }
+}
+
+/**
+ * Función global para filtrar recetas y productos
+ * Conecta las recetas con el sistema de filtrado del catálogo
+ */
+function filtrarReceta(categoria, nombreReceta) {
+    console.log(`🔍 Filtrando productos para: ${nombreReceta} (categoría: ${categoria})`);
+    
+    // Actualizar el campo de búsqueda si existe
+    const campoBusqueda = document.getElementById('campoBusqueda');
+    if (campoBusqueda) {
+        campoBusqueda.value = '';
+    }
+    
+    // Llamar a la función de filtrado existente
+    if (typeof filtrarPorCategoria === 'function') {
+        // Buscar el botón de filtro correspondiente
+        const btnFiltro = document.querySelector(`[onclick*="${categoria}"]`);
+        
+        if (btnFiltro) {
+            filtrarPorCategoria(categoria, btnFiltro);
+        } else {
+            // Si no existe el filtro exacto, usar 'todos'
+            const btnTodos = document.querySelector('[onclick*="todos"]');
+            if (btnTodos) {
+                filtrarPorCategoria('todos', btnTodos);
+            }
+        }
+        
+        // Hacer scroll al catálogo
+        if (typeof scrollearAProductos === 'function') {
+            setTimeout(() => {
+                scrollearAProductos();
+            }, 300);
+        }
+        
+        // Mostrar notificación
+        mostrarNotificacionReceta(nombreReceta, categoria);
+    } else {
+        console.warn('⚠️ Función filtrarPorCategoria no disponible');
+    }
+}
+
+/**
+ * Mostrar notificación cuando se filtra por receta
+ */
+function mostrarNotificacionReceta(nombreReceta, categoria) {
+    // Crear elemento de notificación
+    const notificacion = document.createElement('div');
+    notificacion.className = 'notificacion-receta';
+    notificacion.innerHTML = `
+        <div class="notificacion-contenido">
+            <span class="notificacion-icono">🍽️</span>
+            <span class="notificacion-texto">Mostrando productos para: <strong>${nombreReceta}</strong></span>
+            <button class="notificacion-cerrar" onclick="cerrarNotificacion(this)">&times;</button>
+        </div>
+    `;
+    
+    // Agregar estilos dinámicamente si no existen
+    if (!document.querySelector('#estilosNotificacionReceta')) {
+        const estilos = document.createElement('style');
+        estilos.id = 'estilosNotificacionReceta';
+        estilos.textContent = `
+            .notificacion-receta {
+                position: fixed;
+                top: 100px;
+                right: 20px;
+                background: linear-gradient(135deg, var(--color-primario), var(--color-secundario));
+                color: white;
+                padding: 1rem;
+                border-radius: 12px;
+                box-shadow: 0 8px 30px rgba(37, 99, 235, 0.3);
+                z-index: 10000;
+                animation: slideInRight 0.3s ease-out;
+                max-width: 350px;
+            }
+            
+            .notificacion-contenido {
+                display: flex;
+                align-items: center;
+                gap: 0.75rem;
+            }
+            
+            .notificacion-icono {
+                font-size: 1.5rem;
+            }
+            
+            .notificacion-texto {
+                flex: 1;
+                font-size: 0.9rem;
+                line-height: 1.4;
+            }
+            
+            .notificacion-cerrar {
+                background: none;
+                border: none;
+                color: white;
+                font-size: 1.2rem;
+                cursor: pointer;
+                padding: 0.25rem;
+                border-radius: 4px;
+                opacity: 0.8;
+                transition: opacity 0.2s;
+            }
+            
+            .notificacion-cerrar:hover {
+                opacity: 1;
+                background: rgba(255, 255, 255, 0.1);
+            }
+            
+            @keyframes slideInRight {
+                from {
+                    transform: translateX(100%);
+                    opacity: 0;
+                }
+                to {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+            }
+            
+            @keyframes slideOutRight {
+                from {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+                to {
+                    transform: translateX(100%);
+                    opacity: 0;
+                }
+            }
+            
+            @media (max-width: 480px) {
+                .notificacion-receta {
+                    left: 10px;
+                    right: 10px;
+                    max-width: none;
+                }
+            }
+        `;
+        document.head.appendChild(estilos);
+    }
+    
+    document.body.appendChild(notificacion);
+    
+    // Auto-ocultar después de 5 segundos
+    setTimeout(() => {
+        if (notificacion.parentNode) {
+            cerrarNotificacion(notificacion.querySelector('.notificacion-cerrar'));
+        }
+    }, 5000);
+}
+
+/**
+ * Cerrar notificación de receta
+ */
+function cerrarNotificacion(btn) {
+    const notificacion = btn.closest('.notificacion-receta');
+    if (notificacion) {
+        notificacion.style.animation = 'slideOutRight 0.3s ease-in forwards';
+        setTimeout(() => {
+            if (notificacion.parentNode) {
+                notificacion.parentNode.removeChild(notificacion);
+            }
+        }, 300);
+    }
+}
+
+/**
+ * Inicializar la sección de recetas
+ */
+function inicializarRecetas() {
+    const seccionRecetas = document.querySelector('.seccion-recetas');
+    
+    if (seccionRecetas) {
+        // Inicializar carrusel
+        new CarruselRecetas();
+        
+        console.log('🍳 Sección de recetas inicializada correctamente');
+    } else {
+        // Si no se encuentra, intentar de nuevo en un momento
+        setTimeout(inicializarRecetas, 100);
+    }
 }

@@ -159,6 +159,329 @@
             </div>
         </section>
 
+        <!-- Sección Inspiración y Recetas -->
+        <section class="seccion-recetas" id="seccionRecetas">
+            <div class="recetas-contenedor">
+                <div class="recetas-header">
+                    <h2 class="recetas-titulo">👩‍🍳 Inspiración y Recetas</h2>
+                    <p class="recetas-descripcion">
+                        Descubre ideas deliciosas para preparar con nuestros productos congelados frescos y listos para disfrutar.
+                    </p>
+                </div>
+
+                <div class="carrusel-recetas" id="carruselRecetas">
+                    <!-- Controles de navegación -->
+                    <button class="carrusel-btn carrusel-prev" id="btnPrev" aria-label="Receta anterior">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                            <path d="M15 18L9 12L15 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </button>
+                    
+                    <button class="carrusel-btn carrusel-next" id="btnNext" aria-label="Siguiente receta">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                            <path d="M9 18L15 12L9 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </button>
+
+                    <!-- Contenedor de recetas -->
+                    <div class="recetas-track" id="recetasTrack">
+                        <!-- Receta 1: Empanadas al Airfryer -->
+                        <div class="receta-card" data-categoria="empanadas">
+                            <div class="receta-media">
+                                <div class="receta-video-placeholder">
+                                    <div class="placeholder-content">
+                                        <span class="placeholder-emoji">🥟</span>
+                                        <span class="placeholder-text">Empanadas<br>al Airfryer</span>
+                                    </div>
+                                </div>
+                                <div class="receta-overlay">
+                                    <span class="receta-duracion">⏱️ 15 min</span>
+                                </div>
+                            </div>
+                            <div class="receta-contenido">
+                                <h3 class="receta-nombre">Empanadas al Airfryer</h3>
+                                <p class="receta-descripcion">Crujientes y doradas, perfectas para cualquier momento del día.</p>
+                                <button class="btn-ver-productos" 
+                                        onclick="filtrarReceta('empanadas', 'Empanadas al Airfryer')"
+                                        aria-label="Ver productos para Empanadas al Airfryer">
+                                    🛒 Ver productos para esta receta
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Receta 2: Deditos de queso -->
+                        <div class="receta-card" data-categoria="deditos">
+                            <div class="receta-media">
+                                <div class="receta-video-placeholder">
+                                    <div class="placeholder-content">
+                                        <span class="placeholder-emoji">🧀</span>
+                                        <span class="placeholder-text">Deditos de<br>Queso</span>
+                                    </div>
+                                </div>
+                                <div class="receta-overlay">
+                                    <span class="receta-duracion">⏱️ 12 min</span>
+                                </div>
+                            </div>
+                            <div class="receta-contenido">
+                                <h3 class="receta-nombre">Deditos de Queso Crujientes</h3>
+                                <p class="receta-descripcion">El snack perfecto para compartir en familia o con amigos.</p>
+                                <button class="btn-ver-productos" 
+                                        onclick="filtrarReceta('deditos', 'Deditos de Queso Crujientes')"
+                                        aria-label="Ver productos para Deditos de Queso Crujientes">
+                                    🛒 Ver productos para esta receta
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Receta 3: Pollo semicriollo al horno -->
+                        <div class="receta-card" data-categoria="pollo">
+                            <div class="receta-media">
+                                <div class="receta-video-placeholder">
+                                    <div class="placeholder-content">
+                                        <span class="placeholder-emoji">🍗</span>
+                                        <span class="placeholder-text">Pollo<br>al Horno</span>
+                                    </div>
+                                </div>
+                                <div class="receta-overlay">
+                                    <span class="receta-duracion">⏱️ 45 min</span>
+                                </div>
+                            </div>
+                            <div class="receta-contenido">
+                                <h3 class="receta-nombre">Pollo Semicriollo al Horno</h3>
+                                <p class="receta-descripcion">Jugoso, dorado y lleno de sabor casero tradicional.</p>
+                                <button class="btn-ver-productos" 
+                                        onclick="filtrarReceta('pollo', 'Pollo Semicriollo al Horno')"
+                                        aria-label="Ver productos para Pollo Semicriollo al Horno">
+                                    🛒 Ver productos para esta receta
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Receta 4: Arroz con verduras -->
+                        <div class="receta-card" data-categoria="verduras">
+                            <div class="receta-media">
+                                <div class="receta-video-placeholder">
+                                    <div class="placeholder-content">
+                                        <span class="placeholder-emoji">🍚</span>
+                                        <span class="placeholder-text">Arroz con<br>Verduras</span>
+                                    </div>
+                                </div>
+                                <div class="receta-overlay">
+                                    <span class="receta-duracion">⏱️ 25 min</span>
+                                </div>
+                            </div>
+                            <div class="receta-contenido">
+                                <h3 class="receta-nombre">Arroz con Verduras Mixtas</h3>
+                                <p class="receta-descripcion">Nutritivo, colorido y lleno de sabor natural.</p>
+                                <button class="btn-ver-productos" 
+                                        onclick="filtrarReceta('verduras', 'Arroz con Verduras Mixtas')"
+                                        aria-label="Ver productos para Arroz con Verduras Mixtas">
+                                    🛒 Ver productos para esta receta
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Receta 5: Mazorca salteada -->
+                        <div class="receta-card" data-categoria="verduras">
+                            <div class="receta-media">
+                                <div class="receta-video-placeholder">
+                                    <div class="placeholder-content">
+                                        <span class="placeholder-emoji">🌽</span>
+                                        <span class="placeholder-text">Mazorca<br>Salteada</span>
+                                    </div>
+                                </div>
+                                <div class="receta-overlay">
+                                    <span class="receta-duracion">⏱️ 10 min</span>
+                                </div>
+                            </div>
+                            <div class="receta-contenido">
+                                <h3 class="receta-nombre">Mazorca Salteada con Mantequilla</h3>
+                                <p class="receta-descripcion">Dulce, tierna y con ese toque casero irresistible.</p>
+                                <button class="btn-ver-productos" 
+                                        onclick="filtrarReceta('verduras', 'Mazorca Salteada con Mantequilla')"
+                                        aria-label="Ver productos para Mazorca Salteada con Mantequilla">
+                                    🛒 Ver productos para esta receta
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Receta 6: Ensalada fría -->
+                        <div class="receta-card" data-categoria="pollo">
+                            <div class="receta-media">
+                                <div class="receta-video-placeholder">
+                                    <div class="placeholder-content">
+                                        <span class="placeholder-emoji">🥗</span>
+                                        <span class="placeholder-text">Ensalada<br>Fría</span>
+                                    </div>
+                                </div>
+                                <div class="receta-overlay">
+                                    <span class="receta-duracion">⏱️ 8 min</span>
+                                </div>
+                            </div>
+                            <div class="receta-contenido">
+                                <h3 class="receta-nombre">Ensalada Fría con Pollo y Maíz</h3>
+                                <p class="receta-descripcion">Fresca, ligera y perfecta para días calurosos.</p>
+                                <button class="btn-ver-productos" 
+                                        onclick="filtrarReceta('pollo', 'Ensalada Fría con Pollo y Maíz')"
+                                        aria-label="Ver productos para Ensalada Fría con Pollo y Maíz">
+                                    🛒 Ver productos para esta receta
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Receta 7: Salmón a la plancha -->
+                        <div class="receta-card" data-categoria="pescado">
+                            <div class="receta-media">
+                                <div class="receta-video-placeholder">
+                                    <div class="placeholder-content">
+                                        <span class="placeholder-emoji">🐟</span>
+                                        <span class="placeholder-text">Salmón a<br>la Plancha</span>
+                                    </div>
+                                </div>
+                                <div class="receta-overlay">
+                                    <span class="receta-duracion">⏱️ 20 min</span>
+                                </div>
+                            </div>
+                            <div class="receta-contenido">
+                                <h3 class="receta-nombre">Salmón a la Plancha con Limón</h3>
+                                <p class="receta-descripcion">Rico en omega-3, jugoso y con un toque cítrico irresistible.</p>
+                                <button class="btn-ver-productos" 
+                                        onclick="filtrarReceta('pescado', 'Salmón a la Plancha con Limón')"
+                                        aria-label="Ver productos para Salmón a la Plancha con Limón">
+                                    🛒 Ver productos para esta receta
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Receta 8: Carne molida en salsa -->
+                        <div class="receta-card" data-categoria="carnes">
+                            <div class="receta-media">
+                                <div class="receta-video-placeholder">
+                                    <div class="placeholder-content">
+                                        <span class="placeholder-emoji">🍝</span>
+                                        <span class="placeholder-text">Carne<br>en Salsa</span>
+                                    </div>
+                                </div>
+                                <div class="receta-overlay">
+                                    <span class="receta-duracion">⏱️ 30 min</span>
+                                </div>
+                            </div>
+                            <div class="receta-contenido">
+                                <h3 class="receta-nombre">Carne Molida en Salsa Casera</h3>
+                                <p class="receta-descripcion">Perfecta para acompañar con pasta o arroz, llena de sabor.</p>
+                                <button class="btn-ver-productos" 
+                                        onclick="filtrarReceta('carnes', 'Carne Molida en Salsa Casera')"
+                                        aria-label="Ver productos para Carne Molida en Salsa Casera">
+                                    🛒 Ver productos para esta receta
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Receta 9: Papas a la francesa caseras -->
+                        <div class="receta-card" data-categoria="verduras">
+                            <div class="receta-media">
+                                <div class="receta-video-placeholder">
+                                    <div class="placeholder-content">
+                                        <span class="placeholder-emoji">🍟</span>
+                                        <span class="placeholder-text">Papas a la<br>Francesa</span>
+                                    </div>
+                                </div>
+                                <div class="receta-overlay">
+                                    <span class="receta-duracion">⏱️ 18 min</span>
+                                </div>
+                            </div>
+                            <div class="receta-contenido">
+                                <h3 class="receta-nombre">Papas a la Francesa Doradas</h3>
+                                <p class="receta-descripcion">Crujientes por fuera, suaves por dentro, el acompañante perfecto.</p>
+                                <button class="btn-ver-productos" 
+                                        onclick="filtrarReceta('verduras', 'Papas a la Francesa Doradas')"
+                                        aria-label="Ver productos para Papas a la Francesa Doradas">
+                                    🛒 Ver productos para esta receta
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Receta 10: Cachama frita -->
+                        <div class="receta-card" data-categoria="pescado">
+                            <div class="receta-media">
+                                <div class="receta-video-placeholder">
+                                    <div class="placeholder-content">
+                                        <span class="placeholder-emoji">🐠</span>
+                                        <span class="placeholder-text">Cachama<br>Frita</span>
+                                    </div>
+                                </div>
+                                <div class="receta-overlay">
+                                    <span class="receta-duracion">⏱️ 35 min</span>
+                                </div>
+                            </div>
+                            <div class="receta-contenido">
+                                <h3 class="receta-nombre">Cachama Frita Tradicional</h3>
+                                <p class="receta-descripcion">Pescado fresco con sabor auténtico, ideal para almorzar en familia.</p>
+                                <button class="btn-ver-productos" 
+                                        onclick="filtrarReceta('pescado', 'Cachama Frita Tradicional')"
+                                        aria-label="Ver productos para Cachama Frita Tradicional">
+                                    🛒 Ver productos para esta receta
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Receta 11: Camarones al ajillo -->
+                        <div class="receta-card" data-categoria="pescado">
+                            <div class="receta-media">
+                                <div class="receta-video-placeholder">
+                                    <div class="placeholder-content">
+                                        <span class="placeholder-emoji">🦐</span>
+                                        <span class="placeholder-text">Camarones<br>al Ajillo</span>
+                                    </div>
+                                </div>
+                                <div class="receta-overlay">
+                                    <span class="receta-duracion">⏱️ 15 min</span>
+                                </div>
+                            </div>
+                            <div class="receta-contenido">
+                                <h3 class="receta-nombre">Camarones al Ajillo Gourmet</h3>
+                                <p class="receta-descripcion">Exquisitos camarones con ajo y hierbas finas, una experiencia premium.</p>
+                                <button class="btn-ver-productos" 
+                                        onclick="filtrarReceta('pescado', 'Camarones al Ajillo Gourmet')"
+                                        aria-label="Ver productos para Camarones al Ajillo Gourmet">
+                                    🛒 Ver productos para esta receta
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Receta 12: Combo de pasabocas para fiesta -->
+                        <div class="receta-card" data-categoria="pasabocas">
+                            <div class="receta-media">
+                                <div class="receta-video-placeholder">
+                                    <div class="placeholder-content">
+                                        <span class="placeholder-emoji">🎉</span>
+                                        <span class="placeholder-text">Combo<br>Fiesta</span>
+                                    </div>
+                                </div>
+                                <div class="receta-overlay">
+                                    <span class="receta-duracion">⏱️ 25 min</span>
+                                </div>
+                            </div>
+                            <div class="receta-contenido">
+                                <h3 class="receta-nombre">Combo Fiesta Perfecta</h3>
+                                <p class="receta-descripcion">Mezcla ideal de empanadas, deditos y medallones para celebrar.</p>
+                                <button class="btn-ver-productos" 
+                                        onclick="filtrarReceta('pasabocas', 'Combo Fiesta Perfecta')"
+                                        aria-label="Ver productos para Combo Fiesta Perfecta">
+                                    🛒 Ver productos para esta receta
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Indicadores de paginación -->
+                    <div class="carrusel-indicadores" id="carruselIndicadores">
+                        <!-- Los indicadores se generarán dinámicamente con JavaScript -->
+                    </div>
+                </div>
+            </div>
+        </section>
+
         <!-- Simulador de precio por peso (pollo entero) -->
         <section class="seccion-simulador">
             <div class="simulador-card">
