@@ -94,7 +94,7 @@ const productos = [
         id: 40,
         nombre: 'Filete de Salmón',
         categoria: 'pescado',
-        precio: 42000,
+        precio: 19990,
         descripcion: 'Salmón fresco, rico en omega-3. Porciones de 200g cada una.',
         emoji: '🐟',
         etiqueta: 'Premium',
@@ -104,7 +104,7 @@ const productos = [
         id: 41,
         nombre: 'Camarones Precocido',
         categoria: 'pescado',
-        precio: 38000,
+        precio: 21990,
         descripcion: 'Camarones precociso, pelados y desvenados.',
         emoji: '🦐',
         etiqueta: 'Gourmet',
@@ -114,7 +114,7 @@ const productos = [
         id: 42,
         nombre: 'Cachama Entera x3 unidades',
         categoria: 'pescado',
-        precio: 42000,
+        precio: 14990,
         descripcion: 'Cachama fresca y limpia, lista para cocinar. Su sabor suave y natural es perfecto para disfrutar en familia.',
         emoji: '🐟',
         etiqueta: 'Premium',
@@ -124,7 +124,7 @@ const productos = [
         id: 43,
         nombre: 'Tilapia Roja Entera x3 unidades',
         categoria: 'pescado',
-        precio: 42000,
+        precio: 15990,
         descripcion: 'Tilapia roja fresca y limpia, lista para cocinar. Ideal para cualquier preparación y disfrutar en familia.',
         emoji: '🐟',
         etiqueta: 'Premium',
@@ -134,7 +134,7 @@ const productos = [
         id: 44,
         nombre: 'Mojarra Entera x3 unidades ',
         categoria: 'pescado',
-        precio: 42000,
+        precio: 14990,
         descripcion: 'Mojarra fresca y limpia, lista para cocinar. Ideal para cualquier preparación y disfrutar en familia.',
         emoji: '🐟',
         etiqueta: 'Premium',
@@ -692,9 +692,9 @@ function renderizarProductos() {
 
                     <!-- BOTÓN DESTACADO solo para producto id 1 -->
                     ${producto.id === 1 ? `
-                      <button class="boton boton-destacado" onclick="mostrarSimuladorPollo(${producto.id})">
+                        <button class="boton boton-destacado" onclick="mostrarSimuladorPollo(${producto.id})">
                         🔢 Simular peso (Pollo)
-                      </button>
+                        </button>
                     ` : ''}
                 </div>
             </div>
@@ -2824,7 +2824,7 @@ function inicializarRecetas() {
 // ===== SISTEMA DE RESEÑAS ===== 
 
 /**
- * Sistema completo de reseñas con IndexedDB, Firestore y Optimistic UI
+ * Sistema completo de reseñas conFirestore y Optimistic UI
  * Incluye carrusel, formularios, validación, offline sync y analytics
  */
 
