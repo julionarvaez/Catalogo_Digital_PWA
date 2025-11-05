@@ -3538,6 +3538,13 @@ class SistemaResenas {
     }
 
     /**
+     * Sincronizar reseñas pendientes (alias para sincronizarResenasPendientes)
+     */
+    async syncPendingReviews() {
+        return await this.sincronizarResenasPendientes();
+    }
+
+    /**
      * Sincronizar reseñas pendientes
      */
     async sincronizarResenasPendientes() {

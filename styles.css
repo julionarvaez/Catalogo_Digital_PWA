@@ -41,7 +41,7 @@ body.modo-oscuro {
 html, body {
     width: 100%;
     max-width: 100vw;
-    overflow-x: hidden;
+    overflow-x: clip; /* Cambiar de hidden a clip para permitir scroll interno */
 }
 
 .contenedor {
@@ -57,6 +57,7 @@ html, body {
         width: 100vw;
         padding-left: 0;
         padding-right: 0;
+        overflow: visible; /* Permitir overflow interno */
     }
 }
 
@@ -974,7 +975,9 @@ body.modo-oscuro .pie-pagina {
         width: 95vw;
         padding: 1rem;
     }
-    /* === MODAL DE INSTALACIÓN === */
+}
+
+/* === MODAL DE INSTALACIÓN === */
 .modal-instalacion {
     position: fixed;
     top: 0;
@@ -1056,41 +1059,36 @@ body.modo-oscuro .cerrar-modal:hover {
 
 /* === CORRECCIÓN DE ENCABEZADO EN MÓVILES === */
 @media (max-width: 600px) {
-  .encabezado {
+    .encabezado {
     padding: 0.5rem 0.5rem;
-  }
-
-  .banner-promocional {
-    margin-top: 65px; /* Ajuste específico para pantallas pequeñas */
-  }
-
-  .contenedor {
-    padding-top: 2rem !important; /* Consistente con el nuevo espaciado */
-  }
-
-  .seccion-hero {
-    padding-top: 1rem;
-    padding-bottom: 2rem;
-  }
-
-  .seccion-hero h1 {
-    font-size: 1.8rem !important;
-    line-height: 1.2;
-  }
-
-  .seccion-hero p {
-    font-size: 1rem !important;
-    line-height: 1.4;
-  }
 }
 
+.banner-promocional {
+    margin-top: 65px; /* Ajuste específico para pantallas pequeñas */
+}
 
+.contenedor {
+    padding-top: 2rem !important; /* Consistente con el nuevo espaciado */
+}
 
+.seccion-hero {
+    padding-top: 1rem;
+    padding-bottom: 2rem;
+}
 
+.seccion-hero h1 {
+    font-size: 1.8rem !important;
+    line-height: 1.2;
+}
+
+.seccion-hero p {
+    font-size: 1rem !important;
+    line-height: 1.4;
+}
 }
 
 /* ========================================
-   ESTILOS PARA IMÁGENES DE PRODUCTOS
+ESTILOS PARA IMÁGENES DE PRODUCTOS
    ======================================== */
 
 /* Imagen del producto en tarjetas */
@@ -1244,7 +1242,6 @@ body.modo-oscuro .cerrar-modal:hover {
 .contenido-modal-instalacion h3 {
     margin-bottom: 1rem;
     color: var(--color-primario);
-    font-size: 1.5rem;
 }
 
 .contenido-modal-instalacion form {
@@ -2610,7 +2607,7 @@ body.modo-oscuro .beneficio-card:hover .beneficio-icono {
         rgba(241, 245, 249, 0.95) 50%, 
         rgba(248, 250, 252, 0.9) 100%);
     position: relative;
-    overflow: hidden;
+    overflow: visible; /* CRÍTICO: cambiar a visible */
 }
 
 .seccion-recetas::before {
@@ -2659,16 +2656,17 @@ body.modo-oscuro .beneficio-card:hover .beneficio-icono {
     transform: translateX(-50%);
     width: 100px;
     height: 4px;
-    background: linear-gradient(90deg, var(--color-primario), var(--color-secundario));
+    background: linear-gradient(90deg, transparent, var(--color-acento), transparent);
     border-radius: 2px;
+    animation: brilloLinea 3s ease-in-out infinite;
 }
 
-.recetas-descripcion {
+.recetas-header p {
     font-size: 1.1rem;
     color: var(--color-texto-secundario);
-    line-height: 1.6;
-    max-width: 600px;
+    max-width: 700px;
     margin: 0 auto;
+    line-height: 1.6;
     font-weight: 400;
 }
 
@@ -2677,6 +2675,8 @@ body.modo-oscuro .beneficio-card:hover .beneficio-icono {
 .carrusel-recetas {
     position: relative;
     margin-top: 2rem;
+    overflow: visible; /* CRÍTICO: cambiar a visible */
+    padding: 0 2rem; /* Espacio para botones */
 }
 
 .carrusel-btn {
@@ -2693,21 +2693,23 @@ body.modo-oscuro .beneficio-card:hover .beneficio-icono {
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: var(--transition-smooth);
     z-index: 10;
     box-shadow: 0 4px 20px rgba(37, 99, 235, 0.15);
     backdrop-filter: blur(10px);
 }
 
-.carrusel-btn:hover {
+.carrusel-btn:hover:not(:disabled) {
     background: var(--color-primario);
     color: white;
     transform: translateY(-50%) scale(1.1);
     box-shadow: 0 8px 30px rgba(37, 99, 235, 0.25);
 }
 
-.carrusel-btn:active {
-    transform: translateY(-50%) scale(0.95);
+.carrusel-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: translateY(-50%) scale(0.9);
 }
 
 .carrusel-prev {
@@ -2722,11 +2724,14 @@ body.modo-oscuro .beneficio-card:hover .beneficio-icono {
     display: flex;
     gap: 1.5rem;
     overflow-x: auto;
+    overflow-y: visible; /* CRÍTICO: visible para no cortar */
     scroll-behavior: smooth;
-    padding: 1rem 0;
+    padding: 1.5rem 0; /* Más padding vertical */
     scroll-snap-type: x mandatory;
     scrollbar-width: none;
     -ms-overflow-style: none;
+    -webkit-overflow-scrolling: touch;
+    /* REMOVER márgenes negativos que causan el corte */
 }
 
 .recetas-track::-webkit-scrollbar {
@@ -2745,6 +2750,8 @@ body.modo-oscuro .beneficio-card:hover .beneficio-icono {
     transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     scroll-snap-align: start;
     position: relative;
+    /* Asegurar que no se corte */
+    min-width: 320px;
     
     /* Animación inicial */
     opacity: 0;
@@ -2918,12 +2925,12 @@ body.modo-oscuro .beneficio-card:hover .beneficio-icono {
     border-radius: 50%;
     background: rgba(37, 99, 235, 0.3);
     cursor: pointer;
-    transition: all 0.3s ease;
+    transition: var(--transition-smooth);
 }
 
 .indicador.activo {
     background: var(--color-primario);
-    transform: scale(1.2);
+    transform: scale(1.3);
 }
 
 .indicador:hover {
@@ -2932,20 +2939,6 @@ body.modo-oscuro .beneficio-card:hover .beneficio-icono {
 }
 
 /* ===== RESPONSIVE DESIGN ===== */
-
-@media (max-width: 1024px) {
-    .carrusel-prev {
-        left: -15px;
-    }
-    
-    .carrusel-next {
-        right: -15px;
-    }
-    
-    .receta-card {
-        flex: 0 0 280px;
-    }
-}
 
 @media (max-width: 768px) {
     .seccion-recetas {
@@ -2966,11 +2959,21 @@ body.modo-oscuro .beneficio-card:hover .beneficio-icono {
     
     .receta-card {
         flex: 0 0 260px;
+        min-width: 260px;
     }
     
-    .recetas-track {
-        gap: 1rem;
-        padding: 0.5rem 0;
+    .resena-card {
+        flex: 0 0 280px;
+        min-width: 280px;
+    }
+    
+    .recetas-track,
+    .resenas-track {
+        gap: 0.75rem;
+        padding: 1rem 0.5rem;
+        padding-right: 1rem;
+        overflow-x: auto;
+        overflow-y: visible !important;
     }
     
     .receta-media {
@@ -3003,150 +3006,180 @@ body.modo-oscuro .beneficio-card:hover .beneficio-icono {
         padding: 2rem 0;
     }
     
-    .recetas-titulo {
-        font-size: 1.7rem;
+    .receta-card {
+        flex: 0 0 240px;
+        min-width: 240px;
+    }
+    
+    .resena-card {
+        flex: 0 0 280px;
+        min-width: 280px;
+    }
+    
+    .recetas-track,
+    .resenas-track {
+        gap: 0.75rem;
+        padding: 1rem 0.5rem;
+        padding-right: 1rem;
+    }
+    
+    .receta-media {
+        height: 160px;
+    }
+    
+    .placeholder-emoji {
+        font-size: 3rem;
+    }
+}
+
+/* ===== AJUSTES ESPECÍFICOS PARA MÓVILES ===== */
+
+@media (max-width: 768px) {
+    /* REMOVER la sección duplicada que empieza aquí y va hasta línea ~3100 */
+    /* Mantener solo esta versión: */
+    
+    .seccion-recetas,
+    .seccion-resenas {
+        overflow: visible !important; /* Forzar visible */
+        padding: 3rem 0;
+    }
+    
+    .recetas-contenedor,
+    .resenas-contenedor {
+        overflow: visible !important;
+        padding: 0 0.5rem;
+    }
+    
+    .carrusel-recetas,
+    .resenas-carrusel {
+        overflow: visible !important;
+        padding: 0 1rem;
+    }
+    
+    .recetas-track,
+    .resenas-track {
+        gap: 1rem;
+        padding: 1rem 0.5rem;
+        margin: 0;
+        padding-right: 1rem;
+        overflow-x: auto;
+        overflow-y: visible !important;
+    }
+    
+    .receta-card {
+        flex: 0 0 280px;
+        min-width: 280px;
+        scroll-snap-align: center;
+    }
+    
+    .receta-card:hover {
+        transform: translateY(-4px) scale(1.01);
+        box-shadow: 0 15px 40px rgba(37, 99, 235, 0.15);
+    }
+    
+    .resena-card {
+        flex: 0 0 300px;
+        min-width: 300px;
+        scroll-snap-align: center;
+    }
+    
+    .resena-card:hover {
+        transform: translateY(-4px) scale(1.01);
+        box-shadow: 0 15px 40px rgba(37, 99, 235, 0.15);
+    }
+    
+    .carrusel-btn {
+        display: none !important;
+    }
+    
+    .recetas-titulo,
+    .resenas-titulo {
+        font-size: 2rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .seccion-resenas {
+        padding: 3rem 0;
+    }
+    
+    .carrusel-recetas,
+    .resenas-carrusel {
+        padding: 0 0.5rem;
     }
     
     .receta-card {
         flex: 0 0 240px;
+        min-width: 240px;
     }
     
-    .recetas-track {
+    .resena-card {
+        flex: 0 0 280px;
+        min-width: 280px;
+    }
+    
+    .recetas-track,
+    .resenas-track {
         gap: 0.75rem;
+        padding: 1rem 0.5rem;
+        padding-right: 1rem;
     }
     
     .receta-media {
-        height: 140px;
+        height: 160px;
     }
     
     .placeholder-emoji {
-        font-size: 2.5rem;
-    }
-    
-    .placeholder-text {
-        font-size: 0.9rem;
-    }
-    
-    .receta-contenido {
-        padding: 1rem;
-    }
-    
-    .btn-ver-productos {
-        padding: 0.6rem 1.2rem;
-        font-size: 0.85rem;
+        font-size: 3rem;
     }
 }
 
-/* ===== ACCESIBILIDAD ===== */
+/* ===== PREVENIR INTERFERENCIA DE CAPAS ===== */
 
-@media (prefers-reduced-motion: reduce) {
-    .receta-card,
-    .placeholder-emoji,
-    .fondoFlotante,
-    .emojiFlotante,
-    .carrusel-btn {
-        animation: none !important;
-        transition: none !important;
-    }
-    
-    .receta-card:hover {
-        transform: none !important;
-    }
-    
-    .btn-ver-productos:hover {
-        transform: none !important;
-    }
+/* Asegurar que los overlays no interfieran con el scroll */
+.overlay {
+    pointer-events: none;
 }
 
-/* ===== MODO OSCURO ===== */
-
-body.modo-oscuro .seccion-recetas {
-    background: linear-gradient(135deg, 
-        rgba(15, 23, 42, 0.95) 0%, 
-        rgba(30, 41, 59, 0.9) 50%, 
-        rgba(51, 65, 85, 0.95) 100%);
+.overlay.mostrar {
+    pointer-events: auto;
 }
 
-body.modo-oscuro .receta-card {
-    background: rgba(30, 41, 59, 0.8);
-    border-color: rgba(148, 163, 184, 0.2);
-    backdrop-filter: blur(10px);
+.carrusel-recetas,
+.resenas-carrusel {
+    z-index: 1;
 }
 
-body.modo-oscuro .receta-card:hover {
-    background: rgba(30, 41, 59, 0.9);
-    border-color: rgba(148, 163, 184, 0.3);
+.btn-fab-instalar,
+.prompt-instalacion {
+    pointer-events: auto;
+    z-index: 1400;
 }
 
-body.modo-oscuro .receta-nombre {
-    color: white;
+.banner-promocional {
+    position: relative;
+    z-index: 999;
+    margin-bottom: 2rem;
 }
 
-body.modo-oscuro .recetas-titulo {
-    color: white;
-    background: linear-gradient(135deg, #60a5fa, #38bdf8);
-    background-clip: text;
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-}
+/* ===== SISTEMA DE RESEÑAS - ESTILOS PROFESIONALES ===== */
 
-body.modo-oscuro .recetas-descripcion {
-    color: rgba(203, 213, 225, 0.8);
-}
-
-body.modo-oscuro .receta-descripcion {
-    color: rgba(203, 213, 225, 0.7);
-}
-
-body.modo-oscuro .carrusel-btn {
-    background: rgba(30, 41, 59, 0.9);
-    border-color: rgba(148, 163, 184, 0.3);
-    color: #60a5fa;
-}
-
-body.modo-oscuro .carrusel-btn:hover {
-    background: rgba(96, 165, 250, 0.2);
-    color: white;
-}
-
-body.modo-oscuro .indicador {
-    background: rgba(148, 163, 184, 0.3);
-}
-
-body.modo-oscuro .indicador.activo {
-    background: #60a5fa;
-}
-
-body.modo-oscuro .receta-video-placeholder {
-    background: linear-gradient(135deg, 
-        rgba(59, 130, 246, 0.2), 
-        rgba(56, 189, 248, 0.25));
-}
-
-body.modo-oscuro .placeholder-text {
-    color: #60a5fa;
-}
-
-/* ===== SECCIÓN DE RESEÑAS ===== */
-
-:root {
-    /* Variables específicas para reseñas */
-    --resena-radius: 16px;
-    --resena-shadow: 0 4px 20px rgba(37, 99, 235, 0.1);
-    --resena-shadow-hover: 0 8px 30px rgba(37, 99, 235, 0.2);
-    --estrella-color: #fbbf24;
-    --estrella-color-empty: #e5e7eb;
-    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
+/* Sección principal de reseñas */
 .seccion-resenas {
     padding: 5rem 0;
-    background: linear-gradient(135deg, 
-        rgba(248, 250, 252, 0.95) 0%, 
-        rgba(241, 245, 249, 0.98) 50%, 
+    background: linear-gradient(135deg,
+        rgba(248, 250, 252, 0.95) 0%,
+        rgba(239, 246, 255, 0.98) 50%,
         rgba(248, 250, 252, 0.95) 100%);
     position: relative;
     overflow: hidden;
+}
+
+body.modo-oscuro .seccion-resenas {
+    background: linear-gradient(135deg,
+        rgba(15, 23, 42, 0.95) 0%,
+        rgba(30, 41, 59, 0.98) 50%,
+        rgba(15, 23, 42, 0.95) 100%);
 }
 
 .seccion-resenas::before {
@@ -3156,7 +3189,7 @@ body.modo-oscuro .placeholder-text {
     left: 0;
     right: 0;
     bottom: 0;
-    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 800"><defs><pattern id="reviews-pattern" x="0" y="0" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="50" cy="50" r="2" fill="%232563eb" opacity="0.1"/><circle cx="25" cy="25" r="1.5" fill="%2338bdf8" opacity="0.15"/><circle cx="75" cy="75" r="1" fill="%232563eb" opacity="0.12"/></pattern></defs><rect width="1200" height="800" fill="url(%23reviews-pattern)"/></svg>');
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 800"><defs><pattern id="stars-pattern" x="0" y="0" width="100" height="100" patternUnits="userSpaceOnUse"><path d="M50,15 L57,35 L78,35 L61,48 L68,68 L50,55 L32,68 L39,48 L22,35 L43,35 Z" fill="%23fbbf24" opacity="0.08"/></pattern></defs><rect width="1200" height="800" fill="url(%23stars-pattern)"/></svg>');
     pointer-events: none;
     z-index: 1;
 }
@@ -3169,70 +3202,132 @@ body.modo-oscuro .placeholder-text {
     z-index: 2;
 }
 
-/* ===== HEADER DE RESEÑAS ===== */
-
+/* Header de reseñas */
 .resenas-header {
     text-align: center;
     margin-bottom: 3rem;
+    position: relative;
+    animation: fadeInDown 0.8s ease-out;
 }
 
 .resenas-titulo {
-    font-size: 2.5rem;
-    font-weight: 700;
-    color: var(--color-primario);
-    margin-bottom: 1rem;
-    background: linear-gradient(135deg, var(--color-primario), #1e40af);
-    background-clip: text;
+    font-size: 2.8rem;
+    font-weight: 800;
+    background: linear-gradient(135deg, var(--color-primario) 0%, var(--color-acento) 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
-    font-family: 'Poppins', 'Inter', system-ui, sans-serif;
+    background-clip: text;
+    margin-bottom: 1rem;
     position: relative;
+    display: inline-block;
+    font-family: 'Poppins', 'Inter', system-ui, sans-serif;
+    letter-spacing: -0.5px;
 }
 
 .resenas-titulo::after {
     content: '';
     position: absolute;
-    bottom: -0.5rem;
+    bottom: -10px;
     left: 50%;
     transform: translateX(-50%);
     width: 120px;
     height: 4px;
-    background: linear-gradient(90deg, var(--color-primario), var(--estrella-color));
+    background: linear-gradient(90deg, transparent, var(--color-acento), transparent);
     border-radius: 2px;
+    animation: brilloLinea 3s ease-in-out infinite;
+}
+
+@keyframes brilloLinea {
+    0%, 100% { opacity: 0.5; }
+    50% { opacity: 1; }
 }
 
 .resenas-subtitulo {
-    font-size: 1.1rem;
+    font-size: 1.2rem;
     color: var(--color-texto-secundario);
-    line-height: 1.6;
     max-width: 600px;
     margin: 0 auto;
+    line-height: 1.6;
     font-weight: 400;
 }
 
-/* ===== ESTADÍSTICAS DE RESEÑAS ===== */
+body.modo-oscuro .resenas-subtitulo {
+    color: rgba(226, 232, 240, 0.8);
+}
 
+/* Estadísticas de reseñas */
 .resenas-estadisticas {
     display: flex;
     justify-content: center;
-    gap: 3rem;
-    margin-bottom: 3rem;
-    padding: 2rem;
+    align-items: center;
+    gap: 4rem;
+    margin: 2rem 0 3rem 0;
+    padding: 2.5rem;
     background: white;
-    border-radius: var(--resena-radius);
-    box-shadow: var(--resena-shadow);
+    border-radius: 24px;
+    box-shadow: 0 20px 60px rgba(37, 99, 235, 0.08), 
+                0 5px 15px rgba(0, 0, 0, 0.05);
+    animation: fadeInUp 0.8s ease-out 0.2s backwards;
     border: 1px solid rgba(37, 99, 235, 0.1);
+}
+
+body.modo-oscuro .resenas-estadisticas {
+    background: rgba(30, 41, 59, 0.9);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4), 
+                0 5px 15px rgba(0, 0, 0, 0.3);
+    border-color: rgba(100, 116, 139, 0.2);
+    backdrop-filter: blur(10px);
 }
 
 .estadistica-item {
     text-align: center;
+    position: relative;
+    padding: 1rem;
+    transition: transform 0.3s ease;
+}
+
+.estadistica-item:hover {
+    transform: translateY(-5px);
+}
+
+.estadistica-item:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    right: -2rem;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 2px;
+    height: 60px;
+    background: linear-gradient(to bottom, 
+        transparent, 
+        var(--color-primario), 
+        transparent);
 }
 
 .estadistica-numero {
-    font-size: 2.5rem;
-    font-weight: 700;
-    color: var(--color-primario);
+    font-size: 3.5rem;
+    font-weight: 800;
+    background: linear-gradient(135deg, var(--color-primario), var(--color-acento));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    display: block;
     line-height: 1;
+    font-family: 'Poppins', sans-serif;
+    margin-bottom: 0.5rem;
+}
+
+.estadistica-label {
+    font-size: 0.9rem;
+    color: var(--color-texto-secundario);
+    margin-top: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    font-weight: 600;
+}
+
+body.modo-oscuro .estadistica-label {
+    color: rgba(148, 163, 184, 0.9);
 }
 
 .estadistica-rating {
@@ -3243,319 +3338,127 @@ body.modo-oscuro .placeholder-text {
 }
 
 .rating-numero {
-    font-size: 2.5rem;
-    font-weight: 700;
-    color: var(--color-primario);
+    font-size: 3.5rem;
+    font-weight: 800;
+    background: linear-gradient(135deg, #fbbf24, #f59e0b);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    line-height: 1;
 }
 
-.estrellas-display {
-    display: flex;
-    gap: 0.2rem;
-}
-
-.estrellas-display .estrella {
-    font-size: 1.5rem;
-    color: var(--estrella-color);
-}
-
-.estadistica-label {
-    font-size: 0.9rem;
-    color: var(--color-texto-secundario);
-    margin-top: 0.5rem;
-    font-weight: 500;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-}
-
-/* ===== CARRUSEL DE RESEÑAS ===== */
-
-.resenas-carrusel {
-    position: relative;
-    margin-bottom: 4rem;
-}
-
-.carrusel-btn {
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
+/* Formulario de reseñas - MEJORADO */
+.formulario-resena {
     background: white;
-    border: 2px solid var(--color-primario);
-    color: var(--color-primario);
-    width: 50px;
-    height: 50px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: var(--transition-smooth);
-    z-index: 10;
-    box-shadow: var(--resena-shadow);
-    backdrop-filter: blur(10px);
-}
-
-.carrusel-btn:hover:not(:disabled) {
-    background: var(--color-primario);
-    color: white;
-    transform: translateY(-50%) scale(1.1);
-    box-shadow: var(--resena-shadow-hover);
-}
-
-.carrusel-btn:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-    transform: translateY(-50%) scale(0.9);
-}
-
-.carrusel-prev {
-    left: -25px;
-}
-
-.carrusel-next {
-    right: -25px;
-}
-
-.resenas-track {
-    display: flex;
-    gap: 1.5rem;
-    overflow-x: auto;
-    scroll-behavior: smooth;
-    padding: 1rem 0;
-    scroll-snap-type: x mandatory;
-    scrollbar-width: none;
-    -ms-overflow-style: none;
-    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.resenas-track::-webkit-scrollbar {
-    display: none;
-}
-
-/* ===== TARJETAS DE RESEÑAS ===== */
-
-.resena-card {
-    flex: 0 0 350px;
-    background: white;
-    border-radius: var(--resena-radius);
-    padding: 1.5rem;
-    box-shadow: var(--resena-shadow);
+    border-radius: 24px;
+    padding: 3rem;
+    box-shadow: 0 20px 60px rgba(37, 99, 235, 0.08), 
+                0 5px 15px rgba(0, 0, 0, 0.05);
+    margin-top: 4rem;
+    animation: fadeInUp 0.8s ease-out 0.6s backwards;
     border: 1px solid rgba(37, 99, 235, 0.1);
-    transition: var(--transition-smooth);
-    scroll-snap-align: start;
+    transition: all 0.4s ease;
     position: relative;
     overflow: hidden;
-    
-    /* Animación inicial */
-    opacity: 0;
-    transform: translateY(30px) scale(0.95);
 }
 
-.resena-card.visible {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-}
-
-.resena-card:hover {
-    transform: translateY(-8px) scale(1.02);
-    box-shadow: var(--resena-shadow-hover);
-    border-color: rgba(37, 99, 235, 0.25);
-}
-
-.resena-card::before {
+.formulario-resena::before {
     content: '';
     position: absolute;
     top: 0;
     left: 0;
     right: 0;
     height: 4px;
-    background: linear-gradient(90deg, var(--color-primario), var(--estrella-color));
-    transform: scaleX(0);
-    transform-origin: left;
-    transition: transform 0.4s ease;
+    background: linear-gradient(90deg, 
+        var(--color-primario), 
+        var(--color-acento), 
+        var(--color-primario));
+    background-size: 200% 100%;
+    animation: gradienteMovimiento 3s ease infinite;
 }
 
-.resena-card:hover::before {
-    transform: scaleX(1);
+body.modo-oscuro .formulario-resena {
+    background: rgba(30, 41, 59, 0.9);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4), 
+                0 5px 15px rgba(0, 0, 0, 0.3);
+    border-color: rgba(100, 116, 139, 0.2);
+    backdrop-filter: blur(10px);
 }
 
-.resena-header {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    margin-bottom: 1rem;
+.formulario-resena:hover {
+    border-color: var(--color-primario);
+    box-shadow: 0 25px 70px rgba(37, 99, 235, 0.12), 
+                0 10px 25px rgba(37, 99, 235, 0.08);
+    transform: translateY(-2px);
 }
 
-.resena-avatar {
-    width: 50px;
-    height: 50px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, var(--color-primario), var(--color-secundario));
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: white;
-    font-weight: 700;
-    font-size: 1.2rem;
-    text-transform: uppercase;
-}
-
-.resena-info {
-    flex: 1;
-}
-
-.resena-nombre {
-    font-weight: 600;
-    color: var(--color-primario);
-    margin-bottom: 0.25rem;
-    font-size: 1rem;
-}
-
-.resena-fecha {
-    font-size: 0.85rem;
-    color: var(--color-texto-secundario);
-}
-
-.resena-producto {
-    font-size: 0.8rem;
-    color: var(--color-acento);
-    font-weight: 500;
-    margin-top: 0.25rem;
-}
-
-.resena-rating {
-    display: flex;
-    gap: 0.2rem;
-    margin-bottom: 1rem;
-}
-
-.resena-rating .estrella {
-    font-size: 1.2rem;
-    color: var(--estrella-color);
-    transition: var(--transition-smooth);
-}
-
-.resena-rating .estrella.empty {
-    color: var(--estrella-color-empty);
-}
-
-.resena-texto {
-    color: var(--color-texto);
-    line-height: 1.6;
-    font-size: 0.95rem;
-    position: relative;
-}
-
-.resena-texto::before {
-    content: '"';
-    font-size: 3rem;
-    color: var(--color-primario);
-    opacity: 0.2;
-    position: absolute;
-    top: -1rem;
-    left: -0.5rem;
-    font-family: Georgia, serif;
-}
-
-.resena-estado {
-    display: inline-block;
-    padding: 0.25rem 0.75rem;
-    border-radius: 12px;
-    font-size: 0.75rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    margin-top: 1rem;
-}
-
-.resena-estado.pending {
-    background: rgba(251, 191, 36, 0.2);
-    color: #d97706;
-}
-
-.resena-estado.offline {
-    background: rgba(156, 163, 175, 0.2);
-    color: #6b7280;
-}
-
-.resena-estado.published {
-    background: rgba(34, 197, 94, 0.2);
-    color: #16a34a;
-}
-
-.resena-estado.moderation {
-    background: rgba(59, 130, 246, 0.2);
-    color: #2563eb;
-}
-
-/* ===== PLACEHOLDER DE RESEÑAS ===== */
-
-.resena-placeholder {
-    flex: 0 0 350px;
-    background: white;
-    border-radius: var(--resena-radius);
-    padding: 2rem;
-    text-align: center;
-    box-shadow: var(--resena-shadow);
-    border: 2px dashed rgba(37, 99, 235, 0.3);
-}
-
-.placeholder-icono {
-    font-size: 3rem;
-    margin-bottom: 1rem;
-    opacity: 0.7;
-    animation: pulseIcon 2s ease-in-out infinite;
-}
-
-@keyframes pulseIcon {
-    0%, 100% { transform: scale(1); opacity: 0.7; }
-    50% { transform: scale(1.1); opacity: 1; }
-}
-
-/* ===== FORMULARIO DE RESEÑA ===== */
-
-.formulario-resena {
-    background: white;
-    border-radius: var(--resena-radius);
-    padding: 2rem;
-    box-shadow: var(--resena-shadow);
-    border: 1px solid rgba(37, 99, 235, 0.1);
-    margin-bottom: 2rem;
+body.modo-oscuro .formulario-resena:hover {
+    box-shadow: 0 25px 70px rgba(0, 0, 0, 0.5), 
+                0 10px 25px rgba(37, 99, 235, 0.15);
 }
 
 .formulario-titulo {
-    font-size: 1.5rem;
+    font-size: 2rem;
     font-weight: 700;
     color: var(--color-primario);
-    margin-bottom: 1.5rem;
-    text-align: center;
+    margin-bottom: 2rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-family: 'Poppins', 'Inter', system-ui, sans-serif;
+}
+
+body.modo-oscuro .formulario-titulo {
+    color: #60a5fa;
 }
 
 .resena-form {
     display: grid;
-    gap: 1.5rem;
+    gap: 1.75rem;
 }
 
+/* Campos del formulario */
 .campo-grupo {
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
+    position: relative;
 }
 
 .campo-label {
     font-weight: 600;
-    color: var(--color-texto);
-    font-size: 0.9rem;
+    color: var(--color-texto-principal);
+    font-size: 0.95rem;
+    letter-spacing: 0.3px;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+body.modo-oscuro .campo-label {
+    color: rgba(226, 232, 240, 0.9);
 }
 
 .campo-input,
 .campo-select,
 .campo-textarea {
-    padding: 0.75rem 1rem;
-    border: 2px solid #e5e7eb;
-    border-radius: 8px;
+    width: 100%;
+    padding: 1rem 1.25rem;
+    border: 2px solid #e2e8f0;
+    border-radius: 12px;
     font-size: 1rem;
-    transition: var(--transition-smooth);
-    background: #fafafa;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    background: #f8fafc;
+    font-family: inherit;
+    color: var(--color-texto-principal);
+}
+
+body.modo-oscuro .campo-input,
+body.modo-oscuro .campo-select,
+body.modo-oscuro .campo-textarea {
+    background: rgba(15, 23, 42, 0.6);
+    border-color: rgba(100, 116, 139, 0.3);
+    color: rgba(226, 232, 240, 0.95);
 }
 
 .campo-input:focus,
@@ -3564,394 +3467,657 @@ body.modo-oscuro .placeholder-text {
     outline: none;
     border-color: var(--color-primario);
     background: white;
-    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1),
+                0 4px 12px rgba(37, 99, 235, 0.15);
+    transform: translateY(-2px);
+}
+
+body.modo-oscuro .campo-input:focus,
+body.modo-oscuro .campo-select:focus,
+body.modo-oscuro .campo-textarea:focus {
+    background: rgba(15, 23, 42, 0.9);
+    border-color: #60a5fa;
+    box-shadow: 0 0 0 4px rgba(96, 165, 250, 0.15),
+                0 4px 12px rgba(96, 165, 250, 0.2);
+}
+
+.campo-input::placeholder,
+.campo-textarea::placeholder {
+    color: #94a3b8;
+    font-weight: 400;
+}
+
+body.modo-oscuro .campo-input::placeholder,
+body.modo-oscuro .campo-textarea::placeholder {
+    color: rgba(148, 163, 184, 0.6);
 }
 
 .campo-textarea {
+    min-height: 140px;
     resize: vertical;
-    min-height: 100px;
-    font-family: inherit;
+    line-height: 1.6;
 }
 
-.campo-contador {
-    text-align: right;
-    font-size: 0.8rem;
-    color: var(--color-texto-secundario);
-}
-
-.campo-error {
-    color: #dc2626;
-    font-size: 0.85rem;
-    margin-top: 0.25rem;
-    display: none;
-}
-
-.campo-error.visible {
-    display: block;
-}
-
-/* ===== SELECTOR DE RATING ===== */
-
+/* Rating estrellas interactivas - MEJORADO */
 .rating-selector {
     display: flex;
-    gap: 0.5rem;
-    align-items: center;
+    gap: 0.75rem;
+    margin-top: 0.5rem;
+    padding: 1rem;
+    background: rgba(37, 99, 235, 0.03);
+    border-radius: 12px;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+
+body.modo-oscuro .rating-selector {
+    background: rgba(96, 165, 250, 0.05);
+}
+
+.rating-selector:hover {
+    background: rgba(37, 99, 235, 0.05);
+}
+
+body.modo-oscuro .rating-selector:hover {
+    background: rgba(96, 165, 250, 0.08);
 }
 
 .rating-input {
     display: none;
 }
 
-.rating-selector .estrella {
-    font-size: 2rem;
-    color: var(--estrella-color-empty);
+.rating-selector label.estrella {
+    font-size: 2.5rem;
+    color: #cbd5e1;
     cursor: pointer;
-    transition: var(--transition-smooth);
-    user-select: none;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    margin: 0;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
 }
 
-.rating-selector .estrella:hover,
-.rating-selector .estrella.active {
-    color: var(--estrella-color);
-    transform: scale(1.1);
+body.modo-oscuro .rating-selector label.estrella {
+    color: rgba(100, 116, 139, 0.6);
 }
 
-.rating-input:checked ~ .estrella,
-.rating-input:checked ~ .estrella ~ .estrella {
-    color: var(--estrella-color-empty);
+.rating-selector label.estrella:hover,
+.rating-selector label.estrella:hover ~ label.estrella {
+    color: #fbbf24;
+    transform: scale(1.2) rotate(10deg);
+    filter: drop-shadow(0 4px 8px rgba(251, 191, 36, 0.4));
 }
 
-.rating-input:checked + .estrella,
-.rating-input:checked + .estrella ~ .estrella:nth-of-type(-n+5) {
-    color: var(--estrella-color);
+.rating-input:checked ~ label.estrella {
+    color: #fbbf24;
+    animation: reboteEstrella 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    filter: drop-shadow(0 4px 8px rgba(251, 191, 36, 0.5));
 }
 
-/* ===== BOTONES DEL FORMULARIO ===== */
+/* Contador de caracteres */
+.campo-contador {
+    text-align: right;
+    font-size: 0.85rem;
+    color: var(--color-texto-secundario);
+    margin-top: 0.5rem;
+    font-weight: 500;
+    transition: color 0.3s ease;
+}
 
+body.modo-oscuro .campo-contador {
+    color: rgba(148, 163, 184, 0.7);
+}
+
+.campo-contador.limit-warning {
+    color: #f59e0b;
+    font-weight: 600;
+}
+
+.campo-contador.limit-exceeded {
+    color: var(--color-error);
+    font-weight: 700;
+}
+
+/* Mensajes de error */
+.campo-error {
+    display: none;
+    color: var(--color-error);
+    font-size: 0.85rem;
+    font-weight: 500;
+    margin-top: 0.25rem;
+    padding: 0.5rem 0.75rem;
+    background: rgba(239, 68, 68, 0.1);
+    border-radius: 8px;
+    border-left: 3px solid var(--color-error);
+    animation: slideInLeft 0.3s ease;
+}
+
+.campo-error.visible {
+    display: block;
+}
+
+@keyframes slideInLeft {
+    from {
+        opacity: 0;
+        transform: translateX(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+/* Botones del formulario */
 .formulario-acciones {
     display: flex;
     gap: 1rem;
-    justify-content: center;
     margin-top: 1rem;
 }
 
 .btn-enviar-resena {
+    flex: 1;
+    padding: 1.15rem 2rem;
     background: linear-gradient(135deg, var(--color-primario), var(--color-secundario));
     color: white;
     border: none;
-    padding: 0.75rem 2rem;
-    border-radius: 8px;
-    font-weight: 600;
-    font-size: 1rem;
+    border-radius: 12px;
+    font-size: 1.1rem;
+    font-weight: 700;
     cursor: pointer;
-    transition: var(--transition-smooth);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 8px 20px rgba(37, 99, 235, 0.25);
     position: relative;
     overflow: hidden;
-    min-width: 150px;
 }
 
-.btn-enviar-resena:hover:not(:disabled) {
-    transform: translateY(-2px);
-    box-shadow: var(--resena-shadow-hover);
+.btn-enviar-resena::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+    transition: left 0.6s ease;
+}
+
+.btn-enviar-resena:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 30px rgba(37, 99, 235, 0.35);
+    background: linear-gradient(135deg, #1e40af, #0ea5e9);
+}
+
+.btn-enviar-resena:hover::before {
+    left: 100%;
+}
+
+.btn-enviar-resena:active {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 15px rgba(37, 99, 235, 0.3);
 }
 
 .btn-enviar-resena:disabled {
-    opacity: 0.7;
+    opacity: 0.6;
     cursor: not-allowed;
-    transform: none;
 }
 
-.btn-enviar-resena .btn-loading {
+/* === TARJETAS DE RESEÑAS - NUEVO DISEÑO PROFESIONAL === */
+
+.resenas-carrusel {
+    position: relative;
+    margin: 3rem 0;
+    animation: fadeInUp 0.8s ease-out 0.4s backwards;
+}
+
+.resenas-track {
+    display: flex;
+    gap: 2rem;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scroll-behavior: smooth;
+    padding: 2rem 0;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+.resenas-track::-webkit-scrollbar {
+    display: none;
+}
+
+/* === TARJETA DE RESEÑA INDIVIDUAL - REDISEÑADA === */
+
+.resena-card {
+    min-width: 380px;
+    max-width: 380px;
+    background: white;
+    border-radius: 20px;
+    padding: 2rem;
+    box-shadow: 0 10px 40px rgba(37, 99, 235, 0.08),
+                0 2px 8px rgba(0, 0, 0, 0.04);
+    scroll-snap-align: center;
+    position: relative;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    border: 2px solid rgba(37, 99, 235, 0.08);
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+body.modo-oscuro .resena-card {
+    background: rgba(30, 41, 59, 0.9);
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3),
+                0 2px 8px rgba(0, 0, 0, 0.2);
+    border-color: rgba(100, 116, 139, 0.2);
+    backdrop-filter: blur(10px);
+}
+
+.resena-card:hover {
+    transform: translateY(-8px) scale(1.02);
+    box-shadow: 0 20px 60px rgba(37, 99, 235, 0.15),
+                0 8px 20px rgba(37, 99, 235, 0.1);
+    border-color: var(--color-primario);
+}
+
+body.modo-oscuro .resena-card:hover {
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4),
+                0 8px 20px rgba(96, 165, 250, 0.2);
+    border-color: #60a5fa;
+}
+
+/* Decoración de comillas */
+.resena-card::before {
+    content: '"';
+    position: absolute;
+    top: -10px;
+    left: 20px;
+    font-size: 6rem;
+    font-family: Georgia, serif;
+    color: var(--color-primario);
+    opacity: 0.08;
+    line-height: 1;
+    pointer-events: none;
+}
+
+body.modo-oscuro .resena-card::before {
+    color: #60a5fa;
+    opacity: 0.12;
+}
+
+/* Header de la reseña */
+.resena-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 1rem;
+    position: relative;
+    z-index: 1;
+}
+
+.resena-autor {
     display: flex;
     align-items: center;
-    gap: 0.5rem;
-    justify-content: center;
+    gap: 1rem;
+    flex: 1;
 }
 
-.spinner {
-    animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(360deg); }
-}
-
-.btn-cancelar-resena {
-    background: transparent;
-    color: var(--color-texto-secundario);
-    border: 2px solid #e5e7eb;
-    padding: 0.75rem 1.5rem;
-    border-radius: 8px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: var(--transition-smooth);
-}
-
-.btn-cancelar-resena:hover {
-    border-color: var(--color-primario);
-    color: var(--color-primario);
-}
-
-/* ===== MENSAJES DE ESTADO ===== */
-
-.mensaje-estado {
-    margin-top: 1rem;
-    padding: 1rem;
-    border-radius: 8px;
-    text-align: center;
-}
-
-.mensaje-estado.success {
-    background: rgba(34, 197, 94, 0.1);
-    border: 1px solid rgba(34, 197, 94, 0.3);
-    color: #16a34a;
-}
-
-.mensaje-estado.error {
-    background: rgba(239, 68, 68, 0.1);
-    border: 1px solid rgba(239, 68, 68, 0.3);
-    color: #dc2626;
-}
-
-.mensaje-estado.info {
-    background: rgba(59, 130, 246, 0.1);
-    border: 1px solid rgba(59, 130, 246, 0.3);
-    color: #2563eb;
-}
-
-/* ===== ESTADO OFFLINE ===== */
-
-.estado-offline {
-    background: rgba(156, 163, 175, 0.1);
-    border: 2px dashed #9ca3af;
-    border-radius: var(--resena-radius);
-    padding: 2rem;
-    text-align: center;
-    margin-top: 2rem;
-}
-
-.offline-icono {
-    font-size: 3rem;
-    margin-bottom: 1rem;
-    opacity: 0.7;
-}
-
-.estado-offline h4 {
-    color: var(--color-texto);
-    margin-bottom: 0.5rem;
-}
-
-.estado-offline p {
-    color: var(--color-texto-secundario);
-    margin-bottom: 1rem;
-}
-
-.reseñas-pendientes {
-    background: rgba(251, 191, 36, 0.2);
-    padding: 0.75rem;
-    border-radius: 8px;
-    color: #d97706;
-    font-weight: 500;
-}
-
-/* ===== INDICADORES DEL CARRUSEL ===== */
-
-.carrusel-indicadores {
+/* Avatar mejorado */
+.resena-avatar {
+    width: 64px;
+    height: 64px;
+    border-radius: 16px;
+    background: linear-gradient(135deg, var(--color-primario), var(--color-secundario));
     display: flex;
+    align-items: center;
     justify-content: center;
-    gap: 0.5rem;
-    margin-top: 2rem;
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: white;
+    box-shadow: 0 6px 20px rgba(37, 99, 235, 0.25);
+    position: relative;
+    flex-shrink: 0;
+    transition: all 0.3s ease;
 }
 
-.indicador {
-    width: 12px;
-    height: 12px;
-    border-radius: 50%;
-    background: rgba(37, 99, 235, 0.3);
-    cursor: pointer;
-    transition: var(--transition-smooth);
+.resena-card:hover .resena-avatar {
+    transform: rotate(-5deg) scale(1.05);
+    box-shadow: 0 8px 25px rgba(37, 99, 235, 0.35);
 }
 
-.indicador.activo {
-    background: var(--color-primario);
-    transform: scale(1.3);
+body.modo-oscuro .resena-avatar {
+    background: linear-gradient(135deg, #3b82f6, #60a5fa);
+    box-shadow: 0 6px 20px rgba(96, 165, 250, 0.3);
 }
 
-.indicador:hover {
-    background: var(--color-secundario);
+/* Anillo animado del avatar */
+.resena-avatar::after {
+    content: '';
+    position: absolute;
+    inset: -4px;
+    border-radius: 18px;
+    background: linear-gradient(135deg, var(--color-primario), var(--color-acento));
+    z-index: -1;
+    opacity: 0.3;
+    animation: pulsoAvatar 3s ease-in-out infinite;
+}
+
+body.modo-oscuro .resena-avatar::after {
+    background: linear-gradient(135deg, #60a5fa, #fbbf24);
+}
+
+@keyframes pulsoAvatar {
+    0%, 100% {
+        transform: scale(1);
+        opacity: 0.3;
+    }
+    50% {
+        transform: scale(1.15);
+        opacity: 0.5;
+    }
+}
+
+/* Información del autor */
+.resena-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.resena-info h4 {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--texto-claro);
+    margin: 0 0 0.25rem 0;
+    font-family: 'Poppins', 'Inter', system-ui, sans-serif;
+    line-height: 1.3;
+}
+
+body.modo-oscuro .resena-info h4 {
+    color: white;
+}
+
+.resena-fecha {
+    font-size: 0.85rem;
+    color: var(--color-texto-secundario);
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    margin-top: 0.25rem;
+}
+
+body.modo-oscuro .resena-fecha {
+    color: rgba(148, 163, 184, 0.8);
+}
+
+.resena-fecha::before {
+    content: '📅';
+    font-size: 0.9rem;
+}
+
+/* Rating de estrellas */
+.resena-rating {
+    display: flex;
+    gap: 0.25rem;
+    align-items: center;
+    flex-shrink: 0;
+}
+
+.resena-rating .estrella {
+    font-size: 1.3rem;
+    color: #fbbf24;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+    transition: transform 0.2s ease;
+}
+
+.resena-card:hover .resena-rating .estrella {
     transform: scale(1.1);
 }
 
-/* ===== RESPONSIVE DESIGN ===== */
+/* Texto de la reseña */
+.resena-texto {
+    color: var(--texto-claro);
+    line-height: 1.7;
+    font-size: 0.98rem;
+    margin: 0;
+    position: relative;
+    z-index: 1;
+    font-weight: 400;
+}
+
+body.modo-oscuro .resena-texto {
+    color: rgba(226, 232, 240, 0.9);
+}
+
+/* Footer de la reseña */
+.resena-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 1rem;
+    border-top: 2px solid rgba(37, 99, 235, 0.08);
+    margin-top: auto;
+}
+
+body.modo-oscuro .resena-footer {
+    border-top-color: rgba(100, 116, 139, 0.2);
+}
+
+/* Badge verificado */
+.badge-verificado {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.4rem 0.9rem;
+    background: linear-gradient(135deg, #10b981, #059669);
+    color: white;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25);
+    transition: all 0.3s ease;
+}
+
+.badge-verificado::before {
+    content: '✓';
+    font-size: 1rem;
+    font-weight: 800;
+}
+
+.resena-card:hover .badge-verificado {
+    transform: scale(1.05);
+    box-shadow: 0 6px 16px rgba(16, 185, 129, 0.35);
+}
+
+/* Producto asociado */
+.resena-producto {
+    font-size: 0.85rem;
+    color: var(--color-primario);
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    transition: all 0.3s ease;
+}
+
+.resena-producto::before {
+    content: '🛒';
+    font-size: 1rem;
+}
+
+body.modo-oscuro .resena-producto {
+    color: #60a5fa;
+}
+
+.resena-card:hover .resena-producto {
+    transform: translateX(3px);
+}
+
+/* === CONTROLES DEL CARRUSEL === */
+
+.carrusel-controles {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-top: 2rem;
+}
+
+.btn-carrusel {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: white;
+    border: 2px solid var(--color-primario);
+    color: var(--color-primario);
+    font-size: 1.5rem;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 15px rgba(37, 99, 235, 0.15);
+}
+
+body.modo-oscuro .btn-carrusel {
+    background: rgba(30, 41, 59, 0.8);
+    border-color: #60a5fa;
+    color: #60a5fa;
+    box-shadow: 0 4px 15px rgba(96, 165, 250, 0.2);
+}
+
+.btn-carrusel:hover:not(:disabled) {
+    background: var(--color-primario);
+    color: white;
+    transform: scale(1.1);
+    box-shadow: 0 8px 25px rgba(37, 99, 235, 0.3);
+}
+
+body.modo-oscuro .btn-carrusel:hover:not(:disabled) {
+    background: #60a5fa;
+    color: white;
+    box-shadow: 0 8px 25px rgba(96, 165, 250, 0.35);
+}
+
+.btn-carrusel:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+    transform: scale(0.95);
+}
+
+/* === ANIMACIONES === */
+
+@keyframes fadeInDown {
+    from {
+        opacity: 0;
+        transform: translateY(-30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes pulsoEstrella {
+    0%, 100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.15);
+    }
+}
+
+@keyframes reboteEstrella {
+    0%, 100% {
+        transform: scale(1) rotate(0deg);
+    }
+    25% {
+        transform: scale(1.2) rotate(-10deg);
+    }
+    50% {
+        transform: scale(1.3) rotate(10deg);
+    }
+    75% {
+        transform: scale(1.1) rotate(-5deg);
+    }
+}
+
+/* === RESPONSIVE === */
 
 @media (max-width: 768px) {
-    .seccion-resenas {
-        padding: 3rem 0;
-    }
-    
-    .resenas-titulo {
-        font-size: 2rem;
-    }
-    
-    .resenas-estadisticas {
-        flex-direction: column;
-        gap: 1.5rem;
-        padding: 1.5rem;
-    }
-    
-    .estadistica-numero,
-    .rating-numero {
-        font-size: 2rem;
-    }
-    
-    .carrusel-btn {
-        display: none; /* Ocultar en móvil, usar swipe */
-    }
-    
     .resena-card {
-        flex: 0 0 300px;
-    }
-    
-    .resenas-track {
-        gap: 1rem;
-        padding: 0.5rem 0;
-    }
-    
-    .formulario-resena {
+        min-width: 320px;
+        max-width: 320px;
         padding: 1.5rem;
+        gap: 1.25rem;
     }
     
-    .formulario-acciones {
-        flex-direction: column;
+    .resena-avatar {
+        width: 56px;
+        height: 56px;
+        font-size: 1.4rem;
+        border-radius: 14px;
     }
     
-    .btn-enviar-resena,
-    .btn-cancelar-resena {
-        width: 100%;
+    .resena-info h4 {
+        font-size: 1.05rem;
+    }
+    
+    .resena-fecha {
+        font-size: 0.8rem;
+    }
+    
+    .resena-rating .estrella {
+        font-size: 1.1rem;
+    }
+    
+    .resena-texto {
+        font-size: 0.92rem;
+        line-height: 1.6;
+    }
+    
+    .badge-verificado {
+        font-size: 0.75rem;
+        padding: 0.35rem 0.75rem;
+    }
+    
+    .resena-producto {
+        font-size: 0.8rem;
     }
 }
 
 @media (max-width: 480px) {
-    .seccion-resenas {
-        padding: 2rem 0;
+    .resena-card {
+        min-width: 290px;
+        max-width: 290px;
+        padding: 1.25rem;
+        gap: 1rem;
+        border-radius: 16px;
     }
     
-    .resenas-titulo {
-        font-size: 1.7rem;
+    .resena-avatar {
+        width: 50px;
+        height: 50px;
+        font-size: 1.2rem;
+        border-radius: 12px;
     }
     
-    .resenas-subtitulo {
+    .resena-info h4 {
         font-size: 1rem;
     }
     
-    .resena-card {
-        flex: 0 0 280px;
+    .resena-texto {
+        font-size: 0.9rem;
     }
     
-    .resenas-track {
-        gap: 0.75rem;
+    .resena-card::before {
+        font-size: 4rem;
+        top: -5px;
+        left: 15px;
     }
-    
-    .formulario-resena {
-        padding: 1rem;
-        margin: 0 -0.5rem 2rem -0.5rem;
-    }
-    
-    .rating-selector .estrella {
-        font-size: 1.8rem;
-    }
-}
-
-/* ===== ACCESIBILIDAD ===== */
-
-@media (prefers-reduced-motion: reduce) {
-    .resena-card,
-    .carrusel-btn,
-    .rating-selector .estrella,
-    .placeholder-icono,
-    .spinner {
-        animation: none !important;
-        transition: none !important;
-    }
-    
-    .resena-card:hover,
-    .carrusel-btn:hover,
-    .btn-enviar-resena:hover {
-        transform: none !important;
-    }
-}
-
-/* ===== MODO OSCURO ===== */
-
-body.modo-oscuro .seccion-resenas {
-    background: linear-gradient(135deg, 
-        rgba(15, 23, 42, 0.95) 0%, 
-        rgba(30, 41, 59, 0.9) 50%, 
-        rgba(51, 65, 85, 0.95) 100%);
-}
-
-body.modo-oscuro .resenas-estadisticas,
-body.modo-oscuro .resena-card,
-body.modo-oscuro .formulario-resena {
-    background: rgba(30, 41, 59, 0.8);
-    border-color: rgba(148, 163, 184, 0.2);
-    backdrop-filter: blur(10px);
-}
-
-body.modo-oscuro .resenas-titulo {
-    color: white;
-    background: linear-gradient(135deg, #60a5fa, #38bdf8);
-    background-clip: text;
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-}
-
-body.modo-oscuro .resenas-subtitulo {
-    color: rgba(203, 213, 225, 0.8);
-}
-
-body.modo-oscuro .resena-nombre,
-body.modo-oscuro .formulario-titulo,
-body.modo-oscuro .campo-label {
-    color: white;
-}
-
-body.modo-oscuro .resena-fecha,
-body.modo-oscuro .resena-texto {
-    color: rgba(203, 213, 225, 0.7);
-}
-
-body.modo-oscuro .campo-input,
-body.modo-oscuro .campo-select,
-body.modo-oscuro .campo-textarea {
-    background: rgba(51, 65, 85, 0.5);
-    border-color: rgba(148, 163, 184, 0.3);
-    color: white;
-}
-
-body.modo-oscuro .campo-input:focus,
-body.modo-oscuro .campo-select:focus,
-body.modo-oscuro .campo-textarea:focus {
-    background: rgba(51, 65, 85, 0.8);
-    border-color: #60a5fa;
-}
-
-body.modo-oscuro .carrusel-btn {
-    background: rgba(30, 41, 59, 0.9);
-    border-color: rgba(148, 163, 184, 0.3);
-    color: #60a5fa;
-}
-
-body.modo-oscuro .carrusel-btn:hover:not(:disabled) {
-    background: rgba(96, 165, 250, 0.2);
-    color: white;
-}
-
-body.modo-oscuro .indicador {
-    background: rgba(148, 163, 184, 0.3);
-}
-
-body.modo-oscuro .indicador.activo {
-    background: #60a5fa;
 }
