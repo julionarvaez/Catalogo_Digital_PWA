@@ -21,7 +21,8 @@ function initFirebase() {
             // Decodificar service account desde variable de entorno
             const serviceAccountB64 = process.env.FIREBASE_SERVICE_ACCOUNT_B64;
             if (!serviceAccountB64) {
-                throw new Error('FIREBASE_SERVICE_ACCOUNT_B64 no está configurado');
+                console.error('❌ FIREBASE_SERVICE_ACCOUNT_B64 no está configurado');
+                throw new Error('Firebase no configurado - credenciales faltantes');
             }
             
             const serviceAccount = JSON.parse(
@@ -33,9 +34,9 @@ function initFirebase() {
                 projectId: process.env.FIREBASE_PROJECT_ID || serviceAccount.project_id
             });
             
-            console.log('Firebase Admin SDK inicializado correctamente');
+            console.log('✅ Firebase Admin SDK inicializado correctamente');
         } catch (error) {
-            console.error('Error inicializando Firebase:', error);
+            console.error('❌ Error inicializando Firebase:', error.message);
             throw error;
         }
     }

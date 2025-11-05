@@ -3585,8 +3585,15 @@ class SistemaResenas {
         console.log(`Sincronizando ${pendientes.length} reseñas pendientes...`);
         
         let synchronized = 0;
+        let rateLimitHit = false;
         
         for (const resena of pendientes) {
+            // Si ya alcanzamos el rate limit, pausar
+            if (rateLimitHit) {
+                console.log('Rate limit alcanzado, pausando sincronización...');
+                break;
+            }
+            
             try {
                 const response = await this.enviarResenaAlServidor(resena);
                 
@@ -3604,10 +3611,16 @@ class SistemaResenas {
                 
             } catch (error) {
                 console.error('Error sincronizando reseña individual:', error);
+                
+                // Si es error 429, detener el proceso
+                if (error.message && error.message.includes('Demasiadas reseñas')) {
+                    rateLimitHit = true;
+                    console.log('⏸️ Sincronización pausada por rate limit');
+                }
             }
             
-            // Pequeña pausa entre envíos
-            await new Promise(resolve => setTimeout(resolve, 500));
+            // Pausa más larga entre envíos para evitar rate limiting (1.5 segundos)
+            await new Promise(resolve => setTimeout(resolve, 1500));
         }
         
         if (synchronized > 0) {
@@ -3622,6 +3635,10 @@ class SistemaResenas {
                 synchronized_count: synchronized,
                 total_pending: pendientes.length
             });
+        }
+        
+        if (rateLimitHit && synchronized < pendientes.length) {
+            console.log(`⏳ ${pendientes.length - synchronized} reseñas aún pendientes. Se reintentarán más tarde.`);
         }
     }
 
@@ -3713,7 +3730,11 @@ class SistemaResenas {
             const data = await response.json();
             
             if (!response.ok) {
-                throw new Error(data.error || `HTTP ${response.status}`);
+                // Manejar error 429 (rate limit)
+                if (response.status === 429) {
+                    throw new Error('Demasiadas reseñas. Por favor espera un minuto e intenta de nuevo.');
+                }
+                throw new Error(data.error || data.message || `HTTP ${response.status}`);
             }
             
             return data;
@@ -3741,7 +3762,12 @@ class SistemaResenas {
             const data = await response.json();
             
             if (!response.ok) {
-                throw new Error(data.error || `HTTP ${response.status}`);
+                console.warn(`Error obteniendo reseñas: ${response.status}`);
+                // Si hay error pero tenemos reviews en data, retornarlas
+                if (data.reviews && Array.isArray(data.reviews)) {
+                    return data;
+                }
+                throw new Error(data.error || data.message || `HTTP ${response.status}`);
             }
             
             return data;
@@ -3976,8 +4002,10 @@ class SistemaResenas {
                 });
             }
             
-            // Sistema interno de analytics
-            if (typeof window.AlimentoDelCielo !== 'undefined' && window.AlimentoDelCielo.analytics) {
+            // Sistema interno de analytics (solo si está disponible)
+            if (typeof window.AlimentoDelCielo !== 'undefined' && 
+                window.AlimentoDelCielo.analytics && 
+                typeof window.AlimentoDelCielo.analytics.track === 'function') {
                 window.AlimentoDelCielo.analytics.track(eventName, parameters);
             }
             

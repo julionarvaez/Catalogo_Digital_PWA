@@ -20,7 +20,8 @@ function initFirebase() {
         try {
             const serviceAccountB64 = process.env.FIREBASE_SERVICE_ACCOUNT_B64;
             if (!serviceAccountB64) {
-                throw new Error('FIREBASE_SERVICE_ACCOUNT_B64 no está configurado');
+                console.error('❌ FIREBASE_SERVICE_ACCOUNT_B64 no está configurado');
+                throw new Error('Firebase no configurado - credenciales faltantes');
             }
             
             const serviceAccount = JSON.parse(
@@ -32,9 +33,9 @@ function initFirebase() {
                 projectId: process.env.FIREBASE_PROJECT_ID || serviceAccount.project_id
             });
             
-            console.log('Firebase Admin SDK inicializado para getReviews');
+            console.log('✅ Firebase Admin SDK inicializado para getReviews');
         } catch (error) {
-            console.error('Error inicializando Firebase:', error);
+            console.error('❌ Error inicializando Firebase:', error.message);
             throw error;
         }
     }
@@ -207,7 +208,7 @@ exports.handler = async (event, context) => {
         };
         
     } catch (error) {
-        console.error('Error obteniendo reseñas:', error);
+        console.error('❌ Error obteniendo reseñas:', error.message);
         
         return {
             statusCode: 500,
@@ -215,9 +216,10 @@ exports.handler = async (event, context) => {
             body: JSON.stringify({
                 ok: false,
                 error: 'Error interno del servidor',
-                message: 'No se pudieron cargar las reseñas. Intenta de nuevo más tarde.',
+                message: error.message || 'No se pudieron cargar las reseñas. Intenta de nuevo más tarde.',
                 reviews: [], // Array vacío como fallback
-                count: 0
+                count: 0,
+                timestamp: new Date().toISOString()
             })
         };
     }
