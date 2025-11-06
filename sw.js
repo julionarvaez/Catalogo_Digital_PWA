@@ -1,6 +1,6 @@
 // === SERVICE WORKER PARA ALIMENTO DEL CIELO PWA ===
 // IMPORTANTE: Incrementar esta versión cuando haya cambios importantes
-const CACHE_VERSION = '1.0.2';
+const CACHE_VERSION = '1.0.3';
 const CACHE_NAME = `alimento-del-cielo-v${CACHE_VERSION}`;
 const APP_VERSION = CACHE_VERSION;
 
@@ -94,67 +94,19 @@ self.addEventListener('activate', function(event) {
     );
 });
 
-// === INTERCEPTAR REQUESTS (ESTRATEGIA CACHE-FIRST) ===
+// === INTERCEPTAR REQUESTS (ESTRATEGIA DINÁMICA POR TIPO) ===
 self.addEventListener('fetch', function(event) {
-    // Ignorar extensiones de navegador y protocolos no HTTP
     const url = event.request.url;
-    if (!url.startsWith('http') || 
-        url.includes('chrome-extension:') || 
-        url.includes('moz-extension:') ||
-        url.includes('safari-extension:')) {
+    // Ignorar extensiones de navegador y protocolos no HTTP
+    if (!url.startsWith('http') ||
+        url.startsWith('chrome-extension') ||
+        url.startsWith('moz-extension') ||
+        url.startsWith('safari-extension')) {
         return;
     }
-    
-    // Solo cachear requests HTTP/HTTPS
-    event.respondWith(
-        caches.match(event.request)
-            .then(function(response) {
-                // Si está en cache, devolverlo
-                if (response) {
-                    return response;
-                }
-                
-                // Si no está en cache, hacer fetch
-                return fetch(event.request)
-                    .then(function(response) {
-                        // Verificar si es una respuesta válida
-                        if (!response || response.status !== 200 || response.type !== 'basic') {
-                            return response;
-                        }
-                        
-                        // No cachear scripts de extensiones o terceros no confiables
-                        if (event.request.url.includes('grammarly') ||
-                            event.request.url.includes('extension')) {
-                            return response;
-                        }
-                        
-                        // Clonar la respuesta
-                        const responseToCache = response.clone();
-                        
-                        // Agregar al cache dinámico
-                        caches.open(CACHE_NAME)
-                            .then(function(cache) {
-                                cache.put(event.request, responseToCache);
-                            });
-                        
-                        return response;
-                    })
-                    .catch(function() {
-                        // Si falla el fetch, mostrar página offline
-                        if (event.request.destination === 'document') {
-                            return caches.match('/index.html');
-                        }
-                        
-                        // Para imágenes, mostrar imagen placeholder
-                        if (event.request.destination === 'image') {
-                            return new Response(
-                                '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200"><rect width="200" height="200" fill="#f3f4f6"/><text x="100" y="100" font-size="40" text-anchor="middle" fill="#9ca3af">📱</text><text x="100" y="140" font-size="12" text-anchor="middle" fill="#6b7280">Sin conexión</text></svg>',
-                                { headers: { 'Content-Type': 'image/svg+xml' } }
-                            );
-                        }
-                    });
-            })
-    );
+
+    // Usa las estrategias declaradas abajo según el tipo de request
+    event.respondWith(aplicarEstrategiaCache(event.request));
 });
 
 // === NOTIFICACIONES PUSH ===
@@ -430,10 +382,8 @@ function aplicarEstrategiaCache(request) {
 }
 
 // === VERSIÓN ===
-const VERSION = '1.0.1';
-
 console.log('🚀 Service Worker de Alimento del Cielo cargado correctamente');
-console.log(`📊 Versión: ${VERSION}`);
+console.log(`📊 Versión: ${APP_VERSION}`);
 console.log('✅ Funcionalidades habilitadas:');
 console.log('  📦 Cache estratégico');
 console.log('  🔄 Sincronización background');

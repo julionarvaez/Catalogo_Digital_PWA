@@ -126,10 +126,11 @@ class AutoUpdateManager {
      */
     async getCurrentVersion() {
         try {
-            const response = await fetch('/sw.js');
+            const response = await fetch(`${this.config.updateCheckUrl}?ts=${Date.now()}`, {
+                cache: 'no-store'
+            });
             const text = await response.text();
-            const versionMatch = text.match(/CACHE_VERSION = ['"]([^'"]+)['"]/);
-            
+            const versionMatch = text.match(/CACHE_VERSION\s*=\s*['"]([^'"]+)['"]/);
             if (versionMatch) {
                 this.currentVersion = versionMatch[1];
                 console.log('📊 Versión actual:', this.currentVersion);
@@ -145,8 +146,7 @@ class AutoUpdateManager {
     startUpdateCheck() {
         // Verificar inmediatamente
         this.checkForUpdates();
-        
-        // Luego verificar cada minuto
+        // Luego verificar periódicamente
         setInterval(() => {
             this.checkForUpdates();
         }, this.config.checkInterval);
@@ -157,9 +157,30 @@ class AutoUpdateManager {
      */
     async checkForUpdates() {
         if (!this.registration) return;
-        
+        if (!navigator.onLine) {
+            // Evita ruido cuando no hay conexión
+            console.log('📴 Offline: se omite verificación de actualización');
+            return;
+        }
+
         try {
+            // Pide al navegador buscar un SW nuevo
             await this.registration.update();
+
+            // Chequeo extra: comparar la versión del SW remoto (sin cache)
+            const res = await fetch(`${this.config.updateCheckUrl}?ts=${Date.now()}`, { cache: 'no-store' });
+            const text = await res.text();
+            const match = text.match(/CACHE_VERSION\s*=\s*['"]([^'"]+)['"]/);
+
+            if (match) {
+                const remoteVersion = match[1];
+                if (this.currentVersion && remoteVersion !== this.currentVersion) {
+                    console.log(`🆕 Detectada nueva versión remota: ${remoteVersion} (actual: ${this.currentVersion})`);
+                    this.currentVersion = remoteVersion;
+                    this.handleUpdateAvailable();
+                }
+            }
+
             console.log('✅ Verificación de actualización completada');
         } catch (error) {
             console.warn('⚠️ Error verificando actualizaciones:', error);
@@ -230,26 +251,23 @@ class AutoUpdateManager {
      */
     async applyUpdate() {
         console.log('🔄 Aplicando actualización...');
-        
-        // Mostrar indicador de carga
         this.showLoadingIndicator();
-        
+
         try {
-            // 1. Limpiar cache antiguo
             await this.clearOldCache();
-            
-            // 2. Esperar a que el nuevo SW esté listo
-            const waiting = this.registration.waiting;
-            if (waiting) {
-                // Enviar mensaje para que el SW se active inmediatamente
-                waiting.postMessage({ type: 'SKIP_WAITING' });
+
+            // Intentar activar el worker que está esperando o instalándose
+            const waitingOrInstalling = this.registration.waiting || this.registration.installing;
+            if (waitingOrInstalling) {
+                waitingOrInstalling.postMessage({ type: 'SKIP_WAITING' });
+            } else {
+                // Si no hay ninguno, pide una actualización
+                await this.registration.update().catch(() => {});
             }
-            
-            // 3. Recargar después de un breve delay
+
             setTimeout(() => {
                 window.location.reload(true);
             }, this.config.autoReloadDelay);
-            
         } catch (error) {
             console.error('❌ Error aplicando actualización:', error);
             this.hideLoadingIndicator();
