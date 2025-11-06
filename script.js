@@ -635,6 +635,9 @@ function renderizarProductos() {
             producto.categoria.toLowerCase().includes(terminoBusqueda)
         );
     }
+    
+    // NUEVO: Aplicar ordenamiento
+    productosFiltrados = ordenarProductos(productosFiltrados);
 
     // Generar HTML
     if (productosFiltrados.length === 0) {
@@ -647,10 +650,9 @@ function renderizarProductos() {
                 </button>
             </div>
         `;
+        ocultarMensajeResultados();
         return;
     }
-
-
 
     grilla.innerHTML = productosFiltrados.map(producto => `
         <article class="tarjeta-producto entrada-animada">
@@ -667,6 +669,7 @@ function renderizarProductos() {
                 <div class="etiqueta-producto ${producto.tipoEtiqueta}">
                     ${producto.etiqueta || ''}
                 </div>
+                ${obtenerBadgePopularidad(producto.id)}
             </div>
             <div class="info-producto">
                 <h3 class="titulo-producto">${producto.nombre}</h3>
@@ -676,6 +679,17 @@ function renderizarProductos() {
                     ${producto.unidadMedida ? `<span class="unidad-medida">${producto.unidadMedida}</span>` : ''}
                     ${producto.pesoAproximado ? `<span class="peso-aproximado">${producto.pesoAproximado}</span>` : ''}
                 </div>
+                
+                ${datosPopularidad[producto.id] ? `
+                    <div class="info-popularidad">
+                        <span class="info-ventas" title="Unidades vendidas">
+                            📦 ${datosPopularidad[producto.id].ventas} ventas
+                        </span>
+                        <span class="info-valoracion" title="Valoración promedio">
+                            ⭐ ${datosPopularidad[producto.id].valoracion}
+                        </span>
+                    </div>
+                ` : ''}
 
                 <div class="precio-producto">
                     ${producto.precio.toLocaleString('es-CO')}
@@ -700,6 +714,11 @@ function renderizarProductos() {
             </div>
         </article>
     `).join('');
+    
+    // Mostrar mensaje de resultados si hay ordenamiento activo
+    if (ordenamientoActual.precio || ordenamientoActual.popularidad) {
+        mostrarMensajeResultados();
+    }
 }
 
 // === AGREGAR PRODUCTO ===
@@ -875,6 +894,360 @@ function filtrarProductos() {
 function limpiarFiltros() {
     filtroActual = 'todos';
     document.getElementById('campoBusqueda').value = '';
+    
+    // Limpiar también los filtros de ordenamiento
+    limpiarFiltrosOrdenamiento();
+    
+    document.querySelectorAll('.btn-filtro').forEach(btn => {
+        btn.classList.remove('activo');
+    });
+    document.querySelector('.btn-filtro').classList.add('activo');
+    renderizarProductos();
+}
+
+// === SISTEMA DE FILTROS Y ORDENAMIENTO AVANZADO ===
+
+// Variables globales para ordenamiento
+let ordenamientoActual = {
+    precio: '',
+    popularidad: ''
+};
+
+// Datos de popularidad simulados (en producción vendrían de tu backend/analytics)
+const datosPopularidad = {
+    1: { ventas: 450, valoracion: 4.8 },
+    2: { ventas: 320, valoracion: 4.6 },
+    3: { ventas: 280, valoracion: 4.5 },
+    20: { ventas: 380, valoracion: 4.7 },
+    21: { ventas: 340, valoracion: 4.6 },
+    22: { ventas: 420, valoracion: 4.8 },
+    23: { ventas: 300, valoracion: 4.5 },
+    40: { ventas: 260, valoracion: 4.9 },
+    41: { ventas: 240, valoracion: 4.8 },
+    42: { ventas: 290, valoracion: 4.7 },
+    43: { ventas: 310, valoracion: 4.7 },
+    44: { ventas: 270, valoracion: 4.6 },
+    60: { ventas: 350, valoracion: 4.6 },
+    61: { ventas: 330, valoracion: 4.5 },
+    62: { ventas: 320, valoracion: 4.5 },
+    63: { ventas: 480, valoracion: 4.9 },
+    80: { ventas: 390, valoracion: 4.7 },
+    81: { ventas: 410, valoracion: 4.8 },
+    82: { ventas: 360, valoracion: 4.7 },
+    83: { ventas: 370, valoracion: 4.6 },
+    84: { ventas: 400, valoracion: 4.7 },
+    85: { ventas: 380, valoracion: 4.7 },
+    86: { ventas: 420, valoracion: 4.8 },
+    87: { ventas: 450, valoracion: 4.8 },
+    88: { ventas: 430, valoracion: 4.8 },
+    89: { ventas: 410, valoracion: 4.7 },
+    90: { ventas: 440, valoracion: 4.8 },
+    91: { ventas: 420, valoracion: 4.7 },
+    100: { ventas: 520, valoracion: 4.9 },
+    101: { ventas: 490, valoracion: 4.9 },
+    102: { ventas: 470, valoracion: 4.8 },
+    103: { ventas: 510, valoracion: 4.9 },
+    104: { ventas: 530, valoracion: 5.0 },
+    105: { ventas: 450, valoracion: 4.8 },
+    106: { ventas: 480, valoracion: 4.8 },
+    107: { ventas: 500, valoracion: 4.9 },
+    108: { ventas: 520, valoracion: 4.9 },
+    109: { ventas: 540, valoracion: 5.0 },
+    110: { ventas: 560, valoracion: 5.0 },
+    111: { ventas: 580, valoracion: 5.0 },
+    120: { ventas: 440, valoracion: 4.8 },
+    121: { ventas: 460, valoracion: 4.8 },
+    122: { ventas: 470, valoracion: 4.8 },
+    123: { ventas: 450, valoracion: 4.7 },
+    124: { ventas: 460, valoracion: 4.7 },
+    125: { ventas: 480, valoracion: 4.8 },
+    126: { ventas: 490, valoracion: 4.8 },
+    127: { ventas: 500, valoracion: 4.9 },
+    128: { ventas: 510, valoracion: 4.9 },
+    129: { ventas: 420, valoracion: 4.7 },
+    130: { ventas: 430, valoracion: 4.7 },
+    131: { ventas: 440, valoracion: 4.8 },
+    140: { ventas: 360, valoracion: 4.6 },
+    141: { ventas: 380, valoracion: 4.6 }
+};
+
+/**
+ * Aplicar filtros de ordenamiento
+ */
+function aplicarFiltrosOrdenamiento() {
+    const selectPrecio = document.getElementById('ordenPrecio');
+    const selectPopularidad = document.getElementById('ordenPopularidad');
+    
+    ordenamientoActual.precio = selectPrecio ? selectPrecio.value : '';
+    ordenamientoActual.popularidad = selectPopularidad ? selectPopularidad.value : '';
+    
+    // Añadir clase de carga visual
+    const grilla = document.getElementById('grillaProductos');
+    if (grilla) {
+        grilla.classList.add('filtrando');
+    }
+    
+    // Aplicar filtros con pequeño delay para transición suave
+    setTimeout(() => {
+        renderizarProductos();
+        if (grilla) {
+            grilla.classList.remove('filtrando');
+        }
+        mostrarMensajeResultados();
+        
+        // Analytics
+        if (window.AlimentoDelCielo && window.AlimentoDelCielo.analytics) {
+            window.AlimentoDelCielo.analytics.track('filtro_aplicado', {
+                tipo: 'ordenamiento',
+                precio: ordenamientoActual.precio,
+                popularidad: ordenamientoActual.popularidad
+            });
+        }
+    }, 150);
+}
+
+/**
+ * Limpiar todos los filtros de ordenamiento
+ */
+function limpiarFiltrosOrdenamiento() {
+    const selectPrecio = document.getElementById('ordenPrecio');
+    const selectPopularidad = document.getElementById('ordenPopularidad');
+    
+    if (selectPrecio) selectPrecio.value = '';
+    if (selectPopularidad) selectPopularidad.value = '';
+    
+    ordenamientoActual = {
+        precio: '',
+        popularidad: ''
+    };
+    
+    renderizarProductos();
+    ocultarMensajeResultados();
+    mostrarNotificacion('🔄 Filtros limpiados', 'exito');
+    
+    // Analytics
+    if (window.AlimentoDelCielo && window.AlimentoDelCielo.analytics) {
+        window.AlimentoDelCielo.analytics.track('filtros_limpiados', {
+            tipo: 'ordenamiento'
+        });
+    }
+}
+
+/**
+ * Ordenar productos según criterios seleccionados
+ */
+function ordenarProductos(productos) {
+    let productosOrdenados = [...productos];
+    
+    // Ordenar por precio
+    if (ordenamientoActual.precio === 'asc') {
+        productosOrdenados.sort((a, b) => a.precio - b.precio);
+    } else if (ordenamientoActual.precio === 'desc') {
+        productosOrdenados.sort((a, b) => b.precio - a.precio);
+    }
+    
+    // Ordenar por popularidad
+    if (ordenamientoActual.popularidad === 'ventas') {
+        productosOrdenados.sort((a, b) => {
+            const ventasA = datosPopularidad[a.id]?.ventas || 0;
+            const ventasB = datosPopularidad[b.id]?.ventas || 0;
+            return ventasB - ventasA;
+        });
+    } else if (ordenamientoActual.popularidad === 'valoracion') {
+        productosOrdenados.sort((a, b) => {
+            const valoracionA = datosPopularidad[a.id]?.valoracion || 0;
+            const valoracionB = datosPopularidad[b.id]?.valoracion || 0;
+            return valoracionB - valoracionA;
+        });
+    }
+    
+    return productosOrdenados;
+}
+
+/**
+ * Mostrar mensaje con resultados de filtros
+ */
+function mostrarMensajeResultados() {
+    const grilla = document.getElementById('grillaProductos');
+    if (!grilla) return;
+    
+    // Remover mensaje anterior si existe
+    ocultarMensajeResultados();
+    
+    const tieneOrden = ordenamientoActual.precio || ordenamientoActual.popularidad;
+    if (!tieneOrden) return;
+    
+    const totalProductos = grilla.children.length;
+    
+    let textoOrden = '';
+    if (ordenamientoActual.precio === 'asc') {
+        textoOrden = 'Ordenados por precio: menor a mayor';
+    } else if (ordenamientoActual.precio === 'desc') {
+        textoOrden = 'Ordenados por precio: mayor a menor';
+    } else if (ordenamientoActual.popularidad === 'ventas') {
+        textoOrden = 'Ordenados por: más vendidos';
+    } else if (ordenamientoActual.popularidad === 'valoracion') {
+        textoOrden = 'Ordenados por: mejor valorados';
+    }
+    
+    const mensaje = document.createElement('div');
+    mensaje.className = 'mensaje-resultados';
+    mensaje.id = 'mensajeResultados';
+    mensaje.innerHTML = `
+        <span class="icono-resultado">🎯</span>
+        <span class="texto-resultado">${textoOrden}</span>
+        <span class="contador-resultado">${totalProductos} producto${totalProductos !== 1 ? 's' : ''}</span>
+    `;
+    
+    grilla.parentNode.insertBefore(mensaje, grilla);
+}
+
+/**
+ * Ocultar mensaje de resultados
+ */
+function ocultarMensajeResultados() {
+    const mensajeExistente = document.getElementById('mensajeResultados');
+    if (mensajeExistente) {
+        mensajeExistente.remove();
+    }
+}
+
+/**
+ * Obtener badge de popularidad para mostrar en tarjeta
+ */
+function obtenerBadgePopularidad(productoId) {
+    const datos = datosPopularidad[productoId];
+    if (!datos) return '';
+    
+    const esTopVentas = datos.ventas > 400;
+    const esTopValoracion = datos.valoracion >= 4.8;
+    
+    if (esTopVentas && esTopValoracion) {
+        return '<div class="badge-popularidad badge-top">🏆 Top Producto</div>';
+    } else if (esTopVentas) {
+        return '<div class="badge-popularidad badge-ventas">🔥 Más Vendido</div>';
+    } else if (esTopValoracion) {
+        return '<div class="badge-popularidad badge-valoracion">⭐ Top Rated</div>';
+    }
+    
+    return '';
+}
+
+// === RENDERIZADO DE PRODUCTOS (ACTUALIZADO) ===
+function renderizarProductos() {
+    const grilla = document.getElementById('grillaProductos');
+    let productosFiltrados = productos;
+
+    // Aplicar filtro de categoría
+    if (filtroActual !== 'todos') {
+        productosFiltrados = productos.filter(producto => 
+            producto.categoria === filtroActual
+        );
+    }
+
+    // Aplicar filtro de búsqueda
+    const terminoBusqueda = document.getElementById('campoBusqueda')?.value.toLowerCase();
+    if (terminoBusqueda) {
+        productosFiltrados = productosFiltrados.filter(producto => 
+            producto.nombre.toLowerCase().includes(terminoBusqueda) ||
+            producto.descripcion.toLowerCase().includes(terminoBusqueda) ||
+            producto.categoria.toLowerCase().includes(terminoBusqueda)
+        );
+    }
+    
+    // NUEVO: Aplicar ordenamiento
+    productosFiltrados = ordenarProductos(productosFiltrados);
+
+    // Generar HTML
+    if (productosFiltrados.length === 0) {
+        grilla.innerHTML = `
+            <div style="grid-column: 1 / -1; text-align: center; padding: 3rem;">
+                <h3>😕 No se encontraron productos</h3>
+                <p>Intenta con otros términos de búsqueda o revisa otra categoría.</p>
+                <button class="boton boton-primario" onclick="limpiarFiltros()">
+                    🔄 Ver todos los productos
+                </button>
+            </div>
+        `;
+        ocultarMensajeResultados();
+        return;
+    }
+
+    grilla.innerHTML = productosFiltrados.map(producto => `
+        <article class="tarjeta-producto entrada-animada">
+            <div class="imagen-producto">
+                ${producto.imagen ? `
+                    <img src="${producto.imagen}" 
+                        alt="${producto.nombre}" 
+                        class="producto-img"
+                        onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                    <div class="emoji-fallback" style="display: none;">${producto.emoji}</div>
+                ` : `
+                    <div class="emoji-fallback">${producto.emoji}</div>
+                `}
+                <div class="etiqueta-producto ${producto.tipoEtiqueta}">
+                    ${producto.etiqueta || ''}
+                </div>
+                ${obtenerBadgePopularidad(producto.id)}
+            </div>
+            <div class="info-producto">
+                <h3 class="titulo-producto">${producto.nombre}</h3>
+                <p class="descripcion-producto">${producto.descripcion}</p>
+
+                <div class="meta-producto">
+                    ${producto.unidadMedida ? `<span class="unidad-medida">${producto.unidadMedida}</span>` : ''}
+                    ${producto.pesoAproximado ? `<span class="peso-aproximado">${producto.pesoAproximado}</span>` : ''}
+                </div>
+                
+                ${datosPopularidad[producto.id] ? `
+                    <div class="info-popularidad">
+                        <span class="info-ventas" title="Unidades vendidas">
+                            📦 ${datosPopularidad[producto.id].ventas} ventas
+                        </span>
+                        <span class="info-valoracion" title="Valoración promedio">
+                            ⭐ ${datosPopularidad[producto.id].valoracion}
+                        </span>
+                    </div>
+                ` : ''}
+
+                <div class="precio-producto">
+                    ${producto.precio.toLocaleString('es-CO')}
+                </div>
+                <div class="acciones-producto">
+                    <button class="boton boton-primario" onclick="agregarAlCarrito(${producto.id})">
+                        🛒 Agregar
+                    </button>
+                    <a href="${generarEnlaceWhatsApp(producto)}" 
+                    class="boton boton-whatsapp" 
+                    target="_blank">
+                        💬 WhatsApp
+                    </a>
+
+                    <!-- BOTÓN DESTACADO solo para producto id 1 -->
+                    ${producto.id === 1 ? `
+                        <button class="boton boton-destacado" onclick="mostrarSimuladorPollo(${producto.id})">
+                        🔢 Simular peso (Pollo)
+                        </button>
+                    ` : ''}
+                </div>
+            </div>
+        </article>
+    `).join('');
+    
+    // Mostrar mensaje de resultados si hay ordenamiento activo
+    if (ordenamientoActual.precio || ordenamientoActual.popularidad) {
+        mostrarMensajeResultados();
+    }
+}
+
+// === LIMPIAR FILTROS (ACTUALIZADO) ===
+function limpiarFiltros() {
+    filtroActual = 'todos';
+    document.getElementById('campoBusqueda').value = '';
+    
+    // Limpiar también los filtros de ordenamiento
+    limpiarFiltrosOrdenamiento();
+    
     document.querySelectorAll('.btn-filtro').forEach(btn => {
         btn.classList.remove('activo');
     });
@@ -1519,6 +1892,7 @@ async function procesarPago() {
 // === MODAL PARA DATOS DEL CLIENTE ===
 function mostrarModalDatosPago(total) {
     const modal = document.createElement('div');
+
     modal.className = 'modal-instalacion';
     modal.id = 'modalPagoWompi';
     modal.innerHTML = `
@@ -1855,7 +2229,6 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 // === HELPERS DE VALIDACIÓN ===
-// (Ya existen en tu código, pero los incluyo por completitud)
 function validarEmail(email) {
     const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return regex.test(email);
@@ -3528,379 +3901,11 @@ class SistemaResenas {
                         'published': 'Publicado',
                         'moderation': 'En espera de moderación'
                     };
-                    estadoElement.textContent = estados[status] || 'Publicado';
-                    estadoElement.className = `resena-estado ${status}`;
                 }
             }
         }
     }
 
-    /**
-     * Guardar reseña para envío offline
-     */
-    async saveForOffline(resenaData) {
-        try {
-            if (this.db) {
-                // Usar IndexedDB
-                const transaction = this.db.transaction([this.config.storeName], 'readwrite');
-                const store = transaction.objectStore(this.config.storeName);
-                await store.add(resenaData);
-            } else {
-                // Fallback a localStorage
-                const pendientes = JSON.parse(localStorage.getItem('reseñas_pendientes') || '[]');
-                pendientes.push(resenaData);
-                localStorage.setItem('reseñas_pendientes', JSON.stringify(pendientes));
-            }
-            
-            this.updatePendingCounter();
-            
-        } catch (error) {
-            console.error('Error guardando reseña offline:', error);
-        }
-    }
-
-    /**
-     * Sincronizar reseñas pendientes (alias para sincronizarResenasPendientes)
-     */
-    async syncPendingReviews() {
-        return await this.sincronizarResenasPendientes();
-    }
-
-    /**
-     * Sincronizar reseñas pendientes
-     */
-    async sincronizarResenasPendientes() {
-        if (!navigator.onLine) {
-            console.log('Sin conexión - sincronización aplazada');
-            return;
-        }
-        
-        let pendientes = [];
-        
-        try {
-            if (this.db) {
-                // Obtener de IndexedDB
-                const transaction = this.db.transaction([this.config.storeName], 'readonly');
-                const store = transaction.objectStore(this.config.storeName);
-                const request = store.getAll();
-                
-                request.onsuccess = async () => {
-                    pendientes = request.result;
-                    await this.processPendingReviews(pendientes);
-                };
-            } else {
-                // Obtener de localStorage
-                pendientes = JSON.parse(localStorage.getItem('reseñas_pendientes') || '[]');
-                await this.processPendingReviews(pendientes);
-            }
-        } catch (error) {
-            console.error('Error sincronizando reseñas pendientes:', error);
-        }
-    }
-
-    /**
-     * Procesar reseñas pendientes
-     */
-    async processPendingReviews(pendientes) {
-        if (pendientes.length === 0) return;
-        
-        console.log(`Sincronizando ${pendientes.length} reseñas pendientes...`);
-        
-        let synchronized = 0;
-        let rateLimitHit = false;
-        
-        for (const resena of pendientes) {
-            // Si ya alcanzamos el rate limit, pausar
-            if (rateLimitHit) {
-                console.log('Rate limit alcanzado, pausando sincronización...');
-                break;
-            }
-            
-            try {
-                const response = await this.enviarResenaAlServidor(resena);
-                
-                if (response.ok) {
-                    // Eliminar de almacén offline
-                    await this.removeFromOfflineStore(resena);
-                    
-                    // Actualizar estado en UI si está visible
-                    this.updateReviewStatus(resena.timestamp, 'published', response.id);
-                    
-                    synchronized++;
-                } else {
-                    console.warn('No se pudo sincronizar reseña:', response.error);
-                }
-                
-            } catch (error) {
-                console.error('Error sincronizando reseña individual:', error);
-                
-                // Si es error 429, detener el proceso
-                if (error.message && error.message.includes('Demasiadas reseñas')) {
-                    rateLimitHit = true;
-                    console.log('⏸️ Sincronización pausada por rate limit');
-                }
-            }
-            
-            // Pausa más larga entre envíos para evitar rate limiting (1.5 segundos)
-            await new Promise(resolve => setTimeout(resolve, 1500));
-        }
-        
-        if (synchronized > 0) {
-            console.log(`✅ ${synchronized} reseñas sincronizadas correctamente`);
-            this.updatePendingCounter();
-            
-            // Recargar reseñas para mostrar las nuevas
-            await this.loadReviews();
-            
-            // Analytics
-            this.trackEvent('review_sync', {
-                synchronized_count: synchronized,
-                total_pending: pendientes.length
-            });
-        }
-        
-        if (rateLimitHit && synchronized < pendientes.length) {
-            console.log(`⏳ ${pendientes.length - synchronized} reseñas aún pendientes. Se reintentarán más tarde.`);
-        }
-    }
-
-    /**
-     * Eliminar reseña del almacén offline
-     */
-    async removeFromOfflineStore(resena) {
-        try {
-            if (this.db) {
-                const transaction = this.db.transaction([this.config.storeName], 'readwrite');
-                const store = transaction.objectStore(this.config.storeName);
-                
-                // Buscar por timestamp ya que no tenemos el ID exacto
-                const index = store.index('timestamp');
-                const request = index.get(resena.timestamp);
-                
-                request.onsuccess = () => {
-                    if (request.result) {
-                        store.delete(request.result.id);
-                    }
-                };
-            } else {
-                const pendientes = JSON.parse(localStorage.getItem('reseñas_pendientes') || '[]');
-                const filtered = pendientes.filter(p => p.timestamp !== resena.timestamp);
-                localStorage.setItem('reseñas_pendientes', JSON.stringify(filtered));
-            }
-        } catch (error) {
-            console.error('Error eliminando reseña del almacén offline:', error);
-        }
-    }
-
-    /**
-     * Actualizar contador de reseñas pendientes
-     */
-    updatePendingCounter() {
-        if (!this.elementos.contadorPendientes) return;
-        
-        const getPendingCount = async () => {
-            if (this.db) {
-                const transaction = this.db.transaction([this.config.storeName], 'readonly');
-                const store = transaction.objectStore(this.config.storeName);
-                const request = store.count();
-                
-                request.onsuccess = () => {
-                    this.elementos.contadorPendientes.textContent = request.result;
-                    this.elementos.estadoOffline.style.display = request.result > 0 ? 'block' : 'none';
-                };
-            } else {
-                const pendientes = JSON.parse(localStorage.getItem('reseñas_pendientes') || '[]');
-                this.elementos.contadorPendientes.textContent = pendientes.length;
-                this.elementos.estadoOffline.style.display = pendientes.length > 0 ? 'block' : 'none';
-            }
-        };
-        
-        getPendingCount();
-    }
-
-    /**
-     * Configurar listener de conexión online/offline
-     */
-    setupOnlineListener() {
-        window.addEventListener('online', async () => {
-            console.log('🌐 Conexión restaurada - sincronizando reseñas...');
-            await this.sincronizarResenasPendientes();
-        });
-        
-        window.addEventListener('offline', () => {
-            console.log('📡 Sin conexión - las reseñas se guardarán para envío posterior');
-        });
-    }
-
-    // ===== FUNCIONES PÚBLICAS DE LA API =====
-
-    /**
-     * Enviar reseña al servidor (función pública)
-     */
-    async enviarResenaAlServidor(resenaData) {
-        const url = `${this.config.apiBase}/reviews`;
-        
-        try {
-            const response = await fetch(url, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(resenaData)
-            });
-            
-            const data = await response.json();
-            
-            if (!response.ok) {
-                // Manejar error 429 (rate limit)
-                if (response.status === 429) {
-                    throw new Error('Demasiadas reseñas. Por favor espera un minuto e intenta de nuevo.');
-                }
-                throw new Error(data.error || data.message || `HTTP ${response.status}`);
-            }
-            
-            return data;
-            
-        } catch (error) {
-            console.error('Error en enviarResenaAlServidor:', error);
-            throw error;
-        }
-    }
-
-    /**
-     * Obtener reseñas públicas (función pública)
-     */
-    async obtenerResenasPublicas() {
-        const url = `${this.config.apiBase}/getReviews`;
-        
-        try {
-            const response = await fetch(url, {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                }
-            });
-            
-            const data = await response.json();
-            
-            if (!response.ok) {
-                console.warn(`Error obteniendo reseñas: ${response.status}`);
-                // Si hay error pero tenemos reviews en data, retornarlas
-                if (data.reviews && Array.isArray(data.reviews)) {
-                    return data;
-                }
-                throw new Error(data.error || data.message || `HTTP ${response.status}`);
-            }
-            
-            return data;
-            
-        } catch (error) {
-            console.error('Error en obtenerResenasPublicas:', error);
-            return { ok: false, error: error.message, reviews: [] };
-        }
-    }
-
-    // ===== NAVEGACIÓN DEL CARRUSEL =====
-
-    /**
-     * Mostrar reseña anterior
-     */
-    previousReview() {
-        if (this.resenas.length <= 1) return;
-        
-        this.currentIndex = this.currentIndex > 0 ? this.currentIndex - 1 : this.resenas.length - 1;
-        this.showReview(this.currentIndex);
-    }
-
-    /**
-     * Mostrar siguiente reseña
-     */
-    nextReview() {
-        if (this.resenas.length <= 1) return;
-        
-        this.currentIndex = this.currentIndex < this.resenas.length - 1 ? this.currentIndex + 1 : 0;
-        this.showReview(this.currentIndex);
-    }
-
-    /**
-     * Mostrar reseña específica
-     */
-    showReview(index) {
-        if (!this.elementos.track || index < 0 || index >= this.resenas.length) return;
-        
-        const cardWidth = 350 + 24; // ancho de card + gap
-        const translateX = -(index * cardWidth);
-        
-        this.elementos.track.style.transform = `translateX(${translateX}px)`;
-        this.currentIndex = index;
-        
-        this.updateCarouselControls();
-        this.updateIndicators();
-    }
-
-    /**
-     * Actualizar controles del carrusel
-     */
-    updateCarouselControls() {
-        if (!this.elementos.btnPrev || !this.elementos.btnNext) return;
-        
-        const hasReviews = this.resenas.length > 1;
-        
-        this.elementos.btnPrev.disabled = !hasReviews;
-        this.elementos.btnNext.disabled = !hasReviews;
-    }
-
-    /**
-     * Crear indicadores
-     */
-    createIndicators() {
-        if (!this.elementos.indicadores) return;
-        
-        this.elementos.indicadores.innerHTML = '';
-        
-        if (this.resenas.length <= 1) return;
-        
-        this.resenas.forEach((_, index) => {
-            const indicator = document.createElement('button');
-            indicator.className = 'indicador';
-            indicator.setAttribute('aria-label', `Ir a reseña ${index + 1}`);
-            indicator.addEventListener('click', () => this.showReview(index));
-            
-            this.elementos.indicadores.appendChild(indicator);
-        });
-        
-        this.updateIndicators();
-    }
-
-    /**
-     * Actualizar indicadores
-     */
-    updateIndicators() {
-        if (!this.elementos.indicadores) return;
-        
-        const indicators = this.elementos.indicadores.querySelectorAll('.indicador');
-        indicators.forEach((indicator, index) => {
-            if (index === this.currentIndex) {
-                indicator.classList.add('activo');
-            } else {
-                indicator.classList.remove('activo');
-            }
-        });
-    }
-
-    // ===== UTILIDADES =====
-
-    /**
-     * Establecer estado de carga
-     */
-    setLoadingState(loading) {
-        this.isLoading = loading;
-        // Aquí puedes agregar indicadores visuales de carga
-    }
-
-    /**
-     * Establecer estado de envío
-     */
     setSubmitState(submitting) {
         if (!this.elementos.btnEnviar) return;
         

@@ -30,48 +30,24 @@ const urlsToCache = [
     '/Imagenes/productos/empanada-pollo.png',
     '/Imagenes/productos/empanada-queso.png',
     '/Imagenes/productos/empanada-jamon-queso.png',
-    // Revisa este path: en otras rutas usas "productos" en minúsculas
-    // '/Imagenes/Productos/combo_1.png',
+    '/Imagenes/Productos/combo_1.png',
     '/Imagenes/productos/deditos-queso.png'
 ];
 
 // === INSTALACIÓN DEL SERVICE WORKER ===
 self.addEventListener('install', function(event) {
     console.log('🔧 Service Worker: Instalando...');
+    
     event.waitUntil(
         caches.open(CACHE_NAME)
-            .then(async function(cache) {
+            .then(function(cache) {
                 console.log('📦 Service Worker: Cache abierto');
-                // Intenta precargar todo, pero ignora fallos de archivos no críticos
-                const core = ['/', '/index.html', '/styles.css', '/script.js', '/manifest.json', '/Imagenes/logo/Logo.png'];
-                await cache.addAll(core);
-
-                const productos = [
-                    '/Imagenes/productos/pollo-apanado.png',
-                    '/Imagenes/productos/alitas-bbq.png',
-                    '/Imagenes/productos/pavo-ahumado.png',
-                    '/Imagenes/productos/carne-marinada.png',
-                    '/Imagenes/productos/hamburguesas.png',
-                    '/Imagenes/productos/lomo-cerdo.png',
-                    '/Imagenes/productos/salmon.png',
-                    '/Imagenes/productos/camarones.png',
-                    '/Imagenes/productos/mix-verduras.png',
-                    '/Imagenes/productos/papas-criollas.png',
-                    '/Imagenes/productos/empanada-carne.png',
-                    '/Imagenes/productos/empanada-pollo.png',
-                    '/Imagenes/productos/empanada-queso.png',
-                    '/Imagenes/productos/empanada-jamon-queso.png',
-                    // Revisa este path: en otras rutas usas "productos" en minúsculas
-                    // '/Imagenes/Productos/combo_1.png',
-                    '/Imagenes/productos/deditos-queso.png'
-                ];
-
-                await Promise.all(productos.map(async (url) => {
-                    try { await cache.add(url); } 
-                    catch (e) { console.warn('⚠️ No se pudo precachear', url, e?.status || e); }
-                }));
+                return cache.addAll(urlsToCache);
             })
-            .then(() => self.skipWaiting())
+            .then(function() {
+                console.log('✅ Service Worker: Archivos cacheados');
+                return self.skipWaiting(); // Forzar activación inmediata
+            })
             .catch(function(error) {
                 console.error('❌ Service Worker: Error en instalación:', error);
             })
@@ -338,31 +314,23 @@ async function limpiarCacheAntiguo() {
 // === ESTRATEGIA DE CACHE PERSONALIZADA ===
 async function cacheFirst(request) {
     const cachedResponse = await caches.match(request);
-    if (cachedResponse) return cachedResponse;
-
+    if (cachedResponse) {
+        return cachedResponse;
+    }
+    
     try {
         const networkResponse = await fetch(request);
-        if (networkResponse && networkResponse.ok) {
-            const sameOrigin = new URL(request.url).origin === self.location.origin;
-            const isBasic = networkResponse.type === 'basic';
-            if (sameOrigin && isBasic &&
-                !request.url.includes('grammarly') &&
+        if (networkResponse.ok) {
+            const cache = await caches.open(CACHE_NAME);
+            // No cachear extensiones o scripts externos no confiables
+            if (!request.url.includes('grammarly') &&
                 !request.url.includes('extension')) {
-                const cache = await caches.open(CACHE_NAME);
-                // Recorta caché de imágenes para evitar crecer sin límite
-                if (request.destination === 'image') {
-                    await trimCache(CACHE_NAME, 120); // máx. 120 entradas
-                }
                 cache.put(request, networkResponse.clone());
             }
         }
         return networkResponse;
     } catch (error) {
-        // Fallback para documento
-        if (request.destination === 'document') {
-            const shell = await caches.match('/index.html');
-            if (shell) return shell;
-        }
+        console.error('❌ Error en cache first:', error);
         throw error;
     }
 }
@@ -370,40 +338,22 @@ async function cacheFirst(request) {
 async function networkFirst(request) {
     try {
         const networkResponse = await fetch(request);
-        if (networkResponse && networkResponse.ok) {
-            const sameOrigin = new URL(request.url).origin === self.location.origin;
-            const isBasic = networkResponse.type === 'basic';
-            if (sameOrigin && isBasic &&
-                !request.url.includes('grammarly') &&
+        if (networkResponse.ok) {
+            const cache = await caches.open(CACHE_NAME);
+            // No cachear extensiones o scripts externos no confiables
+            if (!request.url.includes('grammarly') &&
                 !request.url.includes('extension')) {
-                const cache = await caches.open(CACHE_NAME);
                 cache.put(request, networkResponse.clone());
             }
         }
         return networkResponse;
     } catch (error) {
+        console.log('🔄 Network falló, intentando cache');
         const cachedResponse = await caches.match(request);
-        if (cachedResponse) return cachedResponse;
-
-        // Fallback para documento
-        if (request.destination === 'document') {
-            const shell = await caches.match('/index.html');
-            if (shell) return shell;
+        if (cachedResponse) {
+            return cachedResponse;
         }
         throw error;
-    }
-}
-
-// Limitar el tamaño del caché (básico por número de entradas)
-async function trimCache(cacheName, maxEntries = 120) {
-    const cache = await caches.open(cacheName);
-    const keys = await cache.keys();
-    // Si excede, borra las más antiguas primero
-    if (keys.length > maxEntries) {
-        const toDelete = keys.length - maxEntries;
-        for (let i = 0; i < toDelete; i++) {
-            await cache.delete(keys[i]);
-        }
     }
 }
 

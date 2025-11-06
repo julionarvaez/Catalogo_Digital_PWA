@@ -507,6 +507,38 @@
                 onkeyup="filtrarProductos()"
                 id="campoBusqueda"
             >
+            
+            <!-- Nuevo: Filtros de ordenamiento -->
+            <div class="contenedor-ordenamiento">
+                <div class="grupo-filtro-orden">
+                    <label for="ordenPrecio" class="etiqueta-filtro">
+                        <span class="icono-filtro">💰</span>
+                        Ordenar por precio:
+                    </label>
+                    <select id="ordenPrecio" class="select-orden" onchange="aplicarFiltrosOrdenamiento()">
+                        <option value="">Sin orden</option>
+                        <option value="asc">Menor a mayor</option>
+                        <option value="desc">Mayor a menor</option>
+                    </select>
+                </div>
+
+                <div class="grupo-filtro-orden">
+                    <label for="ordenPopularidad" class="etiqueta-filtro">
+                        <span class="icono-filtro">⭐</span>
+                        Ordenar por popularidad:
+                    </label>
+                    <select id="ordenPopularidad" class="select-orden" onchange="aplicarFiltrosOrdenamiento()">
+                        <option value="">Sin orden</option>
+                        <option value="ventas">Más vendidos</option>
+                        <option value="valoracion">Mejor valorados</option>
+                    </select>
+                </div>
+
+                <button class="btn-limpiar-filtros" onclick="limpiarFiltrosOrdenamiento()" title="Limpiar todos los filtros">
+                    🔄 Limpiar filtros
+                </button>
+            </div>
+
             <div class="contenedor-filtros">
                 <button class="btn-filtro activo" onclick="filtrarPorCategoria('todos', this)">
                     🍽️ Todos
@@ -538,7 +570,6 @@
                 <button class="btn-filtro" onclick="filtrarPorCategoria('otros', this)">
                     🍱 Otros
                 </button>
-                
             </div>
         </section>
 

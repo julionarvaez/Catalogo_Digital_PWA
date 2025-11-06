@@ -104,9 +104,9 @@
 👀 Desplázate hasta la sección de reseñas para verlas.
 
 💡 Puedes:
-   • Usar las flechas para navegar entre reseñas
-   • Enviar una nueva reseña usando el formulario
-   • Ver las estadísticas actualizadas
+    • Usar las flechas para navegar entre reseñas
+    • Enviar una nueva reseña usando el formulario
+    • Ver las estadísticas actualizadas
         `;
         
         console.log(mensaje);
