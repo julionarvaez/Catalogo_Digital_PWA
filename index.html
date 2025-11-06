@@ -539,35 +539,44 @@
                 </button>
             </div>
 
-            <div class="contenedor-filtros">
-                <button class="btn-filtro activo" onclick="filtrarPorCategoria('todos', this)">
+            <!-- Título de la sección de categorías -->
+            <div class="titulo-categorias">
+                <h2 class="categorias-heading">
+                    <span class="icono-categoria">🎯</span>
+                    Explora por Categoría
+                    <span class="subtitulo-categoria">Encuentra tus productos favoritos más rápido</span>
+                </h2>
+            </div>
+
+            <div class="contenedor-filtros" role="tablist" aria-label="Filtrar productos por categoría">
+                <button class="btn-filtro activo" onclick="filtrarPorCategoria('todos', this)" role="tab" aria-selected="true">
                     🍽️ Todos
                 </button>
-                <button class="btn-filtro" onclick="filtrarPorCategoria('carnes', this)">
+                <button class="btn-filtro" onclick="filtrarPorCategoria('carnes', this)" role="tab" aria-selected="false">
                     🥩 Carnes
                 </button>
-                <button class="btn-filtro" onclick="filtrarPorCategoria('pollo', this)">
+                <button class="btn-filtro" onclick="filtrarPorCategoria('pollo', this)" role="tab" aria-selected="false">
                     🍗 Pollo
                 </button>
-                <button class="btn-filtro" onclick="filtrarPorCategoria('pescado', this)">
+                <button class="btn-filtro" onclick="filtrarPorCategoria('pescado', this)" role="tab" aria-selected="false">
                     🐟 Pescado
                 </button>
-                <button class="btn-filtro" onclick="filtrarPorCategoria('verduras', this)">
+                <button class="btn-filtro" onclick="filtrarPorCategoria('verduras', this)" role="tab" aria-selected="false">
                     🥬 Verduras
                 </button>
-                <button class="btn-filtro" onclick="filtrarPorCategoria('deditos', this)">
+                <button class="btn-filtro" onclick="filtrarPorCategoria('deditos', this)" role="tab" aria-selected="false">
                     🍟 Deditos
                 </button>
-                <button class="btn-filtro" onclick="filtrarPorCategoria('empanadas', this)">
+                <button class="btn-filtro" onclick="filtrarPorCategoria('empanadas', this)" role="tab" aria-selected="false">
                     🥟 Empanadas
                 </button>
-                <button class="btn-filtro" onclick="filtrarPorCategoria('pasabocas', this)">
+                <button class="btn-filtro" onclick="filtrarPorCategoria('pasabocas', this)" role="tab" aria-selected="false">
                     🍤 Pasabocas
                 </button>
-                <button class="btn-filtro" onclick="filtrarPorCategoria('medallones', this)">
+                <button class="btn-filtro" onclick="filtrarPorCategoria('medallones', this)" role="tab" aria-selected="false">
                     🧁 Medallones
                 </button>
-                <button class="btn-filtro" onclick="filtrarPorCategoria('otros', this)">
+                <button class="btn-filtro" onclick="filtrarPorCategoria('otros', this)" role="tab" aria-selected="false">
                     🍱 Otros
                 </button>
             </div>
