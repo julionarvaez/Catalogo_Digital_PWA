@@ -1434,8 +1434,30 @@ window.AlimentoDelCielo = {
     // PWA
     instalar: instalarPWA,
     
-    // Analytics
-    analytics: enviarEventoAnalytics
+    // Analytics - Sistema unificado
+    analytics: {
+        track: function(eventName, parameters = {}) {
+            try {
+                // Google Analytics (gtag)
+                if (typeof gtag !== 'undefined') {
+                    gtag('event', eventName, {
+                        custom_parameter: parameters,
+                        ...parameters
+                    });
+                }
+                
+                // También llamar a la función global de analytics si existe
+                if (typeof enviarEventoAnalytics === 'function') {
+                    enviarEventoAnalytics(eventName, parameters);
+                }
+                
+                console.log(`📊 Analytics Track: ${eventName}`, parameters);
+                
+            } catch (error) {
+                console.warn('⚠️ Error en analytics.track:', error);
+            }
+        }
+    }
 };
 
 
@@ -3122,11 +3144,6 @@ class SistemaResenas {
                 this.renderReviews();
                 this.updateStatistics();
                 this.updateSchema();
-                
-                // Mostrar advertencia si son datos de demostración
-                if (response.demo) {
-                    console.log('ℹ️ Mostrando reseñas de demostración (Firebase no configurado)');
-                }
             } else {
                 console.warn('No se pudieron cargar las reseñas:', response.error);
                 this.showPlaceholder();
@@ -3999,25 +4016,25 @@ class SistemaResenas {
      */
     trackEvent(eventName, parameters = {}) {
         try {
-            // Google Analytics (gtag)
-            if (typeof gtag !== 'undefined') {
-                gtag('event', eventName, {
-                    custom_parameter: parameters,
-                    ...parameters
-                });
-            }
-            
-            // Sistema interno de analytics (solo si está disponible)
+            // Verificar si window.AlimentoDelCielo está disponible
             if (typeof window.AlimentoDelCielo !== 'undefined' && 
                 window.AlimentoDelCielo.analytics && 
                 typeof window.AlimentoDelCielo.analytics.track === 'function') {
                 window.AlimentoDelCielo.analytics.track(eventName, parameters);
+            } else {
+                // Fallback: usar gtag directamente si está disponible
+                if (typeof gtag !== 'undefined') {
+                    gtag('event', eventName, {
+                        custom_parameter: parameters,
+                        ...parameters
+                    });
+                }
+                
+                console.log(`📊 Analytics: ${eventName}`, parameters);
             }
             
-            console.log(`📊 Analytics: ${eventName}`, parameters);
-            
         } catch (error) {
-            console.warn('Error enviando evento de analytics:', error);
+            console.warn('⚠️ Error enviando evento de analytics:', error);
         }
     }
 }

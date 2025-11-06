@@ -98,7 +98,7 @@ async function getReviews(useCache = true) {
         return reviews;
         
     } catch (error) {
-        console.error('Error obteniendo reseñas:', error.message);
+        console.error('Error obteniendo reseñas:', error);
         
         // En caso de error, retornar cache si existe
         if (reviewsCache) {
@@ -106,65 +106,8 @@ async function getReviews(useCache = true) {
             return reviewsCache;
         }
         
-        // Si no hay cache y Firebase falla, retornar reseñas de demostración
-        console.log('⚠️ Firebase no disponible, retornando reseñas de demostración');
-        return getDemoReviews();
+        throw error;
     }
-}
-
-/**
- * Reseñas de demostración (fallback cuando Firebase no está configurado)
- */
-function getDemoReviews() {
-    const now = Math.floor(Date.now() / 1000);
-    
-    return [
-        {
-            id: 'demo_1',
-            nombre: 'María González',
-            texto: 'Excelente calidad de los productos. El pollo siempre llega fresco y el servicio es impecable. 100% recomendado!',
-            rating: 5,
-            productoId: '1',
-            createdAt: now - (86400 * 2), // Hace 2 días
-            verified: true
-        },
-        {
-            id: 'demo_2',
-            nombre: 'Carlos Pérez',
-            texto: 'Me encanta la variedad de productos congelados. Las empanadas hawaianas son mis favoritas. Entrega rápida y productos de calidad.',
-            rating: 5,
-            productoId: '80',
-            createdAt: now - (86400 * 5), // Hace 5 días
-            verified: false
-        },
-        {
-            id: 'demo_3',
-            nombre: 'Ana Martínez',
-            texto: 'Muy buena atención al cliente. Los productos llegaron bien empacados y congelados. El pescado es fresco y de excelente sabor.',
-            rating: 4,
-            productoId: '40',
-            createdAt: now - (86400 * 7), // Hace 7 días
-            verified: true
-        },
-        {
-            id: 'demo_4',
-            nombre: 'Luis Rodríguez',
-            texto: 'Excelente servicio. Las verduras congeladas mantienen su frescura y sabor. Precios justos y entregas puntuales.',
-            rating: 5,
-            productoId: '60',
-            createdAt: now - (86400 * 10), // Hace 10 días
-            verified: false
-        },
-        {
-            id: 'demo_5',
-            nombre: 'Sofia Hernández',
-            texto: 'Me gusta que ofrecen productos de calidad a buen precio. La carne es tierna y bien porcionada. Definitivamente vuelvo a comprar.',
-            rating: 4,
-            productoId: '20',
-            createdAt: now - (86400 * 15), // Hace 15 días
-            verified: true
-        }
-    ];
 }
 
 /**
@@ -237,7 +180,7 @@ exports.handler = async (event, context) => {
         
         console.log(`Obteniendo reseñas - includeStats: ${includeStats}, forceRefresh: ${forceRefresh}, limit: ${limit}`);
         
-        // Obtener reseñas (esto nunca debería fallar porque tiene fallback)
+        // Obtener reseñas
         const allReviews = await getReviews(!forceRefresh);
         
         // Aplicar límite
@@ -250,7 +193,6 @@ exports.handler = async (event, context) => {
             count: reviews.length,
             totalCount: allReviews.length,
             cached: reviewsCache && !forceRefresh,
-            demo: !reviewsCache, // Indicar si son datos de demostración
             timestamp: new Date().toISOString()
         };
         
@@ -266,38 +208,19 @@ exports.handler = async (event, context) => {
         };
         
     } catch (error) {
-        // Este catch solo debería ejecutarse en casos extremos
-        console.error('❌ Error crítico obteniendo reseñas:', error.message);
+        console.error('❌ Error obteniendo reseñas:', error.message);
         
-        // Intentar retornar reseñas de demostración incluso en error crítico
-        try {
-            const demoReviews = getDemoReviews();
-            return {
-                statusCode: 200, // Cambiar a 200 para no romper el frontend
-                headers,
-                body: JSON.stringify({
-                    ok: true, // Cambiar a true
-                    reviews: demoReviews,
-                    count: demoReviews.length,
-                    totalCount: demoReviews.length,
-                    demo: true,
-                    error: 'Firebase no disponible - usando datos de demostración',
-                    timestamp: new Date().toISOString()
-                })
-            };
-        } catch (demoError) {
-            // Último recurso: retornar array vacío pero con 200
-            return {
-                statusCode: 200,
-                headers,
-                body: JSON.stringify({
-                    ok: true,
-                    reviews: [],
-                    count: 0,
-                    error: 'Servicio temporalmente no disponible',
-                    timestamp: new Date().toISOString()
-                })
-            };
-        }
+        return {
+            statusCode: 500,
+            headers,
+            body: JSON.stringify({
+                ok: false,
+                error: 'Error interno del servidor',
+                message: error.message || 'No se pudieron cargar las reseñas. Intenta de nuevo más tarde.',
+                reviews: [], // Array vacío como fallback
+                count: 0,
+                timestamp: new Date().toISOString()
+            })
+        };
     }
 };

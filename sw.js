@@ -1,5 +1,11 @@
 // === SERVICE WORKER PARA ALIMENTO DEL CIELO PWA ===
-const CACHE_NAME = 'alimento-del-cielo-v1.0.0';
+// IMPORTANTE: Incrementar esta versión cuando haya cambios importantes
+const CACHE_VERSION = '1.0.2';
+const CACHE_NAME = `alimento-del-cielo-v${CACHE_VERSION}`;
+const APP_VERSION = CACHE_VERSION;
+
+// Timestamp de la última actualización (se actualiza automáticamente)
+const LAST_UPDATE = Date.now();
 
 // Archivos esenciales para cachear
 const urlsToCache = [
@@ -50,74 +56,105 @@ self.addEventListener('install', function(event) {
 
 // === ACTIVACIÓN DEL SERVICE WORKER ===
 self.addEventListener('activate', function(event) {
-    console.log('🚀 Service Worker: Activando...');
+    console.log('🚀 Service Worker: Activando versión', APP_VERSION);
     
     event.waitUntil(
-        caches.keys().then(function(cacheNames) {
-            return Promise.all(
-                cacheNames.map(function(cacheName) {
-                    // Eliminar caches antiguos
-                    if (cacheName !== CACHE_NAME) {
-                        console.log('🗑️ Service Worker: Eliminando cache antiguo:', cacheName);
-                        return caches.delete(cacheName);
-                    }
-                })
-            );
-        }).then(function() {
-            console.log('✅ Service Worker: Activado correctamente');
-            return self.clients.claim(); // Controlar inmediatamente las páginas
+        Promise.all([
+            // 1. Limpiar caches antiguos automáticamente
+            caches.keys().then(function(cacheNames) {
+                console.log('📦 Caches encontrados:', cacheNames.length);
+                return Promise.all(
+                    cacheNames.map(function(cacheName) {
+                        // Eliminar TODOS los caches que no sean la versión actual
+                        if (cacheName !== CACHE_NAME) {
+                            console.log('🗑️ Eliminando cache antiguo:', cacheName);
+                            return caches.delete(cacheName);
+                        }
+                    })
+                );
+            }),
+            
+            // 2. Notificar a todos los clientes sobre la nueva versión
+            self.clients.matchAll({ includeUncontrolled: true }).then(function(clients) {
+                clients.forEach(function(client) {
+                    client.postMessage({
+                        type: 'SW_UPDATED',
+                        version: APP_VERSION,
+                        timestamp: LAST_UPDATE
+                    });
+                });
+            }),
+            
+            // 3. Tomar control inmediato de todas las páginas
+            self.clients.claim()
+        ]).then(function() {
+            console.log('✅ Service Worker activado correctamente - v' + APP_VERSION);
+            console.log('🧹 Limpieza automática completada');
         })
     );
 });
 
 // === INTERCEPTAR REQUESTS (ESTRATEGIA CACHE-FIRST) ===
 self.addEventListener('fetch', function(event) {
-    // Solo cachear requests HTTP/HTTPS
-    if (event.request.url.startsWith('http')) {
-        event.respondWith(
-            caches.match(event.request)
-                .then(function(response) {
-                    // Si está en cache, devolverlo
-                    if (response) {
-                        return response;
-                    }
-                    
-                    // Si no está en cache, hacer fetch
-                    return fetch(event.request)
-                        .then(function(response) {
-                            // Verificar si es una respuesta válida
-                            if (!response || response.status !== 200 || response.type !== 'basic') {
-                                return response;
-                            }
-                            
-                            // Clonar la respuesta
-                            const responseToCache = response.clone();
-                            
-                            // Agregar al cache dinámico
-                            caches.open(CACHE_NAME)
-                                .then(function(cache) {
-                                    cache.put(event.request, responseToCache);
-                                });
-                            
-                            return response;
-                        })
-                        .catch(function() {
-                            // Si falla el fetch, mostrar página offline
-                            if (event.request.destination === 'document') {
-                                return caches.match('/index.html');
-                            }
-                            
-                            // Para imágenes, mostrar imagen placeholder
-                            if (event.request.destination === 'image') {
-                                return new Response(
-                                    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200"><rect width="200" height="200" fill="#f3f4f6"/><text x="100" y="100" font-size="40" text-anchor="middle" fill="#9ca3af">📱</text><text x="100" y="140" font-size="12" text-anchor="middle" fill="#6b7280">Sin conexión</text></svg>',
-                                    { headers: { 'Content-Type': 'image/svg+xml' } }
-                                );
-                            }
-                        });
-                })
-        );
+    // Ignorar extensiones de navegador y protocolos no HTTP
+    const url = event.request.url;
+    if (!url.startsWith('http') || 
+        url.includes('chrome-extension:') || 
+        url.includes('moz-extension:') ||
+        url.includes('safari-extension:')) {
+        return;
     }
+    
+    // Solo cachear requests HTTP/HTTPS
+    event.respondWith(
+        caches.match(event.request)
+            .then(function(response) {
+                // Si está en cache, devolverlo
+                if (response) {
+                    return response;
+                }
+                
+                // Si no está en cache, hacer fetch
+                return fetch(event.request)
+                    .then(function(response) {
+                        // Verificar si es una respuesta válida
+                        if (!response || response.status !== 200 || response.type !== 'basic') {
+                            return response;
+                        }
+                        
+                        // No cachear scripts de extensiones o terceros no confiables
+                        if (event.request.url.includes('grammarly') ||
+                            event.request.url.includes('extension')) {
+                            return response;
+                        }
+                        
+                        // Clonar la respuesta
+                        const responseToCache = response.clone();
+                        
+                        // Agregar al cache dinámico
+                        caches.open(CACHE_NAME)
+                            .then(function(cache) {
+                                cache.put(event.request, responseToCache);
+                            });
+                        
+                        return response;
+                    })
+                    .catch(function() {
+                        // Si falla el fetch, mostrar página offline
+                        if (event.request.destination === 'document') {
+                            return caches.match('/index.html');
+                        }
+                        
+                        // Para imágenes, mostrar imagen placeholder
+                        if (event.request.destination === 'image') {
+                            return new Response(
+                                '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200"><rect width="200" height="200" fill="#f3f4f6"/><text x="100" y="100" font-size="40" text-anchor="middle" fill="#9ca3af">📱</text><text x="100" y="140" font-size="12" text-anchor="middle" fill="#6b7280">Sin conexión</text></svg>',
+                                { headers: { 'Content-Type': 'image/svg+xml' } }
+                            );
+                        }
+                    });
+            })
+    );
 });
 
 // === NOTIFICACIONES PUSH ===
@@ -254,36 +291,59 @@ async function enviarPedidosPendientes(pedidos) {
 self.addEventListener('message', function(event) {
     console.log('💬 Service Worker: Mensaje recibido', event.data);
     
-    if (event.data && event.data.type === 'SKIP_WAITING') {
+    const { type, payload } = event.data;
+    
+    if (type === 'SKIP_WAITING') {
+        // Activar inmediatamente el nuevo SW
+        console.log('⚡ Activación inmediata solicitada');
         self.skipWaiting();
     }
     
-    if (event.data && event.data.type === 'CACHE_URLS') {
+    if (type === 'CACHE_URLS') {
         event.waitUntil(
             caches.open(CACHE_NAME).then(cache => {
-                return cache.addAll(event.data.payload);
+                return cache.addAll(payload);
             })
         );
     }
     
-    if (event.data && event.data.type === 'CLEAR_CACHE') {
+    if (type === 'CLEAR_CACHE') {
         event.waitUntil(
             caches.keys().then(cacheNames => {
                 return Promise.all(
-                    cacheNames.map(cacheName => caches.delete(cacheName))
+                    cacheNames.map(cacheName => {
+                        if (cacheName !== CACHE_NAME) {
+                            console.log('🗑️ Limpiando cache:', cacheName);
+                            return caches.delete(cacheName);
+                        }
+                    })
                 );
+            }).then(() => {
+                // Notificar al cliente que la limpieza terminó
+                self.clients.matchAll().then(clients => {
+                    clients.forEach(client => {
+                        client.postMessage({
+                            type: 'CACHE_CLEARED',
+                            timestamp: Date.now()
+                        });
+                    });
+                });
             })
         );
+    }
+    
+    if (type === 'GET_VERSION') {
+        // Enviar versión actual al cliente
+        event.source.postMessage({
+            type: 'VERSION_INFO',
+            version: APP_VERSION,
+            cacheName: CACHE_NAME,
+            timestamp: LAST_UPDATE
+        });
     }
 });
 
 // === LIMPIEZA DE CACHE ===
-self.addEventListener('activate', function(event) {
-    event.waitUntil(
-        limpiarCacheAntiguo()
-    );
-});
-
 async function limpiarCacheAntiguo() {
     const cacheWhitelist = [CACHE_NAME];
     
@@ -300,6 +360,51 @@ async function limpiarCacheAntiguo() {
 }
 
 // === ESTRATEGIA DE CACHE PERSONALIZADA ===
+async function cacheFirst(request) {
+    const cachedResponse = await caches.match(request);
+    if (cachedResponse) {
+        return cachedResponse;
+    }
+    
+    try {
+        const networkResponse = await fetch(request);
+        if (networkResponse.ok) {
+            const cache = await caches.open(CACHE_NAME);
+            // No cachear extensiones o scripts externos no confiables
+            if (!request.url.includes('grammarly') &&
+                !request.url.includes('extension')) {
+                cache.put(request, networkResponse.clone());
+            }
+        }
+        return networkResponse;
+    } catch (error) {
+        console.error('❌ Error en cache first:', error);
+        throw error;
+    }
+}
+
+async function networkFirst(request) {
+    try {
+        const networkResponse = await fetch(request);
+        if (networkResponse.ok) {
+            const cache = await caches.open(CACHE_NAME);
+            // No cachear extensiones o scripts externos no confiables
+            if (!request.url.includes('grammarly') &&
+                !request.url.includes('extension')) {
+                cache.put(request, networkResponse.clone());
+            }
+        }
+        return networkResponse;
+    } catch (error) {
+        console.log('🔄 Network falló, intentando cache');
+        const cachedResponse = await caches.match(request);
+        if (cachedResponse) {
+            return cachedResponse;
+        }
+        throw error;
+    }
+}
+
 function aplicarEstrategiaCache(request) {
     const url = new URL(request.url);
     
@@ -316,7 +421,7 @@ function aplicarEstrategiaCache(request) {
     }
     
     // Para APIs: Network First con fallback
-    if (url.pathname.startsWith('/api/')) {
+    if (url.pathname.startsWith('/api/') || url.pathname.startsWith('/.netlify/')) {
         return networkFirst(request);
     }
     
@@ -324,115 +429,8 @@ function aplicarEstrategiaCache(request) {
     return cacheFirst(request);
 }
 
-async function cacheFirst(request) {
-    const cachedResponse = await caches.match(request);
-    if (cachedResponse) {
-        return cachedResponse;
-    }
-    
-    try {
-        const networkResponse = await fetch(request);
-        if (networkResponse.ok) {
-            const cache = await caches.open(CACHE_NAME);
-            cache.put(request, networkResponse.clone());
-        }
-        return networkResponse;
-    } catch (error) {
-        console.error('❌ Error en cache first:', error);
-        throw error;
-    }
-}
-
-async function networkFirst(request) {
-    try {
-        const networkResponse = await fetch(request);
-        if (networkResponse.ok) {
-            const cache = await caches.open(CACHE_NAME);
-            cache.put(request, networkResponse.clone());
-        }
-        return networkResponse;
-    } catch (error) {
-        console.log('🔄 Network falló, intentando cache');
-        const cachedResponse = await caches.match(request);
-        if (cachedResponse) {
-            return cachedResponse;
-        }
-        throw error;
-    }
-}
-
-// === GESTIÓN DE VERSIONES ===
-const VERSION = '1.0.0  ';
-const ASSETS_VERSION = 'v1';
-
-self.addEventListener('install', function(event) {
-    console.log(`📦 Instalando Service Worker versión ${VERSION}`);
-    
-    event.waitUntil(
-        caches.open(`${CACHE_NAME}-${ASSETS_VERSION}`)
-            .then(cache => {
-                return cache.addAll([
-                    './',
-                    './index.html',
-                    './styles.css',
-                    './script.js',
-                    './manifest.json'
-                ]);
-            })
-            .then(() => self.skipWaiting())
-    );
-});
-
-// === MONITOREO DE RENDIMIENTO ===
-self.addEventListener('fetch', function(event) {
-    const startTime = performance.now();
-    
-    event.respondWith(
-        aplicarEstrategiaCache(event.request)
-            .then(response => {
-                const endTime = performance.now();
-                const duration = endTime - startTime;
-                
-                // Log de rendimiento (solo en desarrollo)
-                if (duration > 1000) {
-                    console.log(`⚠️ Request lento: ${event.request.url} - ${duration.toFixed(2)}ms`);
-                }
-                
-                return response;
-            })
-            .catch(error => {
-                console.error('❌ Error en fetch:', event.request.url, error);
-                
-                // Respuesta de fallback
-                if (event.request.destination === 'document') {
-                    return caches.match('/index.html');
-                }
-                
-                return new Response('Error de red', {
-                    status: 408,
-                    statusText: 'Request timeout'
-                });
-            })
-    );
-});
-
-// === ESTADÍSTICAS DE USO ===
-let requestCount = 0;
-let cacheHits = 0;
-
-self.addEventListener('fetch', function(event) {
-    requestCount++;
-    
-    event.respondWith(
-        caches.match(event.request).then(response => {
-            if (response) {
-                cacheHits++;
-                console.log(`📊 Cache hit rate: ${((cacheHits / requestCount) * 100).toFixed(1)}%`);
-            }
-            return response || fetch(event.request);
-        })
-    );
-});
+// === VERSIÓN ===
+const VERSION = '1.0.1';
 
 console.log('🚀 Service Worker de Alimento del Cielo cargado correctamente');
 console.log(`📊 Versión: ${VERSION}`);
