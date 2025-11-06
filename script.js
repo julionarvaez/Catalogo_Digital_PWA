@@ -3122,6 +3122,11 @@ class SistemaResenas {
                 this.renderReviews();
                 this.updateStatistics();
                 this.updateSchema();
+                
+                // Mostrar advertencia si son datos de demostración
+                if (response.demo) {
+                    console.log('ℹ️ Mostrando reseñas de demostración (Firebase no configurado)');
+                }
             } else {
                 console.warn('No se pudieron cargar las reseñas:', response.error);
                 this.showPlaceholder();
