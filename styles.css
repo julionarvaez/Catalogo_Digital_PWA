@@ -262,40 +262,14 @@ body.modo-oscuro .caja-busqueda {
     50% { transform: translate(20px, 20px); }
 }
 
-/* Modo oscuro para contenedor - Premium */
+/* Modo oscuro para contenedor */
 body.modo-oscuro .contenedor-filtros {
-    background: linear-gradient(135deg, #0c4a6e 0%, #082f49 25%, #0f172a 50%, #1e293b 75%, #0c4a6e 100%);
+    background: linear-gradient(135deg, #0c4a6e 0%, #0f172a 50%, #1e293b 100%);
     box-shadow: 
-        0 15px 40px rgba(6, 182, 212, 0.25),
-        0 8px 20px rgba(14, 116, 144, 0.35),
-        0 0 60px rgba(6, 182, 212, 0.1),
-        inset 0 1px 0 rgba(56, 189, 248, 0.15),
-        inset 0 0 30px rgba(6, 182, 212, 0.05);
-    border: 1px solid rgba(6, 182, 212, 0.3);
-    position: relative;
-}
-
-/* Efecto de resplandor neón en modo oscuro */
-body.modo-oscuro .contenedor-filtros::after {
-    content: '';
-    position: absolute;
-    inset: -2px;
-    background: linear-gradient(90deg, 
-        transparent 0%, 
-        rgba(6, 182, 212, 0.2) 25%, 
-        rgba(14, 165, 233, 0.3) 50%, 
-        rgba(6, 182, 212, 0.2) 75%, 
-        transparent 100%
-    );
-    border-radius: 1.5rem;
-    opacity: 0;
-    z-index: -1;
-    animation: resplandorNeón 4s ease-in-out infinite;
-}
-
-@keyframes resplandorNeón {
-    0%, 100% { opacity: 0; }
-    50% { opacity: 0.4; }
+        0 10px 30px rgba(6, 78, 134, 0.4),
+        0 4px 12px rgba(14, 116, 144, 0.25),
+        inset 0 1px 0 rgba(148, 163, 184, 0.1);
+    border: 1px solid rgba(30, 58, 138, 0.6);
 }
 
 /* === BOTONES DE CATEGORÍA MODERNOS === */
@@ -412,92 +386,29 @@ body.modo-oscuro .contenedor-filtros::after {
     100% { transform: translateX(100%) rotate(45deg); }
 }
 
-/* Modo oscuro para botones - Premium */
+/* Modo oscuro para botones */
 body.modo-oscuro .btn-filtro {
-    background: linear-gradient(135deg, #1e293b 0%, #0f172a 50%, #020617 100%);
+    background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
     color: #e2e8f0;
-    border: 2px solid rgba(71, 85, 105, 0.6);
+    border-color: rgba(51, 65, 85, 0.8);
     box-shadow: 
-        0 4px 16px rgba(0, 0, 0, 0.4),
-        0 2px 8px rgba(0, 0, 0, 0.3),
-        inset 0 1px 0 rgba(148, 163, 184, 0.12),
-        inset 0 -1px 2px rgba(0, 0, 0, 0.3);
-    position: relative;
-}
-
-/* Borde brillante sutil en modo oscuro */
-body.modo-oscuro .btn-filtro::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    border-radius: 1rem;
-    padding: 2px;
-    background: linear-gradient(135deg, rgba(56, 189, 248, 0.2), rgba(14, 165, 233, 0.1));
-    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-    -webkit-mask-composite: xor;
-    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-    mask-composite: exclude;
-    opacity: 0;
-    transition: opacity 0.3s ease;
-}
-
-body.modo-oscuro .btn-filtro:hover::after {
-    opacity: 1;
+        0 4px 12px rgba(0, 0, 0, 0.3),
+        0 2px 6px rgba(0, 0, 0, 0.2),
+        inset 0 1px 0 rgba(148, 163, 184, 0.1);
 }
 
 body.modo-oscuro .btn-filtro:hover {
-    background: linear-gradient(135deg, #334155 0%, #1e293b 50%, #0f172a 100%);
-    border-color: rgba(100, 116, 139, 0.8);
-    color: #f1f5f9;
+    background: linear-gradient(135deg, #334155 0%, #1e293b 100%);
+    border-color: rgba(100, 116, 139, 0.6);
     box-shadow: 
-        0 12px 32px rgba(6, 182, 212, 0.3),
-        0 6px 16px rgba(14, 165, 233, 0.25),
-        0 0 40px rgba(6, 182, 212, 0.15),
-        inset 0 1px 0 rgba(148, 163, 184, 0.2);
-    transform: translateY(-4px) scale(1.05);
+        0 12px 24px rgba(37, 99, 235, 0.3),
+        0 6px 12px rgba(14, 165, 233, 0.2);
 }
 
-/* Estado activo en modo oscuro - Neón cibernético */
 body.modo-oscuro .btn-filtro.activo {
-    background: linear-gradient(135deg, #06b6d4 0%, #0ea5e9 25%, #2563eb 50%, #1d4ed8 75%, #1e40af 100%);
+    background: linear-gradient(135deg, #0ea5e9 0%, #2563eb 50%, #1d4ed8 100%);
     color: #ffffff;
-    border: 2px solid rgba(6, 182, 212, 0.5);
-    box-shadow: 
-        0 8px 28px rgba(6, 182, 212, 0.5),
-        0 4px 16px rgba(14, 165, 233, 0.4),
-        0 0 60px rgba(6, 182, 212, 0.3),
-        inset 0 1px 0 rgba(255, 255, 255, 0.3),
-        inset 0 -1px 0 rgba(0, 0, 0, 0.2);
-    transform: translateY(-2px) scale(1.03);
-    animation: pulsoNeónCategoria 2.5s ease-in-out infinite;
-    text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
-}
-
-/* Animación de pulso neón para modo oscuro */
-@keyframes pulsoNeónCategoria {
-    0%, 100% { 
-        box-shadow: 
-            0 8px 28px rgba(6, 182, 212, 0.5),
-            0 4px 16px rgba(14, 165, 233, 0.4),
-            0 0 60px rgba(6, 182, 212, 0.3),
-            inset 0 1px 0 rgba(255, 255, 255, 0.3);
-    }
-    50% { 
-        box-shadow: 
-            0 12px 36px rgba(6, 182, 212, 0.7),
-            0 6px 20px rgba(14, 165, 233, 0.6),
-            0 0 80px rgba(6, 182, 212, 0.5),
-            inset 0 1px 0 rgba(255, 255, 255, 0.4);
-    }
-}
-
-/* Efecto de partículas en hover del botón activo (modo oscuro) */
-body.modo-oscuro .btn-filtro.activo:hover {
-    box-shadow: 
-        0 12px 36px rgba(6, 182, 212, 0.6),
-        0 6px 20px rgba(14, 165, 233, 0.5),
-        0 0 80px rgba(6, 182, 212, 0.4),
-        inset 0 1px 0 rgba(255, 255, 255, 0.35);
+    border-color: transparent;
 }
 
 /* Estado de enfoque para accesibilidad */
@@ -1239,6 +1150,197 @@ body.modo-oscuro .pie-pagina {
 
 .notificacion.error {
     background: var(--color-error);
+}
+
+/* === MODAL DE NOTIFICACIONES === */
+.modal-notificaciones {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    border-radius: 1rem;
+    padding: 2rem;
+    max-width: 450px;
+    width: 90%;
+    z-index: 2000;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    animation: modalEntrada 0.3s ease;
+}
+
+@keyframes modalEntrada {
+    from {
+        opacity: 0;
+        transform: translate(-50%, -60%);
+    }
+    to {
+        opacity: 1;
+        transform: translate(-50%, -50%);
+    }
+}
+
+.modal-contenido {
+    text-align: center;
+}
+
+.modal-icono {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+    animation: pulsoIcono 1.5s ease infinite;
+}
+
+@keyframes pulsoIcono {
+    0%, 100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.1);
+    }
+}
+
+.modal-titulo {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--texto-oscuro);
+    margin-bottom: 1rem;
+}
+
+.modal-texto {
+    font-size: 1rem;
+    color: var(--texto-claro);
+    margin-bottom: 1rem;
+    line-height: 1.5;
+}
+
+.modal-lista {
+    list-style: none;
+    padding: 0;
+    margin: 1.5rem 0;
+    text-align: left;
+}
+
+.modal-lista li {
+    padding: 0.75rem;
+    margin-bottom: 0.5rem;
+    background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+    border-radius: 0.5rem;
+    color: var(--texto-oscuro);
+    font-size: 0.95rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.3s ease;
+}
+
+.modal-lista li:hover {
+    transform: translateX(5px);
+    background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+}
+
+.modal-acciones {
+    display: flex;
+    gap: 1rem;
+    margin-top: 1.5rem;
+}
+
+.btn-modal-aceptar,
+.btn-modal-rechazar {
+    flex: 1;
+    padding: 1rem;
+    border: none;
+    border-radius: 0.75rem;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-modal-aceptar {
+    background: linear-gradient(135deg, var(--color-primario) 0%, #1e40af 100%);
+    color: white;
+    box-shadow: 0 4px 15px rgba(37, 99, 235, 0.3);
+}
+
+.btn-modal-aceptar:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(37, 99, 235, 0.4);
+}
+
+.btn-modal-aceptar:active {
+    transform: translateY(0);
+}
+
+.btn-modal-rechazar {
+    background: #f1f5f9;
+    color: var(--texto-claro);
+}
+
+.btn-modal-rechazar:hover {
+    background: #e2e8f0;
+}
+
+.modal-nota {
+    font-size: 0.85rem;
+    color: var(--texto-claro);
+    margin-top: 1rem;
+    font-style: italic;
+}
+
+/* Modo oscuro para modal */
+[data-theme="dark"] .modal-notificaciones {
+    background: var(--fondo-tarjeta);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+}
+
+[data-theme="dark"] .modal-titulo {
+    color: white;
+}
+
+[data-theme="dark"] .modal-texto {
+    color: var(--texto-claro);
+}
+
+[data-theme="dark"] .modal-lista li {
+    background: linear-gradient(135deg, rgba(37, 99, 235, 0.1) 0%, rgba(59, 130, 246, 0.15) 100%);
+    color: white;
+}
+
+[data-theme="dark"] .modal-lista li:hover {
+    background: linear-gradient(135deg, rgba(37, 99, 235, 0.2) 0%, rgba(59, 130, 246, 0.25) 100%);
+}
+
+[data-theme="dark"] .btn-modal-rechazar {
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+}
+
+[data-theme="dark"] .btn-modal-rechazar:hover {
+    background: rgba(255, 255, 255, 0.15);
+}
+
+/* Responsive para modal */
+@media (max-width: 480px) {
+    .modal-notificaciones {
+        padding: 1.5rem;
+        max-width: 95%;
+    }
+    
+    .modal-titulo {
+        font-size: 1.25rem;
+    }
+    
+    .modal-icono {
+        font-size: 3rem;
+    }
+    
+    .modal-acciones {
+        flex-direction: column;
+    }
+    
+    .btn-modal-aceptar,
+    .btn-modal-rechazar {
+        width: 100%;
+    }
 }
 
 /* === OVERLAY === */
@@ -2866,6 +2968,96 @@ body.modo-oscuro .mensaje-resultados .texto-resultado {
     transform: translateY(-1px);
 }
 
+/* Botón de notificaciones en banner */
+.btn-activar-notificaciones {
+    background: rgba(255, 215, 0, 0.25);
+    color: white;
+    border: 2px solid rgba(255, 215, 0, 0.5);
+    padding: 0.6rem 1rem;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.btn-activar-notificaciones::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.3);
+    transform: translate(-50%, -50%);
+    transition: width 0.6s, height 0.6s;
+}
+
+.btn-activar-notificaciones:hover::before {
+    width: 300px;
+    height: 300px;
+}
+
+.btn-activar-notificaciones:hover {
+    background: rgba(255, 215, 0, 0.35);
+    border-color: rgba(255, 215, 0, 0.7);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(255, 215, 0, 0.3);
+}
+
+.btn-activar-notificaciones:active {
+    transform: translateY(0);
+}
+
+.btn-activar-notificaciones .icono-notif {
+    font-size: 1.1rem;
+    animation: balanceoNotif 2s ease-in-out infinite;
+    position: relative;
+    z-index: 1;
+}
+
+@keyframes balanceoNotif {
+    0%, 100% {
+        transform: rotate(0deg);
+    }
+    10%, 30% {
+        transform: rotate(-10deg);
+    }
+    20%, 40% {
+        transform: rotate(10deg);
+    }
+    50% {
+        transform: rotate(0deg);
+    }
+}
+
+.btn-activar-notificaciones .texto-notif {
+    position: relative;
+    z-index: 1;
+}
+
+/* Estado cuando las notificaciones están activadas */
+.btn-activar-notificaciones.activo {
+    background: rgba(34, 197, 94, 0.25);
+    border-color: rgba(34, 197, 94, 0.5);
+}
+
+.btn-activar-notificaciones.activo:hover {
+    background: rgba(34, 197, 94, 0.35);
+    border-color: rgba(34, 197, 94, 0.7);
+}
+
+.btn-activar-notificaciones.activo .icono-notif {
+    animation: none;
+}
+
 .btn-cerrar-banner {
     position: absolute;
     top: 0.75rem;
@@ -2984,9 +3176,20 @@ body.modo-oscuro .mensaje-resultados .texto-resultado {
     }
     
     .btn-instalar-banner,
-    .btn-ver-promociones {
+    .btn-ver-promociones,
+    .btn-activar-notificaciones {
         font-size: 0.85rem;
-        padding: 0.6rem 1rem;
+        padding: 0.5rem 0.8rem;
+    }
+    
+    .btn-activar-notificaciones .texto-notif {
+        display: none; /* Ocultar texto en móvil, solo mostrar icono */
+    }
+    
+    .btn-activar-notificaciones {
+        min-width: auto;
+        width: auto;
+        padding: 0.5rem 0.7rem;
     }
 }
 
@@ -3075,6 +3278,429 @@ body.modo-oscuro .btn-cerrar-banner {
 body.modo-oscuro .btn-cerrar-banner:hover {
     background: rgba(255, 255, 255, 0.2);
     transform: scale(1.1);
+}
+
+/* ===== BOTÓN FLOTANTE DE WHATSAPP ===== */
+
+.btn-whatsapp-flotante {
+    position: fixed;
+    bottom: 30px;
+    left: 30px;
+    width: 60px;
+    height: 60px;
+    background: linear-gradient(135deg, #25D366 0%, #128C7E 100%);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    box-shadow: 
+        0 8px 24px rgba(37, 211, 102, 0.4),
+        0 4px 12px rgba(18, 140, 126, 0.3),
+        inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    z-index: 999;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    cursor: pointer;
+    overflow: hidden;
+    animation: pulsoWhatsApp 2.5s ease-in-out infinite;
+}
+
+/* Efecto de onda de fondo */
+.btn-whatsapp-flotante::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    transform: translate(-50%, -50%) scale(0);
+    transition: transform 0.6s ease;
+}
+
+.btn-whatsapp-flotante:hover::before {
+    transform: translate(-50%, -50%) scale(2.5);
+    opacity: 0;
+}
+
+/* Estado hover */
+.btn-whatsapp-flotante:hover {
+    width: 200px;
+    border-radius: 30px;
+    box-shadow: 
+        0 12px 32px rgba(37, 211, 102, 0.5),
+        0 6px 16px rgba(18, 140, 126, 0.4),
+        inset 0 1px 0 rgba(255, 255, 255, 0.3);
+    animation: none;
+}
+
+/* Estado activo */
+.btn-whatsapp-flotante:active {
+    transform: scale(0.95);
+}
+
+/* Icono de WhatsApp */
+.icono-whatsapp {
+    width: 32px;
+    height: 32px;
+    position: relative;
+    z-index: 2;
+    transition: transform 0.3s ease;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+}
+
+.btn-whatsapp-flotante:hover .icono-whatsapp {
+    transform: scale(1.1) rotate(5deg);
+}
+
+/* Texto del botón (oculto por defecto) */
+.texto-whatsapp {
+    position: absolute;
+    left: 65px;
+    white-space: nowrap;
+    font-weight: 600;
+    font-size: 0.95rem;
+    opacity: 0;
+    transform: translateX(-10px);
+    transition: all 0.3s ease;
+    z-index: 2;
+    letter-spacing: 0.3px;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.btn-whatsapp-flotante:hover .texto-whatsapp {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+/* Badge de notificación */
+.badge-whatsapp {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    background: linear-gradient(135deg, #ff4444 0%, #cc0000 100%);
+    color: white;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    font-weight: bold;
+    z-index: 3;
+    box-shadow: 
+        0 2px 8px rgba(255, 68, 68, 0.5),
+        0 0 0 3px #ffffff;
+    animation: pulsoNotificacionWA 1.5s ease-in-out infinite;
+}
+
+/* Animación de pulso del botón */
+@keyframes pulsoWhatsApp {
+    0%, 100% {
+        box-shadow: 
+            0 8px 24px rgba(37, 211, 102, 0.4),
+            0 4px 12px rgba(18, 140, 126, 0.3),
+            inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    }
+    50% {
+        box-shadow: 
+            0 12px 32px rgba(37, 211, 102, 0.5),
+            0 6px 16px rgba(18, 140, 126, 0.4),
+            inset 0 1px 0 rgba(255, 255, 255, 0.3);
+    }
+}
+
+/* Animación de pulso del badge */
+@keyframes pulsoNotificacionWA {
+    0%, 100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.15);
+    }
+}
+
+/* Efecto de ondas concéntricas (opcional - elegante) */
+.btn-whatsapp-flotante::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 100%;
+    height: 100%;
+    border: 2px solid rgba(37, 211, 102, 0.6);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    animation: ondasWhatsApp 2.5s ease-out infinite;
+    pointer-events: none;
+}
+
+@keyframes ondasWhatsApp {
+    0% {
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 1;
+    }
+    100% {
+        transform: translate(-50%, -50%) scale(1.8);
+        opacity: 0;
+    }
+}
+
+/* Modo oscuro */
+body.modo-oscuro .btn-whatsapp-flotante {
+    box-shadow: 
+        0 8px 24px rgba(37, 211, 102, 0.5),
+        0 4px 12px rgba(18, 140, 126, 0.4),
+        inset 0 1px 0 rgba(255, 255, 255, 0.15);
+}
+
+body.modo-oscuro .btn-whatsapp-flotante:hover {
+    box-shadow: 
+        0 12px 32px rgba(37, 211, 102, 0.6),
+        0 6px 16px rgba(18, 140, 126, 0.5),
+        inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+body.modo-oscuro .badge-whatsapp {
+    box-shadow: 
+        0 2px 8px rgba(255, 68, 68, 0.6),
+        0 0 0 3px rgba(15, 23, 42, 1);
+}
+
+/* === RESPONSIVE === */
+
+/* Tablet */
+@media (max-width: 768px) {
+    .btn-whatsapp-flotante {
+        bottom: 25px;
+        left: 20px;
+        width: 56px;
+        height: 56px;
+    }
+    
+    .icono-whatsapp {
+        width: 28px;
+        height: 28px;
+    }
+    
+    .btn-whatsapp-flotante:hover {
+        width: 180px;
+    }
+    
+    .texto-whatsapp {
+        font-size: 0.9rem;
+        left: 60px;
+    }
+}
+
+/* Móvil */
+@media (max-width: 480px) {
+    .btn-whatsapp-flotante {
+        bottom: 90px; /* Evitar conflicto con el botón de instalación */
+        left: 15px;
+        width: 54px;
+        height: 54px;
+    }
+    
+    .icono-whatsapp {
+        width: 26px;
+        height: 26px;
+    }
+    
+    /* En móvil, no expandir tanto el botón */
+    .btn-whatsapp-flotante:hover {
+        width: 54px;
+        border-radius: 50%;
+    }
+    
+    /* Ocultar texto en móvil para mantenerlo simple */
+    .texto-whatsapp {
+        display: none;
+    }
+    
+    .badge-whatsapp {
+        width: 20px;
+        height: 20px;
+        font-size: 0.7rem;
+        top: -3px;
+        right: -3px;
+    }
+}
+
+/* Ultra móvil */
+@media (max-width: 360px) {
+    .btn-whatsapp-flotante {
+        bottom: 85px;
+        left: 10px;
+        width: 50px;
+        height: 50px;
+    }
+    
+    .icono-whatsapp {
+        width: 24px;
+        height: 24px;
+    }
+}
+
+/* Accesibilidad táctil */
+@media (hover: none) and (pointer: coarse) {
+    .btn-whatsapp-flotante {
+        min-width: 56px;
+        min-height: 56px;
+        -webkit-tap-highlight-color: rgba(37, 211, 102, 0.3);
+        touch-action: manipulation;
+    }
+    
+    .btn-whatsapp-flotante:active {
+        transform: scale(0.92);
+        transition: transform 0.1s ease;
+    }
+}
+
+/* Preferencia de movimiento reducido */
+@media (prefers-reduced-motion: reduce) {
+    .btn-whatsapp-flotante,
+    .badge-whatsapp,
+    .btn-whatsapp-flotante::before,
+    .btn-whatsapp-flotante::after {
+        animation: none !important;
+    }
+    
+    .btn-whatsapp-flotante {
+        transition: box-shadow 0.2s ease;
+    }
+}
+
+/* === TOOLTIP DE WHATSAPP === */
+
+.tooltip-whatsapp {
+    position: fixed;
+    bottom: 100px;
+    left: 30px;
+    z-index: 998;
+    opacity: 0;
+    transform: translateY(20px) scale(0.9);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    pointer-events: none;
+}
+
+.tooltip-whatsapp.mostrar {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    pointer-events: all;
+}
+
+.tooltip-whatsapp-contenido {
+    background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+    color: #1e293b;
+    padding: 1rem 1.25rem;
+    border-radius: 1rem;
+    box-shadow: 
+        0 10px 30px rgba(0, 0, 0, 0.15),
+        0 4px 12px rgba(0, 0, 0, 0.1),
+        inset 0 1px 0 rgba(255, 255, 255, 0.8);
+    font-size: 0.95rem;
+    font-weight: 600;
+    white-space: nowrap;
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    border: 2px solid rgba(37, 211, 102, 0.2);
+}
+
+/* Flecha del tooltip */
+.tooltip-whatsapp-contenido::before {
+    content: '';
+    position: absolute;
+    bottom: -8px;
+    left: 20px;
+    width: 16px;
+    height: 16px;
+    background: inherit;
+    transform: rotate(45deg);
+    border-right: 2px solid rgba(37, 211, 102, 0.2);
+    border-bottom: 2px solid rgba(37, 211, 102, 0.2);
+}
+
+.tooltip-whatsapp-cerrar {
+    background: rgba(100, 116, 139, 0.1);
+    border: none;
+    color: #64748b;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    font-weight: bold;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+}
+
+.tooltip-whatsapp-cerrar:hover {
+    background: rgba(239, 68, 68, 0.15);
+    color: #ef4444;
+    transform: scale(1.1);
+}
+
+/* Modo oscuro para tooltip */
+body.modo-oscuro .tooltip-whatsapp-contenido {
+    background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+    color: #e2e8f0;
+    border-color: rgba(37, 211, 102, 0.3);
+    box-shadow: 
+        0 10px 30px rgba(0, 0, 0, 0.5),
+        0 4px 12px rgba(0, 0, 0, 0.3),
+        inset 0 1px 0 rgba(148, 163, 184, 0.1);
+}
+
+body.modo-oscuro .tooltip-whatsapp-cerrar {
+    background: rgba(148, 163, 184, 0.15);
+    color: #94a3b8;
+}
+
+body.modo-oscuro .tooltip-whatsapp-cerrar:hover {
+    background: rgba(239, 68, 68, 0.2);
+    color: #f87171;
+}
+
+/* Responsive para tooltip */
+@media (max-width: 768px) {
+    .tooltip-whatsapp {
+        bottom: 90px;
+        left: 20px;
+        max-width: calc(100vw - 40px);
+    }
+    
+    .tooltip-whatsapp-contenido {
+        font-size: 0.875rem;
+        padding: 0.875rem 1rem;
+        white-space: normal;
+        max-width: 280px;
+    }
+}
+
+@media (max-width: 480px) {
+    .tooltip-whatsapp {
+        bottom: 160px;
+        left: 15px;
+        right: 15px;
+    }
+    
+    .tooltip-whatsapp-contenido {
+        font-size: 0.85rem;
+        padding: 0.75rem 0.875rem;
+    }
+    
+    .tooltip-whatsapp-contenido::before {
+        left: 15px;
+    }
 }
 
 /* ===== SECCIÓN BENEFICIOS VISUALES ===== */

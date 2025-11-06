@@ -612,6 +612,12 @@ document.addEventListener('DOMContentLoaded', function() {
     generarCodigoReferido();
     configurarBusqueda();
     configurarEventos();
+    inicializarBotonWhatsApp();
+    
+    // Inicializar sistema de notificaciones
+    setTimeout(() => {
+        inicializarNotificaciones();
+    }, 2000); // Esperar 2 segundos después de cargar la página
 });
 
 // === RENDERIZADO DE PRODUCTOS ===
@@ -737,6 +743,11 @@ function agregarAlCarrito(idProducto) {
     guardarCarrito();
     actualizarCarrito();
     mostrarNotificacion(`✅ ${producto.nombre} agregado al carrito`);
+    
+    // Notificación push para primer producto
+    if (carritoCompras.length === 1 && !itemExistente) {
+        notificarProductoAgregado(producto.nombre);
+    }
 }
 
 // === ELIMINAR PRODUCTO ===
@@ -1426,12 +1437,370 @@ function mostrarNotificacion(mensaje, tipo = 'exito') {
     const notificacion = document.getElementById('notificacion');
     const textoNotificacion = document.getElementById('textoNotificacion');
     
+    if (!notificacion || !textoNotificacion) {
+        console.warn('⚠️ Elementos de notificación no encontrados');
+        return;
+    }
+    
     textoNotificacion.textContent = mensaje;
     notificacion.className = `notificacion mostrar ${tipo === 'error' ? 'error' : ''}`;
     
     setTimeout(() => {
         notificacion.classList.remove('mostrar');
     }, 3000);
+}
+
+// === SISTEMA DE NOTIFICACIONES PUSH ===
+
+/**
+ * Solicita permiso para mostrar notificaciones
+ * @returns {Promise<string>} Estado del permiso ('granted', 'denied', 'default')
+ */
+async function solicitarPermisoNotificaciones() {
+    if (!('Notification' in window)) {
+        console.log('❌ Este navegador no soporta notificaciones');
+        return 'denied';
+    }
+
+    // Si ya tenemos permiso
+    if (Notification.permission === 'granted') {
+        console.log('✅ Permisos de notificación ya concedidos');
+        return 'granted';
+    }
+
+    // Si el usuario ya rechazó
+    if (Notification.permission === 'denied') {
+        console.log('❌ Permisos de notificación denegados previamente');
+        return 'denied';
+    }
+
+    // Solicitar permiso
+    try {
+        const permission = await Notification.requestPermission();
+        console.log(`📬 Permiso de notificaciones: ${permission}`);
+        
+        if (permission === 'granted') {
+            mostrarNotificacion('🔔 ¡Notificaciones activadas! Te avisaremos de ofertas especiales');
+            
+            // Guardar en localStorage
+            localStorage.setItem('notificaciones_activadas', 'true');
+            
+            // Suscribirse a notificaciones push
+            suscribirseAPush();
+            
+            // Enviar notificación de prueba después de 3 segundos
+            setTimeout(() => {
+                mostrarNotificacionPush(
+                    '🎉 ¡Bienvenido!',
+                    'Gracias por activar las notificaciones. Te mantendremos informado de nuestras mejores ofertas.',
+                    '/index.html'
+                );
+            }, 3000);
+        } else {
+            mostrarNotificacion('ℹ️ Notificaciones desactivadas. Puedes activarlas más tarde.', 'error');
+        }
+        
+        return permission;
+    } catch (error) {
+        console.error('❌ Error al solicitar permisos:', error);
+        return 'denied';
+    }
+}
+
+/**
+ * Suscribe al usuario a notificaciones push
+ */
+async function suscribirseAPush() {
+    if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
+        console.log('❌ Push notifications no soportadas');
+        return;
+    }
+
+    try {
+        const registration = await navigator.serviceWorker.ready;
+        console.log('🔧 Service Worker listo para suscripción push');
+
+        // Verificar si ya está suscrito
+        let subscription = await registration.pushManager.getSubscription();
+        
+        if (subscription) {
+            console.log('✅ Ya existe una suscripción push:', subscription.endpoint);
+            return subscription;
+        }
+
+        // Crear nueva suscripción
+        // NOTA: En producción necesitarías una clave VAPID del servidor
+        // Por ahora usamos suscripción local para demostración
+        subscription = await registration.pushManager.subscribe({
+            userVisibleOnly: true,
+            applicationServerKey: null // En producción: convertirVapidKey(VAPID_PUBLIC_KEY)
+        });
+
+        console.log('✅ Suscripción push creada:', subscription.endpoint);
+        
+        // Aquí enviarías la suscripción a tu servidor
+        // await enviarSuscripcionAlServidor(subscription);
+        
+        return subscription;
+    } catch (error) {
+        console.error('❌ Error al suscribirse a push:', error);
+        
+        // Si falla por falta de VAPID key, continuar de todos modos
+        if (error.message.includes('applicationServerKey')) {
+            console.log('ℹ️ Continuando sin clave VAPID (modo demo)');
+        }
+    }
+}
+
+/**
+ * Muestra una notificación push nativa del navegador
+ * @param {string} titulo - Título de la notificación
+ * @param {string} mensaje - Cuerpo del mensaje
+ * @param {string} url - URL a abrir al hacer clic (opcional)
+ */
+function mostrarNotificacionPush(titulo, mensaje, url = '/') {
+    if (!('Notification' in window)) {
+        console.log('❌ Notificaciones no soportadas');
+        return;
+    }
+
+    if (Notification.permission !== 'granted') {
+        console.log('⚠️ No hay permisos para mostrar notificaciones');
+        return;
+    }
+
+    // Opciones de la notificación
+    const opciones = {
+        body: mensaje,
+        icon: './Imagenes/logo/Logo.png',
+        badge: './Imagenes/iconos/96x96/96x96.png',
+        image: './Imagenes/logo/Logo.png', // Imagen grande
+        vibrate: [200, 100, 200], // Patrón de vibración
+        tag: 'alimento-cielo-' + Date.now(), // ID único
+        requireInteraction: false, // Se cierra automáticamente
+        silent: false, // Con sonido
+        data: {
+            url: url,
+            timestamp: Date.now()
+        },
+        actions: [
+            {
+                action: 'ver',
+                title: '👀 Ver Ahora',
+                icon: './Imagenes/iconos/96x96/96x96.png'
+            },
+            {
+                action: 'cerrar',
+                title: '✖️ Cerrar'
+            }
+        ]
+    };
+
+    // Crear la notificación
+    const notificacion = new Notification(titulo, opciones);
+
+    // Manejar clic en la notificación
+    notificacion.onclick = function(event) {
+        event.preventDefault(); // Prevenir comportamiento por defecto
+        
+        // Abrir/enfocar la ventana
+        if (url && url !== '/') {
+            window.open(url, '_blank');
+        } else {
+            window.focus();
+        }
+        
+        notificacion.close();
+    };
+
+    // Auto-cerrar después de 10 segundos
+    setTimeout(() => {
+        notificacion.close();
+    }, 10000);
+
+    console.log('✅ Notificación push mostrada:', titulo);
+}
+
+/**
+ * Verifica el estado de las notificaciones
+ */
+function verificarEstadoNotificaciones() {
+    if (!('Notification' in window)) {
+        return {
+            soportado: false,
+            permiso: 'denied',
+            mensaje: 'Tu navegador no soporta notificaciones'
+        };
+    }
+
+    return {
+        soportado: true,
+        permiso: Notification.permission,
+        mensaje: Notification.permission === 'granted' 
+            ? '✅ Notificaciones activadas' 
+            : Notification.permission === 'denied'
+            ? '❌ Notificaciones bloqueadas'
+            : 'ℹ️ Notificaciones disponibles'
+    };
+}
+
+/**
+ * Envía notificación de bienvenida al primer ingreso
+ */
+function notificacionBienvenida() {
+    const esPrimeraVisita = !localStorage.getItem('primera_visita');
+    
+    if (esPrimeraVisita && Notification.permission === 'granted') {
+        setTimeout(() => {
+            mostrarNotificacionPush(
+                '🎉 ¡Bienvenido a Alimento del Cielo!',
+                'Descubre nuestros productos frescos y congelados de la mejor calidad. ¡Ofertas especiales cada semana!',
+                '/index.html'
+            );
+        }, 5000);
+        
+        localStorage.setItem('primera_visita', 'true');
+    }
+}
+
+/**
+ * Notificación cuando se agrega al carrito
+ */
+function notificarProductoAgregado(nombreProducto) {
+    if (Notification.permission === 'granted') {
+        const cantidadItems = carritoCompras.reduce((total, item) => total + item.cantidad, 0);
+        
+        if (cantidadItems === 1) {
+            // Primera compra
+            mostrarNotificacionPush(
+                '🛒 Primer producto agregado',
+                `${nombreProducto} está en tu carrito. ¡Sigue comprando!`,
+                '/index.html#carrito'
+            );
+        }
+    }
+}
+
+/**
+ * Inicializa el sistema de notificaciones
+ */
+function inicializarNotificaciones() {
+    console.log('🔔 Inicializando sistema de notificaciones...');
+    
+    const estado = verificarEstadoNotificaciones();
+    console.log('📊 Estado notificaciones:', estado);
+    
+    // Si el usuario nunca fue preguntado, preguntar después de 30 segundos
+    if (estado.soportado && estado.permiso === 'default') {
+        const yaPreguntoNotificaciones = localStorage.getItem('pregunto_notificaciones');
+        
+        if (!yaPreguntoNotificaciones) {
+            setTimeout(() => {
+                mostrarPromptNotificaciones();
+            }, 30000); // Esperar 30 segundos antes de preguntar
+        }
+    }
+    
+    // Si ya tiene permisos, verificar suscripción
+    if (estado.permiso === 'granted') {
+        suscribirseAPush();
+        notificacionBienvenida();
+    }
+    
+    // Actualizar estado visual del botón
+    actualizarEstadoBotonNotificaciones();
+}
+
+/**
+ * Muestra un prompt amigable para activar notificaciones
+ */
+function mostrarPromptNotificaciones() {
+    // Crear overlay
+    const overlay = document.createElement('div');
+    overlay.className = 'overlay';
+    overlay.style.display = 'block';
+    
+    // Crear modal
+    const modal = document.createElement('div');
+    modal.className = 'modal-notificaciones';
+    modal.innerHTML = `
+        <div class="modal-contenido">
+            <div class="modal-icono">🔔</div>
+            <h3 class="modal-titulo">¿Activar Notificaciones?</h3>
+            <p class="modal-texto">
+                Recibe avisos de:
+            </p>
+            <ul class="modal-lista">
+                <li>✨ Ofertas especiales y descuentos</li>
+                <li>🆕 Nuevos productos disponibles</li>
+                <li>🎁 Promociones exclusivas</li>
+                <li>📦 Estado de tus pedidos</li>
+            </ul>
+            <div class="modal-acciones">
+                <button class="btn-modal-aceptar" id="btnAceptarNotificaciones">
+                    🔔 Sí, Activar
+                </button>
+                <button class="btn-modal-rechazar" id="btnRechazarNotificaciones">
+                    Ahora no
+                </button>
+            </div>
+            <p class="modal-nota">Puedes desactivarlas en cualquier momento</p>
+        </div>
+    `;
+    
+    document.body.appendChild(overlay);
+    document.body.appendChild(modal);
+    
+    // Marcar que ya se preguntó
+    localStorage.setItem('pregunto_notificaciones', 'true');
+    
+    // Eventos
+    document.getElementById('btnAceptarNotificaciones').addEventListener('click', async () => {
+        await solicitarPermisoNotificaciones();
+        overlay.remove();
+        modal.remove();
+        actualizarEstadoBotonNotificaciones();
+    });
+    
+    document.getElementById('btnRechazarNotificaciones').addEventListener('click', () => {
+        overlay.remove();
+        modal.remove();
+        mostrarNotificacion('ℹ️ Puedes activar notificaciones más tarde desde la configuración');
+    });
+    
+    // Cerrar al hacer clic en overlay
+    overlay.addEventListener('click', () => {
+        overlay.remove();
+        modal.remove();
+    });
+}
+
+/**
+ * Actualiza el estado visual del botón de notificaciones según los permisos
+ */
+function actualizarEstadoBotonNotificaciones() {
+    const botonNotif = document.getElementById('btnActivarNotificaciones');
+    
+    if (!botonNotif) return;
+    
+    const estado = verificarEstadoNotificaciones();
+    
+    if (estado.permiso === 'granted') {
+        botonNotif.classList.add('activo');
+        botonNotif.innerHTML = `
+            <span class="icono-notif">✅</span>
+            <span class="texto-notif">Activas</span>
+        `;
+        botonNotif.title = 'Notificaciones activadas';
+        botonNotif.style.pointerEvents = 'none'; // Deshabilitar clicks
+    } else if (estado.permiso === 'denied') {
+        botonNotif.innerHTML = `
+            <span class="icono-notif">🔕</span>
+            <span class="texto-notif">Bloqueadas</span>
+        `;
+        botonNotif.title = 'Notificaciones bloqueadas. Actívalas desde la configuración del navegador.';
+        botonNotif.style.cursor = 'not-allowed';
+    }
 }
 
 
@@ -4095,3 +4464,132 @@ async function sincronizarResenasPendientes() {
         throw new Error('Sistema de reseñas no inicializado');
     }
 }
+
+// === GESTIÓN DEL BOTÓN FLOTANTE DE WHATSAPP ===
+
+/**
+ * Inicializa el botón flotante de WhatsApp
+ * Gestiona el badge de notificación y el tracking de interacciones
+ */
+function inicializarBotonWhatsApp() {
+    const btnWhatsApp = document.getElementById('btnWhatsAppFlotante');
+    const badge = document.getElementById('badgeWhatsapp');
+    
+    if (!btnWhatsApp) {
+        console.warn('⚠️ Botón de WhatsApp no encontrado');
+        return;
+    }
+    
+    // Verificar si el usuario ya interactuó con WhatsApp
+    const whatsappClicked = localStorage.getItem('whatsapp_clicked');
+    
+    // Ocultar el badge si ya fue clickeado
+    if (whatsappClicked === 'true' && badge) {
+        badge.style.display = 'none';
+    }
+    
+    // Evento al hacer clic en el botón
+    btnWhatsApp.addEventListener('click', function() {
+        // Ocultar el badge permanentemente
+        if (badge) {
+            badge.style.display = 'none';
+            localStorage.setItem('whatsapp_clicked', 'true');
+        }
+        
+        // Tracking de analytics (si está disponible)
+        if (typeof gtag !== 'undefined') {
+            gtag('event', 'click', {
+                'event_category': 'WhatsApp',
+                'event_label': 'Botón Flotante',
+                'value': 1
+            });
+        }
+        
+        // Log para debugging
+        console.log('📱 Usuario contactó vía WhatsApp');
+    });
+    
+    // Efecto de entrada con retraso (aparece suavemente después de 2 segundos)
+    setTimeout(() => {
+        btnWhatsApp.style.opacity = '0';
+        btnWhatsApp.style.visibility = 'visible';
+        btnWhatsApp.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+        
+        requestAnimationFrame(() => {
+            btnWhatsApp.style.opacity = '1';
+        });
+    }, 2000);
+    
+    // Mostrar mensaje tooltip después de 5 segundos (solo la primera vez)
+    const tooltipMostrado = localStorage.getItem('whatsapp_tooltip_shown');
+    if (!tooltipMostrado && !whatsappClicked) {
+        setTimeout(() => {
+            mostrarTooltipWhatsApp();
+            localStorage.setItem('whatsapp_tooltip_shown', 'true');
+        }, 5000);
+    }
+}
+
+/**
+ * Muestra un tooltip temporal sobre el botón de WhatsApp
+ */
+function mostrarTooltipWhatsApp() {
+    const btnWhatsApp = document.getElementById('btnWhatsAppFlotante');
+    if (!btnWhatsApp) return;
+    
+    // Crear tooltip dinámicamente
+    const tooltip = document.createElement('div');
+    tooltip.className = 'tooltip-whatsapp';
+    tooltip.innerHTML = `
+        <div class="tooltip-whatsapp-contenido">
+            💬 ¿Necesitas ayuda? Chatea con nosotros
+            <button class="tooltip-whatsapp-cerrar" onclick="cerrarTooltipWhatsApp()">✕</button>
+        </div>
+    `;
+    
+    // Insertar en el body
+    document.body.appendChild(tooltip);
+    
+    // Animar entrada
+    setTimeout(() => {
+        tooltip.classList.add('mostrar');
+    }, 100);
+    
+    // Auto-ocultar después de 8 segundos
+    setTimeout(() => {
+        cerrarTooltipWhatsApp();
+    }, 8000);
+}
+
+/**
+ * Cierra el tooltip de WhatsApp
+ */
+function cerrarTooltipWhatsApp() {
+    const tooltip = document.querySelector('.tooltip-whatsapp');
+    if (tooltip) {
+        tooltip.classList.remove('mostrar');
+        setTimeout(() => {
+            tooltip.remove();
+        }, 300);
+    }
+}
+
+/**
+ * Actualiza el contador del badge (útil para notificaciones)
+ * @param {number} cantidad - Número a mostrar en el badge (0 para ocultar)
+ */
+function actualizarBadgeWhatsApp(cantidad) {
+    const badge = document.getElementById('badgeWhatsapp');
+    if (!badge) return;
+    
+    if (cantidad > 0) {
+        badge.textContent = cantidad > 9 ? '9+' : cantidad;
+        badge.style.display = 'flex';
+    } else {
+        badge.style.display = 'none';
+    }
+}
+
+// Exponer funciones globalmente para uso externo
+window.actualizarBadgeWhatsApp = actualizarBadgeWhatsApp;
+window.cerrarTooltipWhatsApp = cerrarTooltipWhatsApp;

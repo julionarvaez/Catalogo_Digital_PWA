@@ -70,6 +70,10 @@
                 <button class="btn-ver-promociones" onclick="accionVerPromociones()">
                     🎁 Ver Promociones
                 </button>
+                <button class="btn-activar-notificaciones" id="btnActivarNotificaciones" onclick="solicitarPermisoNotificaciones()" title="Activar notificaciones de ofertas">
+                    <span class="icono-notif">🔔</span>
+                    <span class="texto-notif">Ofertas</span>
+                </button>
             </div>
         </div>
         
@@ -923,9 +927,24 @@
         <span class="texto-fab">Instalar App</span>
     </button>
 
-    <!-- Notificación -->
+    <!-- Botón Flotante de WhatsApp -->
+    <a href="https://wa.me/573135212887?text=Hola!%20Estoy%20interesado%20en%20sus%20productos%20congelados%20🍗" 
+        target="_blank" 
+        rel="noopener noreferrer" 
+        class="btn-whatsapp-flotante" 
+        id="btnWhatsAppFlotante"
+        title="Chatea con nosotros por WhatsApp"
+        aria-label="Contactar por WhatsApp">
+        <!-- Icono SVG de WhatsApp -->
+        <svg class="icono-whatsapp" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+            <path fill="currentColor" d="M16 0c-8.837 0-16 7.163-16 16 0 2.825 0.737 5.607 2.137 8.048l-2.137 7.952 7.933-2.127c2.42 1.37 5.173 2.127 8.067 2.127 8.837 0 16-7.163 16-16s-7.163-16-16-16zM16 29.467c-2.482 0-4.908-0.646-7.07-1.87l-0.507-0.292-4.713 1.262 1.262-4.669-0.292-0.508c-1.207-2.100-1.847-4.507-1.847-6.390 0-7.168 5.832-13 13-13s13 5.832 13 13-5.832 13-13 13zM23.613 19.933c-0.373-0.187-2.197-1.083-2.538-1.208-0.34-0.125-0.587-0.187-0.833 0.187s-0.958 1.208-1.175 1.455c-0.217 0.248-0.433 0.279-0.806 0.093-1.873-0.935-3.097-1.668-4.33-3.777-0.326-0.558 0.326-0.519 0.934-1.729 0.101-0.248 0.051-0.464-0.028-0.651-0.079-0.187-0.833-2.009-1.142-2.751-0.301-0.723-0.607-0.625-0.833-0.637-0.216-0.010-0.464-0.012-0.711-0.012s-0.651 0.093-0.992 0.464c-0.34 0.372-1.301 1.271-1.301 3.104s1.332 3.599 1.519 3.846c0.187 0.248 2.633 4.019 6.381 5.64 0.891 0.383 1.587 0.612 2.129 0.783 0.895 0.284 1.709 0.244 2.354 0.148 0.718-0.107 2.197-0.898 2.506-1.766s0.309-1.613 0.217-1.766c-0.093-0.154-0.34-0.248-0.713-0.435z"/>
+        </svg>
+        <span class="texto-whatsapp">Chatea con nosotros</span>
+        <!-- Badge de notificación (opcional) -->
+        <span class="badge-whatsapp" id="badgeWhatsapp">1</span>
+    </a>
 
-    <!-- Notificación -->
+    <!-- Notificación In-App -->
     <div class="notificacion" id="notificacion">
         <span id="textoNotificacion"></span>
     </div>

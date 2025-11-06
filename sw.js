@@ -169,37 +169,59 @@ self.addEventListener('push', function(event) {
 
 // === CLICK EN NOTIFICACIÓN ===
 self.addEventListener('notificationclick', function(event) {
-    console.log('🔔 Service Worker: Click en notificación');
+    console.log('🔔 Service Worker: Click en notificación', event.action);
     
     event.notification.close();
     
-    if (event.action === 'open' || !event.action) {
-        // Abrir la aplicación
-        const urlToOpen = event.notification.data.url || '/';
-        
-        event.waitUntil(
-            clients.matchAll({
-                type: 'window',
-                includeUncontrolled: true
-            }).then(function(clientList) {
-                // Si ya hay una ventana abierta, enfocarla
-                for (let i = 0; i < clientList.length; i++) {
-                    const client = clientList[i];
-                    if (client.url === urlToOpen && 'focus' in client) {
-                        return client.focus();
-                    }
-                }
-                
-                // Si no hay ventana abierta, crear una nueva
-                if (clients.openWindow) {
-                    return clients.openWindow(urlToOpen);
-                }
-            })
-        );
-    } else if (event.action === 'close') {
-        // Solo cerrar la notificación (ya se cerró arriba)
-        console.log('🔔 Notificación cerrada por el usuario');
+    // Determinar qué acción tomar
+    if (event.action === 'close') {
+        // Solo cerrar la notificación
+        console.log('✖️ Notificación cerrada por el usuario');
+        return;
     }
+    
+    // Para acción 'open', 'ver', o click general en la notificación
+    const urlToOpen = new URL(event.notification.data?.url || '/', self.location.origin).href;
+    console.log('📱 Abriendo URL:', urlToOpen);
+    
+    event.waitUntil(
+        clients.matchAll({
+            type: 'window',
+            includeUncontrolled: true
+        }).then(function(clientList) {
+            console.log(`🔍 Ventanas abiertas encontradas: ${clientList.length}`);
+            
+            // Primero intentar encontrar una ventana con la URL exacta
+            for (let i = 0; i < clientList.length; i++) {
+                const client = clientList[i];
+                if (client.url === urlToOpen && 'focus' in client) {
+                    console.log('✅ Enfocando ventana existente');
+                    return client.focus();
+                }
+            }
+            
+            // Si no hay coincidencia exacta, enfocar cualquier ventana del sitio
+            for (let i = 0; i < clientList.length; i++) {
+                const client = clientList[i];
+                if (client.url.startsWith(self.location.origin) && 'focus' in client) {
+                    console.log('✅ Enfocando ventana del mismo origen y navegando');
+                    return client.focus().then(() => {
+                        if ('navigate' in client) {
+                            return client.navigate(urlToOpen);
+                        }
+                    });
+                }
+            }
+            
+            // Si no hay ventanas abiertas, crear una nueva
+            if (clients.openWindow) {
+                console.log('🆕 Abriendo nueva ventana');
+                return clients.openWindow(urlToOpen);
+            }
+        }).catch(function(error) {
+            console.error('❌ Error al manejar click en notificación:', error);
+        })
+    );
 });
 
 // === SINCRONIZACIÓN EN BACKGROUND ===
