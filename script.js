@@ -1493,6 +1493,36 @@ function cerrarCentroNotificaciones() {
 }
 
 /**
+ * Cierra paneles (carrito, centro de notificaciones) que estén abiertos.
+ * Usado por el overlay para un comportamiento consistente.
+ */
+function cerrarPanelesAbiertos() {
+    const sidebar = document.getElementById('sidebarCarrito');
+    const panel = document.getElementById('panelNotificaciones');
+    const overlay = document.getElementById('overlay');
+
+    let algunoCerrado = false;
+
+    if (sidebar && sidebar.classList.contains('abierto')) {
+        sidebar.classList.remove('abierto');
+        algunoCerrado = true;
+    }
+
+    if (panel && panel.classList.contains('abierto')) {
+        panel.classList.remove('abierto');
+        algunoCerrado = true;
+    }
+
+    if (overlay && overlay.classList.contains('mostrar')) {
+        overlay.classList.remove('mostrar');
+    }
+
+    if (algunoCerrado) {
+        document.body.style.overflow = 'auto';
+    }
+}
+
+/**
  * Carga y muestra las notificaciones guardadas en localStorage
  */
 function cargarNotificacionesGuardadas() {
@@ -2591,34 +2621,52 @@ function mostrarConfiguracionNotificaciones() {
             <div style="margin-bottom: 2rem;">
                 <h4 style="margin-bottom: 1rem;">📬 Tipos de notificaciones</h4>
                 
-                <label style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; padding: 0.8rem; background: var(--color-fondo-secundario); border-radius: 8px;">
+                <label class="toggle-row" style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; padding: 0.6rem; background: rgba(241,248,255,0.7); border-radius: 8px;">
                     <span>🔥 Promociones y ofertas</span>
-                    <input type="checkbox" id="pref_promocion" ${preferencias.promocion ? 'checked' : ''}>
+                    <label class="toggle-switch" aria-label="Promociones y ofertas">
+                        <input type="checkbox" id="pref_promocion" ${preferencias.promocion ? 'checked' : ''}>
+                        <span class="slider"></span>
+                    </label>
                 </label>
                 
-                <label style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; padding: 0.8rem; background: var(--color-fondo-secundario); border-radius: 8px;">
+                <label class="toggle-row" style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; padding: 0.6rem; background: rgba(241,248,255,0.7); border-radius: 8px;">
                     <span>🆕 Nuevos productos</span>
-                    <input type="checkbox" id="pref_lanzamiento" ${preferencias.lanzamiento ? 'checked' : ''}>
+                    <label class="toggle-switch" aria-label="Nuevos productos">
+                        <input type="checkbox" id="pref_lanzamiento" ${preferencias.lanzamiento ? 'checked' : ''}>
+                        <span class="slider"></span>
+                    </label>
                 </label>
                 
-                <label style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; padding: 0.8rem; background: var(--color-fondo-secundario); border-radius: 8px;">
+                <label class="toggle-row" style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; padding: 0.6rem; background: rgba(241,248,255,0.7); border-radius: 8px;">
                     <span>🎁 Combos especiales</span>
-                    <input type="checkbox" id="pref_combo" ${preferencias.combo ? 'checked' : ''}>
+                    <label class="toggle-switch" aria-label="Combos especiales">
+                        <input type="checkbox" id="pref_combo" ${preferencias.combo ? 'checked' : ''}>
+                        <span class="slider"></span>
+                    </label>
                 </label>
                 
-                <label style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; padding: 0.8rem; background: var(--color-fondo-secundario); border-radius: 8px;">
+                <label class="toggle-row" style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; padding: 0.6rem; background: rgba(241,248,255,0.7); border-radius: 8px;">
                     <span>⚡ Ofertas flash</span>
-                    <input type="checkbox" id="pref_oferta_flash" ${preferencias.oferta_flash ? 'checked' : ''}>
+                    <label class="toggle-switch" aria-label="Ofertas flash">
+                        <input type="checkbox" id="pref_oferta_flash" ${preferencias.oferta_flash ? 'checked' : ''}>
+                        <span class="slider"></span>
+                    </label>
                 </label>
                 
-                <label style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; padding: 0.8rem; background: var(--color-fondo-secundario); border-radius: 8px;">
+                <label class="toggle-row" style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; padding: 0.6rem; background: rgba(241,248,255,0.7); border-radius: 8px;">
                     <span>🛒 Recordatorios de carrito</span>
-                    <input type="checkbox" id="pref_carrito_abandonado" ${preferencias.carrito_abandonado ? 'checked' : ''}>
+                    <label class="toggle-switch" aria-label="Recordatorios de carrito">
+                        <input type="checkbox" id="pref_carrito_abandonado" ${preferencias.carrito_abandonado ? 'checked' : ''}>
+                        <span class="slider"></span>
+                    </label>
                 </label>
                 
-                <label style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; padding: 0.8rem; background: var(--color-fondo-secundario); border-radius: 8px;">
+                <label class="toggle-row" style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; padding: 0.6rem; background: rgba(241,248,255,0.7); border-radius: 8px;">
                     <span>💭 Recordatorios generales</span>
-                    <input type="checkbox" id="pref_recordatorio" ${preferencias.recordatorio ? 'checked' : ''}>
+                    <label class="toggle-switch" aria-label="Recordatorios generales">
+                        <input type="checkbox" id="pref_recordatorio" ${preferencias.recordatorio ? 'checked' : ''}>
+                        <span class="slider"></span>
+                    </label>
                 </label>
             </div>
             
@@ -2640,10 +2688,16 @@ function mostrarConfiguracionNotificaciones() {
             </div>
             
             <div style="margin-bottom: 2rem;">
-                <label style="display: flex; align-items: center; justify-content: space-between; padding: 1rem; background: var(--color-error); color: white; border-radius: 8px;">
-                    <span>🔕 Modo No Molestar</span>
-                    <input type="checkbox" id="pref_noMolestar" ${preferencias.noMolestar ? 'checked' : ''}>
-                </label>
+                <div style="padding: 1rem; background: linear-gradient(90deg,#ff6b6b,#e63946); border-radius: 8px; color: white; display:flex; align-items:center; justify-content:space-between;">
+                    <div style="display:flex; align-items:center; gap:12px;">
+                        <div style="font-size:1.2rem;">🔕</div>
+                        <div style="font-weight:600;">Modo No Molestar</div>
+                    </div>
+                    <label class="toggle-switch" aria-label="Modo No Molestar">
+                        <input type="checkbox" id="pref_noMolestar" ${preferencias.noMolestar ? 'checked' : ''}>
+                        <span class="slider"></span>
+                    </label>
+                </div>
             </div>
             
             <div style="display: flex; gap: 1rem;">

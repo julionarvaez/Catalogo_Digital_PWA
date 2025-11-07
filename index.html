@@ -12,12 +12,11 @@
     <link rel="apple-touch-icon" sizes="180x180" href="./Imagenes/logo/Logo.png">
     <link rel="icon" type="image/png" href="./Imagenes/logo/Logo.png">
     <link rel="stylesheet" href="styles.css">
-    <link rel="stylesheet" href="config-notif-styles.css">
     
 </head>
 <body>
     <!-- Overlay -->
-    <div class="overlay" id="overlay" onclick="alternarCarrito()"></div>
+    <div class="overlay" id="overlay" onclick="cerrarPanelesAbiertos()"></div>
 
     <!-- Encabezado -->
     <header class="encabezado">
@@ -517,11 +516,11 @@
                 id="campoBusqueda"
             >
             
-            <!-- Nuevo: Filtros de ordenamiento -->
+            <!-- Filtros de ordenamiento -->
             <div class="contenedor-ordenamiento">
                 <div class="grupo-filtro-orden">
                     <label for="ordenPrecio" class="etiqueta-filtro">
-                        <span class="icono-filtro">💰</span>
+                        <i class="fas fa-coins"></i>
                         Ordenar por precio:
                     </label>
                     <select id="ordenPrecio" class="select-orden" onchange="aplicarFiltrosOrdenamiento()">
@@ -533,7 +532,7 @@
 
                 <div class="grupo-filtro-orden">
                     <label for="ordenPopularidad" class="etiqueta-filtro">
-                        <span class="icono-filtro">⭐</span>
+                        <i class="fas fa-star"></i>
                         Ordenar por popularidad:
                     </label>
                     <select id="ordenPopularidad" class="select-orden" onchange="aplicarFiltrosOrdenamiento()">
@@ -544,50 +543,53 @@
                 </div>
 
                 <button class="btn-limpiar-filtros" onclick="limpiarFiltrosOrdenamiento()" title="Limpiar todos los filtros">
-                    🔄 Limpiar filtros
+                    <i class="fas fa-broom"></i> Limpiar filtros
                 </button>
             </div>
 
-            <!-- Título de la sección de categorías -->
-            <div class="titulo-categorias">
-                <h2 class="categorias-heading">
-                    <span class="icono-categoria">🎯</span>
-                    Explora por Categoría
-                    <span class="subtitulo-categoria">Encuentra tus productos favoritos más rápido</span>
-                </h2>
-            </div>
+            <!-- Contenedor destacado de categorías -->
+            <div class="contenedor-categorias-destacado">
+                <!-- Título de la sección de categorías -->
+                <div class="titulo-categorias">
+                    <h2 class="categorias-heading">
+                        <span class="icono-categoria">🎯</span>
+                        Explora por Categoría
+                        <span class="subtitulo-categoria">Encuentra tus productos favoritos más rápido</span>
+                    </h2>
+                </div>
 
-            <div class="contenedor-filtros" role="tablist" aria-label="Filtrar productos por categoría">
-                <button class="btn-filtro activo" onclick="filtrarPorCategoria('todos', this)" role="tab" aria-selected="true">
-                    🍽️ Todos
-                </button>
-                <button class="btn-filtro" onclick="filtrarPorCategoria('carnes', this)" role="tab" aria-selected="false">
-                    🥩 Carnes
-                </button>
-                <button class="btn-filtro" onclick="filtrarPorCategoria('pollo', this)" role="tab" aria-selected="false">
-                    🍗 Pollo
-                </button>
-                <button class="btn-filtro" onclick="filtrarPorCategoria('pescado', this)" role="tab" aria-selected="false">
-                    🐟 Pescado
-                </button>
-                <button class="btn-filtro" onclick="filtrarPorCategoria('verduras', this)" role="tab" aria-selected="false">
-                    🥬 Verduras
-                </button>
-                <button class="btn-filtro" onclick="filtrarPorCategoria('deditos', this)" role="tab" aria-selected="false">
-                    🍟 Deditos
-                </button>
-                <button class="btn-filtro" onclick="filtrarPorCategoria('empanadas', this)" role="tab" aria-selected="false">
-                    🥟 Empanadas
-                </button>
-                <button class="btn-filtro" onclick="filtrarPorCategoria('pasabocas', this)" role="tab" aria-selected="false">
-                    🍤 Pasabocas
-                </button>
-                <button class="btn-filtro" onclick="filtrarPorCategoria('medallones', this)" role="tab" aria-selected="false">
-                    🧁 Medallones
-                </button>
-                <button class="btn-filtro" onclick="filtrarPorCategoria('otros', this)" role="tab" aria-selected="false">
-                    🍱 Otros
-                </button>
+                <div class="contenedor-filtros" role="tablist" aria-label="Filtrar productos por categoría">
+                    <button class="btn-filtro activo" onclick="filtrarPorCategoria('todos', this)" role="tab" aria-selected="true">
+                        🍽️ Todos
+                    </button>
+                    <button class="btn-filtro" onclick="filtrarPorCategoria('carnes', this)" role="tab" aria-selected="false">
+                        🥩 Carnes
+                    </button>
+                    <button class="btn-filtro" onclick="filtrarPorCategoria('pollo', this)" role="tab" aria-selected="false">
+                        🍗 Pollo
+                    </button>
+                    <button class="btn-filtro" onclick="filtrarPorCategoria('pescado', this)" role="tab" aria-selected="false">
+                        🐟 Pescado
+                    </button>
+                    <button class="btn-filtro" onclick="filtrarPorCategoria('verduras', this)" role="tab" aria-selected="false">
+                        🥬 Verduras
+                    </button>
+                    <button class="btn-filtro" onclick="filtrarPorCategoria('deditos', this)" role="tab" aria-selected="false">
+                        🍟 Deditos
+                    </button>
+                    <button class="btn-filtro" onclick="filtrarPorCategoria('empanadas', this)" role="tab" aria-selected="false">
+                        🥟 Empanadas
+                    </button>
+                    <button class="btn-filtro" onclick="filtrarPorCategoria('pasabocas', this)" role="tab" aria-selected="false">
+                        🍤 Pasabocas
+                    </button>
+                    <button class="btn-filtro" onclick="filtrarPorCategoria('medallones', this)" role="tab" aria-selected="false">
+                        🧁 Medallones
+                    </button>
+                    <button class="btn-filtro" onclick="filtrarPorCategoria('otros', this)" role="tab" aria-selected="false">
+                        🍱 Otros
+                    </button>
+                </div>
             </div>
         </section>
 
@@ -849,12 +851,7 @@
     <div class="panel-notificaciones" id="panelNotificaciones">
         <div class="encabezado-notificaciones">
             <h2>🔔 Centro de Notificaciones</h2>
-            <div class="botones-encabezado-notif">
-                <button class="btn-config-notif" onclick="abrirConfiguracionNotificaciones()" title="Configurar notificaciones">
-                    ⚙️
-                </button>
-                <button class="btn-cerrar-notificaciones" onclick="alternarCentroNotificaciones()">✕</button>
-            </div>
+            <button class="btn-cerrar-notificaciones" onclick="alternarCentroNotificaciones()">✕</button>
         </div>
         <div class="contenido-notificaciones" id="contenidoNotificaciones">
             <div class="notificaciones-vacias" id="notificacionesVacias">
@@ -876,184 +873,6 @@
             <button class="btn-limpiar-notificaciones" onclick="limpiarNotificaciones()" style="display: none;">
                 🗑️ Limpiar todas
             </button>
-        </div>
-    </div>
-
-    <!-- Modal de Configuración de Notificaciones -->
-    <div class="modal-config-notif" id="modalConfigNotif">
-        <div class="overlay-config-notif" onclick="cerrarConfiguracionNotificaciones()"></div>
-        <div class="panel-config-notif">
-            <!-- Encabezado -->
-            <div class="header-config-notif">
-                <div class="icono-header-config">
-                    🔔
-                </div>
-                <div class="header-texto-config">
-                    <h1>Configuración de Notificaciones</h1>
-                    <p>Personaliza los avisos que deseas recibir</p>
-                </div>
-                <button class="btn-cerrar-config-notif" onclick="cerrarConfiguracionNotificaciones()">✕</button>
-            </div>
-
-            <!-- Contenido -->
-            <div class="contenido-config-notif">
-                <!-- Sección: Tipos de Notificaciones -->
-                <div class="seccion-config">
-                    <h2 class="seccion-titulo-config">
-                        <span>📬</span>
-                        Tipos de notificaciones
-                    </h2>
-                    <div class="seccion-card-config">
-                        <!-- Promociones y ofertas -->
-                        <div class="notif-config-item">
-                            <div class="notif-config-info">
-                                <div class="notif-config-icono">🎉</div>
-                                <div class="notif-config-texto">
-                                    <h3>Promociones y ofertas</h3>
-                                    <p>Descuentos especiales y ofertas exclusivas</p>
-                                </div>
-                            </div>
-                            <label class="toggle-switch-config">
-                                <input type="checkbox" id="notif-promociones" checked>
-                                <span class="toggle-slider-config"></span>
-                            </label>
-                        </div>
-
-                        <!-- Nuevos productos -->
-                        <div class="notif-config-item">
-                            <div class="notif-config-info">
-                                <div class="notif-config-icono">✨</div>
-                                <div class="notif-config-texto">
-                                    <h3>Nuevos productos</h3>
-                                    <p>Novedades y lanzamientos del catálogo</p>
-                                </div>
-                            </div>
-                            <label class="toggle-switch-config">
-                                <input type="checkbox" id="notif-nuevos" checked>
-                                <span class="toggle-slider-config"></span>
-                            </label>
-                        </div>
-
-                        <!-- Combos especiales -->
-                        <div class="notif-config-item">
-                            <div class="notif-config-info">
-                                <div class="notif-config-icono">🍽️</div>
-                                <div class="notif-config-texto">
-                                    <h3>Combos especiales</h3>
-                                    <p>Paquetes y ofertas combinadas</p>
-                                </div>
-                            </div>
-                            <label class="toggle-switch-config">
-                                <input type="checkbox" id="notif-combos" checked>
-                                <span class="toggle-slider-config"></span>
-                            </label>
-                        </div>
-
-                        <!-- Ofertas flash -->
-                        <div class="notif-config-item">
-                            <div class="notif-config-info">
-                                <div class="notif-config-icono">⚡</div>
-                                <div class="notif-config-texto">
-                                    <h3>Ofertas flash</h3>
-                                    <p>Promociones por tiempo limitado</p>
-                                </div>
-                            </div>
-                            <label class="toggle-switch-config">
-                                <input type="checkbox" id="notif-flash" checked>
-                                <span class="toggle-slider-config"></span>
-                            </label>
-                        </div>
-
-                        <!-- Recordatorios de carrito -->
-                        <div class="notif-config-item">
-                            <div class="notif-config-info">
-                                <div class="notif-config-icono">🛒</div>
-                                <div class="notif-config-texto">
-                                    <h3>Recordatorios de carrito</h3>
-                                    <p>Productos pendientes en tu carrito</p>
-                                </div>
-                            </div>
-                            <label class="toggle-switch-config">
-                                <input type="checkbox" id="notif-carrito">
-                                <span class="toggle-slider-config"></span>
-                            </label>
-                        </div>
-
-                        <!-- Recordatorios generales -->
-                        <div class="notif-config-item">
-                            <div class="notif-config-info">
-                                <div class="notif-config-icono">🎁</div>
-                                <div class="notif-config-texto">
-                                    <h3>Recordatorios generales</h3>
-                                    <p>Avisos y recordatorios importantes</p>
-                                </div>
-                            </div>
-                            <label class="toggle-switch-config">
-                                <input type="checkbox" id="notif-generales" checked>
-                                <span class="toggle-slider-config"></span>
-                            </label>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Sección: Horario de Notificaciones -->
-                <div class="seccion-config">
-                    <h2 class="seccion-titulo-config">
-                        <span>⏰</span>
-                        Horario de notificaciones
-                    </h2>
-                    <div class="seccion-card-config">
-                        <div class="horario-container-config">
-                            <div class="input-group-config">
-                                <label for="hora-desde-config">Desde</label>
-                                <input type="time" id="hora-desde-config" class="input-hora-config" value="08:00">
-                            </div>
-                            <div class="input-group-config">
-                                <label for="hora-hasta-config">Hasta</label>
-                                <input type="time" id="hora-hasta-config" class="input-hora-config" value="22:00">
-                            </div>
-                        </div>
-                        <div class="horario-info-config">
-                            <span>ℹ️</span>
-                            <span>Recibirás notificaciones solo dentro de este horario</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Sección: Modo No Molestar -->
-                <div class="seccion-config">
-                    <h2 class="seccion-titulo-config">
-                        <span>🔕</span>
-                        Modo No Molestar
-                    </h2>
-                    <div class="seccion-card-config no-molestar-card-config">
-                        <div class="notif-config-icono-grande">🔕</div>
-                        <h3>Silenciar todas las notificaciones</h3>
-                        <p>Desactiva temporalmente todas las notificaciones</p>
-                        <label class="toggle-switch-config toggle-no-molestar-config">
-                            <input type="checkbox" id="modo-no-molestar-config">
-                            <span class="toggle-slider-config"></span>
-                        </label>
-                    </div>
-                </div>
-
-                <!-- Acciones -->
-                <div class="acciones-config">
-                    <button class="btn-config btn-primario-config" onclick="guardarConfiguracionNotificaciones()">
-                        <span>💾</span>
-                        Guardar configuración
-                    </button>
-                    <button class="btn-config btn-secundario-config" onclick="cerrarConfiguracionNotificaciones()">
-                        Cancelar
-                    </button>
-                </div>
-
-                <!-- Nota Inferior -->
-                <div class="nota-inferior-config">
-                    <span>🔒</span>
-                    <p>Tus preferencias se guardan localmente y solo afectan a este dispositivo. Puedes cambiarlas en cualquier momento.</p>
-                </div>
-            </div>
         </div>
     </div>
 
@@ -1152,13 +971,14 @@
         id="btnWhatsAppFlotante"
         title="Chatea con nosotros por WhatsApp"
         aria-label="Contactar por WhatsApp">
-        <!-- Icono SVG de WhatsApp -->
-        <svg class="icono-whatsapp" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
-            <path fill="currentColor" d="M16 0c-8.837 0-16 7.163-16 16 0 2.825 0.737 5.607 2.137 8.048l-2.137 7.952 7.933-2.127c2.42 1.37 5.173 2.127 8.067 2.127 8.837 0 16-7.163 16-16s-7.163-16-16-16zM16 29.467c-2.482 0-4.908-0.646-7.07-1.87l-0.507-0.292-4.713 1.262 1.262-4.669-0.292-0.508c-1.207-2.100-1.847-4.507-1.847-6.390 0-7.168 5.832-13 13-13s13 5.832 13 13-5.832 13-13 13zM23.613 19.933c-0.373-0.187-2.197-1.083-2.538-1.208-0.34-0.125-0.587-0.187-0.833 0.187s-0.958 1.208-1.175 1.455c-0.217 0.248-0.433 0.279-0.806 0.093-1.873-0.935-3.097-1.668-4.33-3.777-0.326-0.558 0.326-0.519 0.934-1.729 0.101-0.248 0.051-0.464-0.028-0.651-0.079-0.187-0.833-2.009-1.142-2.751-0.301-0.723-0.607-0.625-0.833-0.637-0.216-0.010-0.464-0.012-0.711-0.012s-0.651 0.093-0.992 0.464c-0.34 0.372-1.301 1.271-1.301 3.104s1.332 3.599 1.519 3.846c0.187 0.248 2.633 4.019 6.381 5.64 0.891 0.383 1.587 0.612 2.129 0.783 0.895 0.284 1.709 0.244 2.354 0.148 0.718-0.107 2.197-0.898 2.506-1.766s0.309-1.613 0.217-1.766c-0.093-0.154-0.34-0.248-0.713-0.435z"/>
-        </svg>
-        <span class="texto-whatsapp">Chatea con nosotros</span>
-        <!-- Badge de notificación (opcional) -->
-        <span class="badge-whatsapp" id="badgeWhatsapp">1</span>
+        <div class="whatsapp-contenido">
+            <img src="./Imagenes/iconos/96x96/Whatsapp.png" alt="WhatsApp" class="icono-whatsapp-img">
+            <span class="texto-whatsapp">¿Necesitas ayuda?</span>
+        </div>
+        <!-- Badge de notificación animado -->
+        <span class="badge-whatsapp pulse">
+            <span class="badge-numero">1</span>
+        </span>
     </a>
 
     <!-- Notificación In-App -->
@@ -1166,132 +986,10 @@
         <span id="textoNotificacion"></span>
     </div>
 
-    <!-- Toast para configuración de notificaciones -->
-    <div id="toastConfig" class="toast-config">
-        <span>✅</span>
-        <span id="toastConfigMensaje">Configuración guardada correctamente</span>
-    </div>
-
     <!-- Sistema de Actualización Automática -->
     <script src="auto-update.js" defer></script>
     
     <script src="script.js"></script>
-    <script>
-        // ===== FUNCIONES PARA CONFIGURACIÓN DE NOTIFICACIONES =====
-        
-        function abrirConfiguracionNotificaciones() {
-            const modal = document.getElementById('modalConfigNotif');
-            modal.classList.add('activo');
-            cargarConfiguracionNotificaciones();
-            document.body.style.overflow = 'hidden';
-        }
-
-        function cerrarConfiguracionNotificaciones() {
-            const modal = document.getElementById('modalConfigNotif');
-            modal.classList.remove('activo');
-            document.body.style.overflow = '';
-        }
-
-        function cargarConfiguracionNotificaciones() {
-            const configGuardada = localStorage.getItem('configNotificaciones');
-            if (configGuardada) {
-                const config = JSON.parse(configGuardada);
-                document.getElementById('notif-promociones').checked = config.promociones ?? true;
-                document.getElementById('notif-nuevos').checked = config.nuevos ?? true;
-                document.getElementById('notif-combos').checked = config.combos ?? true;
-                document.getElementById('notif-flash').checked = config.flash ?? true;
-                document.getElementById('notif-carrito').checked = config.carrito ?? false;
-                document.getElementById('notif-generales').checked = config.generales ?? true;
-                document.getElementById('hora-desde-config').value = config.horaDesde || '08:00';
-                document.getElementById('hora-hasta-config').value = config.horaHasta || '22:00';
-                document.getElementById('modo-no-molestar-config').checked = config.noMolestar ?? false;
-            }
-        }
-
-        function guardarConfiguracionNotificaciones() {
-            const btn = event.target.closest('.btn-primario-config');
-            btn.classList.add('guardando');
-            const originalHTML = btn.innerHTML;
-            btn.innerHTML = '<span>💾</span> Guardando...';
-
-            // Recopilar configuración
-            const config = {
-                promociones: document.getElementById('notif-promociones').checked,
-                nuevos: document.getElementById('notif-nuevos').checked,
-                combos: document.getElementById('notif-combos').checked,
-                flash: document.getElementById('notif-flash').checked,
-                carrito: document.getElementById('notif-carrito').checked,
-                generales: document.getElementById('notif-generales').checked,
-                horaDesde: document.getElementById('hora-desde-config').value,
-                horaHasta: document.getElementById('hora-hasta-config').value,
-                noMolestar: document.getElementById('modo-no-molestar-config').checked
-            };
-
-            // Simular guardado
-            setTimeout(() => {
-                localStorage.setItem('configNotificaciones', JSON.stringify(config));
-                
-                btn.classList.remove('guardando');
-                btn.innerHTML = originalHTML;
-                
-                mostrarToastConfig('Configuración guardada correctamente', true);
-                
-                // Cerrar modal después de un momento
-                setTimeout(() => {
-                    cerrarConfiguracionNotificaciones();
-                }, 1500);
-                
-                console.log('Configuración guardada:', config);
-            }, 1200);
-        }
-
-        function mostrarToastConfig(mensaje, exito = true) {
-            const toast = document.getElementById('toastConfig');
-            const toastMensaje = document.getElementById('toastConfigMensaje');
-            
-            toastMensaje.textContent = mensaje;
-            toast.className = `toast-config ${exito ? 'exito' : ''}`;
-            
-            setTimeout(() => toast.classList.add('mostrar'), 100);
-            
-            setTimeout(() => {
-                toast.classList.remove('mostrar');
-            }, 3000);
-        }
-
-        // Validar horario
-        document.addEventListener('DOMContentLoaded', function() {
-            const horaHasta = document.getElementById('hora-hasta-config');
-            if (horaHasta) {
-                horaHasta.addEventListener('change', function() {
-                    const desde = document.getElementById('hora-desde-config').value;
-                    const hasta = this.value;
-                    
-                    if (hasta <= desde) {
-                        alert('La hora final debe ser posterior a la hora inicial');
-                        this.value = '22:00';
-                    }
-                });
-            }
-        });
-
-        // Cerrar modal al hacer clic en overlay
-        document.addEventListener('click', function(e) {
-            if (e.target.classList.contains('overlay-config-notif')) {
-                cerrarConfiguracionNotificaciones();
-            }
-        });
-
-        // Cerrar modal con tecla Escape
-        document.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape') {
-                const modal = document.getElementById('modalConfigNotif');
-                if (modal && modal.classList.contains('activo')) {
-                    cerrarConfiguracionNotificaciones();
-                }
-            }
-        });
-    </script>
 </body>
 
 </html>
