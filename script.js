@@ -606,7 +606,7 @@ document.addEventListener('DOMContentLoaded', function() {
     console.log('🚀 Iniciando Alimento del Cielo PWA...');
     renderizarProductos();
     cargarTema();
-    cargarCarritoGuardado();
+    cargarCarritoDesdeLocalStorage();
     mostrarPromptInstalacion();
     registrarServiceWorker();
     generarCodigoReferido();
@@ -844,10 +844,25 @@ function actualizarCarrito() {
 // === LIMPIAR CARRITO ===
 
 function limpiarCarrito() {
-    carritoCompras = [];
+    carritoCompas = [];
     actualizarCarrito();
     guardarCarrito();
     mostrarNotificacion('🧹 Carrito vaciado');
+}
+
+// === CARGAR CARRITO DESDE LOCALSTORAGE ===
+function cargarCarritoDesdeLocalStorage() {
+    try {
+        const carritoGuardado = localStorage.getItem('carritoAlimentoDelCielo');
+        if (carritoGuardado) {
+            carritoCompras = JSON.parse(carritoGuardado);
+            actualizarCarrito();
+            console.log('✅ Carrito cargado desde localStorage:', carritoCompras.length, 'items');
+        }
+    } catch (error) {
+        console.error('Error al cargar carrito:', error);
+        carritoCompras = [];
+    }
 }
 
 // === COMBOS ===
@@ -4943,6 +4958,109 @@ class SistemaResenas {
             
         } catch (error) {
             console.warn('⚠️ Error enviando evento de analytics:', error);
+        }
+    }
+
+    /**
+     * Sincronizar reseñas pendientes con el servidor
+     * Se ejecuta cuando hay conexión para enviar reseñas guardadas offline
+     */
+    async syncPendingReviews() {
+        try {
+            // Verificar si hay conexión
+            if (!navigator.onLine) {
+                console.log('📡 Sin conexión. Sincronización pendiente.');
+                return;
+            }
+
+            // Obtener reseñas pendientes de IndexedDB
+            const transaction = this.db.transaction(['pendingReviews'], 'readonly');
+            const objectStore = transaction.objectStore('pendingReviews');
+            const request = objectStore.getAll();
+
+            request.onsuccess = async () => {
+                const pendingReviews = request.result;
+                
+                if (pendingReviews.length === 0) {
+                    console.log('✅ No hay reseñas pendientes de sincronizar');
+                    return;
+                }
+
+                console.log(`🔄 Sincronizando ${pendingReviews.length} reseñas pendientes...`);
+
+                // Intentar enviar cada reseña pendiente
+                for (const review of pendingReviews) {
+                    try {
+                        // Intentar enviar al servidor
+                        const response = await fetch('/.netlify/functions/reviews', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({
+                                nombre: review.nombre,
+                                calificacion: review.calificacion,
+                                comentario: review.comentario,
+                                fecha: review.fecha
+                            })
+                        });
+
+                        if (response.ok) {
+                            // Si se envió exitosamente, eliminar de pendientes
+                            const deleteTransaction = this.db.transaction(['pendingReviews'], 'readwrite');
+                            const deleteStore = deleteTransaction.objectStore('pendingReviews');
+                            deleteStore.delete(review.id);
+                            
+                            console.log(`✅ Reseña ${review.id} sincronizada exitosamente`);
+                        } else {
+                            console.warn(`⚠️ Error al sincronizar reseña ${review.id}:`, response.statusText);
+                        }
+                    } catch (error) {
+                        console.warn(`⚠️ Error al enviar reseña ${review.id}:`, error);
+                        // Mantener en pendientes para próximo intento
+                    }
+                }
+
+                // Actualizar contador de pendientes
+                this.updatePendingCount();
+                
+                console.log('✅ Sincronización completada');
+            };
+
+            request.onerror = () => {
+                console.error('❌ Error al obtener reseñas pendientes:', request.error);
+            };
+
+        } catch (error) {
+            console.error('❌ Error en sincronización de reseñas:', error);
+        }
+    }
+
+    /**
+     * Actualizar contador de reseñas pendientes en la UI
+     */
+    async updatePendingCount() {
+        try {
+            const transaction = this.db.transaction(['pendingReviews'], 'readonly');
+            const objectStore = transaction.objectStore('pendingReviews');
+            const countRequest = objectStore.count();
+
+            countRequest.onsuccess = () => {
+                const count = countRequest.result;
+                
+                // Actualizar badge si existe
+                const badge = document.querySelector('.pending-reviews-badge');
+                if (badge) {
+                    if (count > 0) {
+                        badge.textContent = count;
+                        badge.style.display = 'inline-block';
+                    } else {
+                        badge.style.display = 'none';
+                    }
+                }
+            };
+        } catch (error) {
+            console.error('Error actualizando contador de pendientes:', error);
         }
     }
 }
