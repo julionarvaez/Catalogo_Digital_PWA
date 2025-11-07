@@ -4248,14 +4248,28 @@ class SistemaResenas {
     }
 
     /**
+     * Configurar listener para cambios de conectividad
+     */
+    setupOnlineListener() {
+        window.addEventListener('online', async () => {
+            console.log('🌐 Conexión restaurada, sincronizando reseñas pendientes...');
+            await this.syncPendingReviews();
+        });
+        
+        window.addEventListener('offline', () => {
+            console.log('📡 Sin conexión. Las reseñas se guardarán localmente.');
+        });
+    }
+
+    /**
      * Obtener referencias a elementos del DOM
      */
     getElements() {
         this.elementos = {
             // Carrusel
             track: document.getElementById('resenasTrack'),
-            btnPrev: document.getElementById('btnPrev'),
-            btnNext: document.getElementById('btnNext'),
+            btnPrev: document.getElementById('btnPrevResenas'), // Corregido
+            btnNext: document.getElementById('btnNextResenas'), // Corregido
             indicadores: document.getElementById('indicadoresResenas'),
             
             // Estadísticas
@@ -4631,6 +4645,87 @@ class SistemaResenas {
     }
 
     /**
+     * Crear indicadores del carrusel
+     */
+    createIndicators() {
+        if (!this.elementos.indicadores || this.resenas.length === 0) return;
+        
+        this.elementos.indicadores.innerHTML = '';
+        
+        this.resenas.forEach((_, index) => {
+            const dot = document.createElement('button');
+            dot.className = 'carousel-dot';
+            dot.setAttribute('aria-label', `Ver reseña ${index + 1}`);
+            dot.onclick = () => this.showReview(index);
+            
+            if (index === this.currentIndex) {
+                dot.classList.add('active');
+            }
+            
+            this.elementos.indicadores.appendChild(dot);
+        });
+    }
+
+    /**
+     * Mostrar una reseña específica
+     */
+    showReview(index) {
+        if (!this.elementos.track || this.resenas.length === 0) return;
+        
+        // Asegurar que el índice esté en rango
+        if (index < 0) index = this.resenas.length - 1;
+        if (index >= this.resenas.length) index = 0;
+        
+        this.currentIndex = index;
+        
+        // Actualizar posición del carrusel
+        const offset = -index * 100;
+        this.elementos.track.style.transform = `translateX(${offset}%)`;
+        
+        // Actualizar indicadores
+        const dots = this.elementos.indicadores?.querySelectorAll('.carousel-dot');
+        dots?.forEach((dot, i) => {
+            dot.classList.toggle('active', i === index);
+        });
+        
+        // Actualizar controles
+        this.updateCarouselControls();
+    }
+
+    /**
+     * Actualizar estado de controles del carrusel
+     */
+    updateCarouselControls() {
+        if (!this.elementos.btnPrev || !this.elementos.btnNext) return;
+        
+        const hasReviews = this.resenas.length > 0;
+        const hasManyReviews = this.resenas.length > 1;
+        
+        // Habilitar/deshabilitar botones
+        this.elementos.btnPrev.disabled = !hasManyReviews;
+        this.elementos.btnNext.disabled = !hasManyReviews;
+        
+        // Actualizar visibilidad de indicadores
+        if (this.elementos.indicadores) {
+            this.elementos.indicadores.style.display = hasManyReviews ? 'flex' : 'none';
+        }
+    }
+
+    /**
+     * Navegar a la reseña anterior
+     */
+    previousReview() {
+        this.showReview(this.currentIndex - 1);
+    }
+
+    /**
+     * Navegar a la siguiente reseña
+     */
+    nextReview() {
+        this.showReview(this.currentIndex + 1);
+    }
+
+    /**
      * Manejar envío del formulario
      */
     async handleSubmit(event) {
@@ -4962,6 +5057,151 @@ class SistemaResenas {
     }
 
     /**
+     * Obtener reseñas públicas desde Netlify Functions
+     */
+    async obtenerResenasPublicas() {
+        try {
+            const response = await fetch('/.netlify/functions/getReviews', {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const data = await response.json();
+            
+            return {
+                ok: true,
+                reviews: data.reviews || [],
+                total: data.total || 0
+            };
+
+        } catch (error) {
+            console.error('Error obteniendo reseñas:', error);
+            return {
+                ok: false,
+                error: error.message,
+                reviews: []
+            };
+        }
+    }
+
+    /**
+     * Enviar reseña al servidor
+     */
+    async enviarResenaAlServidor(resenaData) {
+        try {
+            const response = await fetch('/.netlify/functions/reviews', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    nombre: resenaData.nombre,
+                    texto: resenaData.texto, // Corregido: texto en lugar de comentario
+                    rating: resenaData.rating, // Corregido: rating en lugar de calificacion
+                    productoId: resenaData.productoId
+                })
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const data = await response.json();
+            
+            return {
+                ok: true,
+                id: data.id || data.reviewId,
+                message: data.message || 'Reseña enviada correctamente'
+            };
+
+        } catch (error) {
+            console.error('Error enviando reseña:', error);
+            return {
+                ok: false,
+                error: error.message
+            };
+        }
+    }
+
+    /**
+     * Guardar reseña para envío offline
+     */
+    async saveForOffline(resenaData) {
+        if (!this.db) {
+            console.warn('IndexedDB no disponible, usando localStorage');
+            this.saveToLocalStorage(resenaData);
+            return;
+        }
+
+        try {
+            const transaction = this.db.transaction(['pendingReviews'], 'readwrite');
+            const objectStore = transaction.objectStore('pendingReviews');
+            
+            const reviewToSave = {
+                nombre: resenaData.nombre,
+                comentario: resenaData.texto,
+                calificacion: resenaData.rating,
+                productoId: resenaData.productoId,
+                fecha: new Date(resenaData.timestamp).toISOString(),
+                timestamp: resenaData.timestamp,
+                status: 'pending'
+            };
+
+            objectStore.add(reviewToSave);
+            
+            console.log('📦 Reseña guardada para envío offline');
+
+        } catch (error) {
+            console.error('Error guardando reseña offline:', error);
+            this.saveToLocalStorage(resenaData);
+        }
+    }
+
+    /**
+     * Guardar en localStorage como fallback
+     */
+    saveToLocalStorage(resenaData) {
+        try {
+            const key = 'pendingReviews';
+            const existing = JSON.parse(localStorage.getItem(key) || '[]');
+            existing.push({
+                ...resenaData,
+                comentario: resenaData.texto,
+                calificacion: resenaData.rating,
+                fecha: new Date(resenaData.timestamp).toISOString()
+            });
+            localStorage.setItem(key, JSON.stringify(existing));
+            console.log('💾 Reseña guardada en localStorage');
+        } catch (error) {
+            console.error('Error guardando en localStorage:', error);
+        }
+    }
+
+    /**
+     * Estado de carga
+     */
+    setLoadingState(isLoading) {
+        this.isLoading = isLoading;
+        
+        if (this.elementos.track) {
+            if (isLoading) {
+                this.elementos.track.innerHTML = `
+                    <div class="loading-reviews">
+                        <div class="spinner"></div>
+                        <p>Cargando reseñas...</p>
+                    </div>
+                `;
+            }
+        }
+    }
+
+    /**
      * Sincronizar reseñas pendientes con el servidor
      * Se ejecuta cuando hay conexión para enviar reseñas guardadas offline
      */
@@ -4999,9 +5239,9 @@ class SistemaResenas {
                             },
                             body: JSON.stringify({
                                 nombre: review.nombre,
-                                calificacion: review.calificacion,
-                                comentario: review.comentario,
-                                fecha: review.fecha
+                                texto: review.comentario || review.texto, // Corregido: texto
+                                rating: review.calificacion || review.rating, // Corregido: rating
+                                productoId: review.productoId
                             })
                         });
 
