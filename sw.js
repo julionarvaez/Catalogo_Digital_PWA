@@ -1,6 +1,6 @@
 // === SERVICE WORKER PARA ALIMENTO DEL CIELO PWA ===
 // IMPORTANTE: Incrementar esta versión cuando haya cambios importantes
-const CACHE_VERSION = '1.0.3';
+const CACHE_VERSION = '1.0.5';
 const CACHE_NAME = `alimento-del-cielo-v${CACHE_VERSION}`;
 const APP_VERSION = CACHE_VERSION;
 
@@ -163,9 +163,44 @@ self.addEventListener('push', function(event) {
     };
     
     event.waitUntil(
-        self.registration.showNotification(notificationData.title || '🍽️ Alimento del Cielo', options)
+        Promise.all([
+            self.registration.showNotification(notificationData.title || '🍽️ Alimento del Cielo', options),
+            // Guardar notificación en localStorage a través de los clientes
+            guardarNotificacionEnClientes(
+                notificationData.title || '🍽️ Alimento del Cielo',
+                notificationData.body,
+                notificationData.url || '/'
+            )
+        ])
     );
 });
+
+// === GUARDAR NOTIFICACIÓN EN CLIENTES ===
+async function guardarNotificacionEnClientes(titulo, mensaje, url) {
+    try {
+        const clientList = await clients.matchAll({
+            type: 'window',
+            includeUncontrolled: true
+        });
+        
+        // Enviar mensaje a todos los clientes para que guarden la notificación
+        clientList.forEach(client => {
+            client.postMessage({
+                type: 'GUARDAR_NOTIFICACION',
+                data: {
+                    titulo,
+                    mensaje,
+                    url,
+                    timestamp: Date.now()
+                }
+            });
+        });
+        
+        console.log('📨 Notificación enviada a', clientList.length, 'clientes');
+    } catch (error) {
+        console.error('❌ Error al guardar notificación en clientes:', error);
+    }
+}
 
 // === CLICK EN NOTIFICACIÓN ===
 self.addEventListener('notificationclick', function(event) {
@@ -333,6 +368,33 @@ async function limpiarCacheAntiguo() {
     console.log('🧹 Cache limpiado');
 }
 
+// === FUNCIÓN PARA VERIFICAR SI SE DEBE CACHEAR ===
+function debeCachear(url) {
+    // No cachear extensiones del navegador
+    if (url.includes('grammarly') || 
+        url.includes('extension') ||
+        url.includes('chrome-extension') ||
+        url.includes('moz-extension')) {
+        return false;
+    }
+    
+    // No cachear CDNs externos (Bootstrap, jQuery, etc.)
+    const cdnDomains = [
+        'cdn.jsdelivr.net',
+        'cdnjs.cloudflare.com',
+        'unpkg.com',
+        'cdn.bootcss.com',
+        'maxcdn.bootstrapcdn.com',
+        'stackpath.bootstrapcdn.com',
+        'code.jquery.com',
+        'ajax.googleapis.com',
+        'fonts.googleapis.com',
+        'fonts.gstatic.com'
+    ];
+    
+    return !cdnDomains.some(domain => url.includes(domain));
+}
+
 // === ESTRATEGIA DE CACHE PERSONALIZADA ===
 async function cacheFirst(request) {
     const cachedResponse = await caches.match(request);
@@ -342,13 +404,9 @@ async function cacheFirst(request) {
     
     try {
         const networkResponse = await fetch(request);
-        if (networkResponse.ok) {
+        if (networkResponse.ok && debeCachear(request.url)) {
             const cache = await caches.open(CACHE_NAME);
-            // No cachear extensiones o scripts externos no confiables
-            if (!request.url.includes('grammarly') &&
-                !request.url.includes('extension')) {
-                cache.put(request, networkResponse.clone());
-            }
+            cache.put(request, networkResponse.clone());
         }
         return networkResponse;
     } catch (error) {
@@ -360,13 +418,9 @@ async function cacheFirst(request) {
 async function networkFirst(request) {
     try {
         const networkResponse = await fetch(request);
-        if (networkResponse.ok) {
+        if (networkResponse.ok && debeCachear(request.url)) {
             const cache = await caches.open(CACHE_NAME);
-            // No cachear extensiones o scripts externos no confiables
-            if (!request.url.includes('grammarly') &&
-                !request.url.includes('extension')) {
-                cache.put(request, networkResponse.clone());
-            }
+            cache.put(request, networkResponse.clone());
         }
         return networkResponse;
     } catch (error) {

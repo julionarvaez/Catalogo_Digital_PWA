@@ -613,6 +613,7 @@ document.addEventListener('DOMContentLoaded', function() {
     configurarBusqueda();
     configurarEventos();
     inicializarBotonWhatsApp();
+    inicializarContadorNotificaciones(); // Inicializar contador de notificaciones
     
     // Inicializar sistema de notificaciones
     setTimeout(() => {
@@ -1432,6 +1433,283 @@ function cerrarCarrito() {
     document.body.style.overflow = 'auto'; // Restaurar scroll
 }
 
+// === CENTRO DE NOTIFICACIONES ===
+
+/**
+ * Alterna la visibilidad del panel de notificaciones
+ */
+function alternarCentroNotificaciones() {
+    const panel = document.getElementById('panelNotificaciones');
+    const overlay = document.getElementById('overlay');
+    
+    if (!panel) {
+        console.error('❌ Panel de notificaciones no encontrado');
+        return;
+    }
+    
+    const estaAbierto = panel.classList.contains('abierto');
+    
+    if (estaAbierto) {
+        cerrarCentroNotificaciones();
+    } else {
+        abrirCentroNotificaciones();
+    }
+}
+
+/**
+ * Abre el centro de notificaciones
+ */
+function abrirCentroNotificaciones() {
+    const panel = document.getElementById('panelNotificaciones');
+    const overlay = document.getElementById('overlay');
+    
+    // Cerrar carrito si está abierto
+    const carritoAbierto = document.getElementById('sidebarCarrito');
+    if (carritoAbierto && carritoAbierto.classList.contains('abierto')) {
+        cerrarCarrito();
+    }
+    
+    panel.classList.add('abierto');
+    overlay.classList.add('mostrar');
+    document.body.style.overflow = 'hidden';
+    
+    // Cargar notificaciones guardadas
+    cargarNotificacionesGuardadas();
+    
+    // Marcar contador como leído
+    actualizarContadorNotificaciones(0);
+}
+
+/**
+ * Cierra el centro de notificaciones
+ */
+function cerrarCentroNotificaciones() {
+    const panel = document.getElementById('panelNotificaciones');
+    const overlay = document.getElementById('overlay');
+    
+    panel.classList.remove('abierto');
+    overlay.classList.remove('mostrar');
+    document.body.style.overflow = 'auto';
+}
+
+/**
+ * Carga y muestra las notificaciones guardadas en localStorage
+ */
+function cargarNotificacionesGuardadas() {
+    const notificacionesGuardadas = obtenerNotificacionesGuardadas();
+    const listaNotificaciones = document.getElementById('listaNotificaciones');
+    const notificacionesVacias = document.getElementById('notificacionesVacias');
+    const btnMarcarLeidas = document.querySelector('.btn-marcar-leidas');
+    const btnLimpiar = document.querySelector('.btn-limpiar-notificaciones');
+    
+    if (!listaNotificaciones || !notificacionesVacias) {
+        console.error('❌ Elementos del panel de notificaciones no encontrados');
+        return;
+    }
+    
+    if (notificacionesGuardadas.length === 0) {
+        listaNotificaciones.style.display = 'none';
+        notificacionesVacias.style.display = 'block';
+        if (btnMarcarLeidas) btnMarcarLeidas.style.display = 'none';
+        if (btnLimpiar) btnLimpiar.style.display = 'none';
+        return;
+    }
+    
+    // Mostrar lista de notificaciones
+    listaNotificaciones.style.display = 'flex';
+    notificacionesVacias.style.display = 'none';
+    if (btnMarcarLeidas) btnMarcarLeidas.style.display = 'block';
+    if (btnLimpiar) btnLimpiar.style.display = 'block';
+    
+    // Limpiar lista actual
+    listaNotificaciones.innerHTML = '';
+    
+    // Ordenar notificaciones por fecha (más recientes primero)
+    notificacionesGuardadas.sort((a, b) => b.timestamp - a.timestamp);
+    
+    // Renderizar cada notificación
+    notificacionesGuardadas.forEach((notif, index) => {
+        const notifElement = crearElementoNotificacion(notif, index);
+        listaNotificaciones.appendChild(notifElement);
+    });
+}
+
+/**
+ * Crea el elemento HTML de una notificación
+ */
+function crearElementoNotificacion(notificacion, index) {
+    const div = document.createElement('div');
+    div.className = `notificacion-item ${!notificacion.leida ? 'no-leida' : ''}`;
+    div.dataset.index = index;
+    
+    const tiempoRelativo = obtenerTiempoRelativo(notificacion.timestamp);
+    
+    div.innerHTML = `
+        <div class="notificacion-header">
+            <span class="notificacion-titulo">${notificacion.titulo}</span>
+            <span class="notificacion-tiempo">${tiempoRelativo}</span>
+        </div>
+        <p class="notificacion-mensaje">${notificacion.mensaje}</p>
+    `;
+    
+    // Click para marcar como leída y navegar si tiene URL
+    div.addEventListener('click', () => {
+        marcarNotificacionLeida(index);
+        if (notificacion.url) {
+            window.location.href = notificacion.url;
+        }
+    });
+    
+    return div;
+}
+
+/**
+ * Obtiene el tiempo relativo desde una fecha
+ */
+function obtenerTiempoRelativo(timestamp) {
+    const ahora = Date.now();
+    const diferencia = ahora - timestamp;
+    
+    const segundos = Math.floor(diferencia / 1000);
+    const minutos = Math.floor(segundos / 60);
+    const horas = Math.floor(minutos / 60);
+    const dias = Math.floor(horas / 24);
+    
+    if (dias > 0) return `Hace ${dias} día${dias > 1 ? 's' : ''}`;
+    if (horas > 0) return `Hace ${horas} hora${horas > 1 ? 's' : ''}`;
+    if (minutos > 0) return `Hace ${minutos} min`;
+    return 'Ahora';
+}
+
+/**
+ * Obtiene las notificaciones guardadas del localStorage
+ */
+function obtenerNotificacionesGuardadas() {
+    try {
+        const notificaciones = localStorage.getItem('notificaciones_guardadas');
+        return notificaciones ? JSON.parse(notificaciones) : [];
+    } catch (error) {
+        console.error('❌ Error al obtener notificaciones:', error);
+        return [];
+    }
+}
+
+/**
+ * Guarda una notificación en localStorage
+ */
+function guardarNotificacion(titulo, mensaje, url = null) {
+    try {
+        const notificaciones = obtenerNotificacionesGuardadas();
+        
+        const nuevaNotificacion = {
+            titulo,
+            mensaje,
+            url,
+            timestamp: Date.now(),
+            leida: false
+        };
+        
+        notificaciones.unshift(nuevaNotificacion); // Agregar al inicio
+        
+        // Limitar a las últimas 50 notificaciones
+        if (notificaciones.length > 50) {
+            notificaciones.splice(50);
+        }
+        
+        localStorage.setItem('notificaciones_guardadas', JSON.stringify(notificaciones));
+        
+        // Actualizar contador
+        const noLeidas = notificaciones.filter(n => !n.leida).length;
+        actualizarContadorNotificaciones(noLeidas);
+        
+    } catch (error) {
+        console.error('❌ Error al guardar notificación:', error);
+    }
+}
+
+/**
+ * Marca una notificación como leída
+ */
+function marcarNotificacionLeida(index) {
+    try {
+        const notificaciones = obtenerNotificacionesGuardadas();
+        if (notificaciones[index]) {
+            notificaciones[index].leida = true;
+            localStorage.setItem('notificaciones_guardadas', JSON.stringify(notificaciones));
+            
+            // Actualizar contador
+            const noLeidas = notificaciones.filter(n => !n.leida).length;
+            actualizarContadorNotificaciones(noLeidas);
+            
+            // Recargar vista
+            cargarNotificacionesGuardadas();
+        }
+    } catch (error) {
+        console.error('❌ Error al marcar notificación como leída:', error);
+    }
+}
+
+/**
+ * Marca todas las notificaciones como leídas
+ */
+function marcarTodasLeidas() {
+    try {
+        const notificaciones = obtenerNotificacionesGuardadas();
+        notificaciones.forEach(n => n.leida = true);
+        localStorage.setItem('notificaciones_guardadas', JSON.stringify(notificaciones));
+        
+        actualizarContadorNotificaciones(0);
+        cargarNotificacionesGuardadas();
+        
+        mostrarNotificacion('✅ Todas las notificaciones marcadas como leídas');
+    } catch (error) {
+        console.error('❌ Error al marcar todas como leídas:', error);
+    }
+}
+
+/**
+ * Limpia todas las notificaciones
+ */
+function limpiarNotificaciones() {
+    if (!confirm('¿Estás seguro de que deseas eliminar todas las notificaciones?')) {
+        return;
+    }
+    
+    try {
+        localStorage.removeItem('notificaciones_guardadas');
+        actualizarContadorNotificaciones(0);
+        cargarNotificacionesGuardadas();
+        
+        mostrarNotificacion('🗑️ Todas las notificaciones han sido eliminadas');
+    } catch (error) {
+        console.error('❌ Error al limpiar notificaciones:', error);
+    }
+}
+
+/**
+ * Actualiza el contador de notificaciones no leídas
+ */
+function actualizarContadorNotificaciones(cantidad) {
+    const contador = document.getElementById('contadorNotif');
+    if (!contador) return;
+    
+    if (cantidad > 0) {
+        contador.textContent = cantidad > 9 ? '9+' : cantidad;
+        contador.style.display = 'flex';
+    } else {
+        contador.style.display = 'none';
+    }
+}
+
+/**
+ * Inicializa el contador de notificaciones al cargar la página
+ */
+function inicializarContadorNotificaciones() {
+    const notificaciones = obtenerNotificacionesGuardadas();
+    const noLeidas = notificaciones.filter(n => !n.leida).length;
+    actualizarContadorNotificaciones(noLeidas);
+}
+
 // === NOTIFICACIONES ===
 function mostrarNotificacion(mensaje, tipo = 'exito') {
     const notificacion = document.getElementById('notificacion');
@@ -1569,6 +1847,9 @@ function mostrarNotificacionPush(titulo, mensaje, url = '/') {
         return;
     }
 
+    // Guardar notificación en el centro de notificaciones
+    guardarNotificacion(titulo, mensaje, url);
+
     // Opciones de la notificación
     const opciones = {
         body: mensaje,
@@ -1653,6 +1934,7 @@ function notificacionBienvenida() {
     if (esPrimeraVisita && Notification.permission === 'granted') {
         setTimeout(() => {
             mostrarNotificacionPush(
+
                 '🎉 ¡Bienvenido a Alimento del Cielo!',
                 'Descubre nuestros productos frescos y congelados de la mejor calidad. ¡Ofertas especiales cada semana!',
                 '/index.html'
@@ -1711,521 +1993,747 @@ function inicializarNotificaciones() {
     actualizarEstadoBotonNotificaciones();
 }
 
-/**
- * Muestra un prompt amigable para activar notificaciones
- */
-function mostrarPromptNotificaciones() {
-    // Crear overlay
-    const overlay = document.createElement('div');
-    overlay.className = 'overlay';
-    overlay.style.display = 'block';
-    
-    // Crear modal
-    const modal = document.createElement('div');
-    modal.className = 'modal-notificaciones';
-    modal.innerHTML = `
-        <div class="modal-contenido">
-            <div class="modal-icono">🔔</div>
-            <h3 class="modal-titulo">¿Activar Notificaciones?</h3>
-            <p class="modal-texto">
-                Recibe avisos de:
-            </p>
-            <ul class="modal-lista">
-                <li>✨ Ofertas especiales y descuentos</li>
-                <li>🆕 Nuevos productos disponibles</li>
-                <li>🎁 Promociones exclusivas</li>
-                <li>📦 Estado de tus pedidos</li>
-            </ul>
-            <div class="modal-acciones">
-                <button class="btn-modal-aceptar" id="btnAceptarNotificaciones">
-                    🔔 Sí, Activar
-                </button>
-                <button class="btn-modal-rechazar" id="btnRechazarNotificaciones">
-                    Ahora no
-                </button>
-            </div>
-            <p class="modal-nota">Puedes desactivarlas en cualquier momento</p>
-        </div>
-    `;
-    
-    document.body.appendChild(overlay);
-    document.body.appendChild(modal);
-    
-    // Marcar que ya se preguntó
-    localStorage.setItem('pregunto_notificaciones', 'true');
-    
-    // Eventos
-    document.getElementById('btnAceptarNotificaciones').addEventListener('click', async () => {
-        await solicitarPermisoNotificaciones();
-        overlay.remove();
-        modal.remove();
-        actualizarEstadoBotonNotificaciones();
-    });
-    
-    document.getElementById('btnRechazarNotificaciones').addEventListener('click', () => {
-        overlay.remove();
-        modal.remove();
-        mostrarNotificacion('ℹ️ Puedes activar notificaciones más tarde desde la configuración');
-    });
-    
-    // Cerrar al hacer clic en overlay
-    overlay.addEventListener('click', () => {
-        overlay.remove();
-        modal.remove();
-    });
-}
+// ========================================
+// SISTEMA PROFESIONAL DE NOTIFICACIONES PUSH
+// ========================================
 
 /**
- * Actualiza el estado visual del botón de notificaciones según los permisos
+ * CONFIGURACIÓN DE NOTIFICACIONES
  */
-function actualizarEstadoBotonNotificaciones() {
-    const botonNotif = document.getElementById('btnActivarNotificaciones');
+const NOTIFICACIONES_CONFIG = {
+    // Tipos de notificaciones
+    tipos: {
+        PROMOCION: 'promocion',
+        LANZAMIENTO: 'lanzamiento',
+        RECORDATORIO: 'recordatorio',
+        COMBO: 'combo',
+        OFERTA_FLASH: 'oferta_flash',
+        CARRITO_ABANDONADO: 'carrito_abandonado',
+        ACTUALIZACION: 'actualizacion',
+        PEDIDO: 'pedido'
+    },
     
-    if (!botonNotif) return;
+    // Prioridades
+    prioridades: {
+        ALTA: 'alta',
+        MEDIA: 'media',
+        BAJA: 'baja'
+    },
     
-    const estado = verificarEstadoNotificaciones();
+    // Intervalos mínimos entre notificaciones (en ms)
+    intervalos: {
+        promocion: 24 * 60 * 60 * 1000, // 24 horas
+        lanzamiento: 12 * 60 * 60 * 1000, // 12 horas
+        recordatorio: 6 * 60 * 60 * 1000, // 6 horas
+        combo: 24 * 60 * 60 * 1000, // 24 horas
+        oferta_flash: 2 * 60 * 60 * 1000, // 2 horas
+        carrito_abandonado: 30 * 60 * 1000, // 30 minutos
+        actualizacion: 7 * 24 * 60 * 60 * 1000, // 7 días
+        pedido: 0 // Sin límite
+    },
     
-    if (estado.permiso === 'granted') {
-        botonNotif.classList.add('activo');
-        botonNotif.innerHTML = `
-            <span class="icono-notif">✅</span>
-            <span class="texto-notif">Activas</span>
-        `;
-        botonNotif.title = 'Notificaciones activadas';
-        botonNotif.style.pointerEvents = 'none'; // Deshabilitar clicks
-    } else if (estado.permiso === 'denied') {
-        botonNotif.innerHTML = `
-            <span class="icono-notif">🔕</span>
-            <span class="texto-notif">Bloqueadas</span>
-        `;
-        botonNotif.title = 'Notificaciones bloqueadas. Actívalas desde la configuración del navegador.';
-        botonNotif.style.cursor = 'not-allowed';
-    }
-}
-
-
-// === PWA E INSTALACIÓN ===
-function mostrarPromptInstalacion() {
-    // Capturar el evento beforeinstallprompt
-    window.addEventListener('beforeinstallprompt', (evento) => {
-        console.log('✅ Evento beforeinstallprompt capturado');
-        
-        // Prevenir que el navegador muestre su propio prompt
-        evento.preventDefault();
-        
-        // Guardar el evento para usarlo después
-        deferredPrompt = evento;
-        
-        // Mostrar el botón de instalación
-        mostrarBotonFABInstalar();
-        
-        // Mostrar popup promocional (opcional) solo la primera vez
-        setTimeout(() => {
-            const popupCerrado = localStorage.getItem('popupInstalacionCerrado');
-            if (!popupCerrado) {
-                const promptElement = document.getElementById('promptInstalacion');
-                if (promptElement) {
-                    promptElement.classList.add('mostrar');
-                }
-            }
-        }, 5000);
-    });
-    
-    // Detectar si la app ya está instalada
-    window.addEventListener('appinstalled', (evento) => {
-        console.log('✅ PWA instalada exitosamente');
-        deferredPrompt = null;
-        mostrarNotificacion('🎉 ¡App instalada! Encuéntrala en tu pantalla de inicio');
-    });
-    
-    // Verificar si ya está ejecutándose en modo standalone (instalada)
-    if (window.matchMedia('(display-mode: standalone)').matches || 
-        window.navigator.standalone === true) {
-        console.log('ℹ️ La app ya está instalada y ejecutándose en modo standalone');
-    }
-    
-    // Mostrar el botón siempre (se ocultará solo si no hay soporte)
-    mostrarBotonFABInstalar();
-}
-
-function mostrarBotonFABInstalar() {
-    const btnFab = document.getElementById('btnFabInstalar');
-    if (btnFab) {
-        btnFab.classList.remove('oculto');
-        
-        // Animación de entrada
-        setTimeout(() => {
-            btnFab.style.opacity = '1';
-            btnFab.style.visibility = 'visible';
-            btnFab.style.transform = 'translateY(0)';
-        }, 100);
-    }
-}
-
-function ocultarBotonFABInstalar() {
-    const btnFab = document.getElementById('btnFabInstalar');
-    if (btnFab) {
-        btnFab.style.opacity = '0';
-        btnFab.style.visibility = 'hidden';
-        btnFab.style.transform = 'translateY(100px)';
-        
-        setTimeout(() => {
-            btnFab.classList.add('oculto');
-        }, 300);
-    }
-}
-
-function instalarPWA() {
-    console.log('🚀 Intentando instalar PWA...');
-    
-    // Verificar si ya está ejecutándose como app instalada
-    if (window.matchMedia('(display-mode: standalone)').matches || 
-        window.navigator.standalone === true) {
-        mostrarNotificacion('ℹ️ La app ya está instalada. Puedes reinstalarla desde el menú del navegador si lo deseas.', 'exito');
-        return;
-    }
-    
-    // Si tenemos el evento de instalación guardado
-    if (deferredPrompt) {
-        console.log('✅ Mostrando prompt de instalación nativo');
-        
-        // Mostrar el prompt de instalación nativo
-        deferredPrompt.prompt();
-        
-        // Esperar a que el usuario responda
-        deferredPrompt.userChoice.then((choiceResult) => {
-            if (choiceResult.outcome === 'accepted') {
-                console.log('✅ Usuario aceptó la instalación');
-                mostrarNotificacion('🎉 ¡Instalando la app! Búscala en tu pantalla de inicio');
-            } else {
-                console.log('❌ Usuario canceló la instalación');
-                mostrarNotificacion('ℹ️ Instalación cancelada. Puedes instalarla cuando quieras', 'exito');
-            }
-            
-            // Resetear el prompt (aunque el navegador lo hace automáticamente)
-            deferredPrompt = null;
-        }).catch((error) => {
-            console.error('❌ Error al mostrar el prompt:', error);
-            mostrarNotificacion('⚠️ Error al instalar. Intenta desde el menú del navegador', 'error');
-        });
-        
-        // Cerrar el popup promocional si está abierto
-        cerrarPromptInstalacion();
-    } else {
-        // No hay evento disponible
-        console.log('⚠️ No hay evento beforeinstallprompt disponible');
-        
-        // Verificar el navegador y mostrar mensaje apropiado
-        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
-        const isChrome = /Chrome/.test(navigator.userAgent) && /Google Inc/.test(navigator.vendor);
-        const isEdge = /Edg/.test(navigator.userAgent);
-        const isOpera = /OPR/.test(navigator.userAgent);
-        const isSafari = /Safari/.test(navigator.userAgent) && !/Chrome/.test(navigator.userAgent);
-        
-        if (isIOS && isSafari) {
-            mostrarNotificacion('📱 En iOS: Toca el botón "Compartir" y luego "Añadir a pantalla de inicio"', 'exito');
-        } else if (isChrome || isEdge || isOpera) {
-            mostrarNotificacion('💻 Busca el icono ⊕ "Instalar" en la barra de direcciones o en el menú del navegador', 'exito');
-        } else {
-            mostrarNotificacion('⚠️ Este navegador no soporta instalación automática de PWAs', 'error');
-        }
-    }
-}
-
-function cerrarPromptInstalacion() {
-    const promptElement = document.getElementById('promptInstalacion');
-    if (promptElement) {
-        promptElement.classList.remove('mostrar');
-    }
-    localStorage.setItem('popupInstalacionCerrado', 'true');
-}
-
-// === SERVICE WORKER ===
-function registrarServiceWorker() {
-    if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('sw.js')
-            .then((registration) => {
-                console.log('🔧 Service Worker registrado:', registration);
-                
-                // Verificar actualizaciones
-                registration.addEventListener('updatefound', () => {
-                    const nuevoWorker = registration.installing;
-                    nuevoWorker.addEventListener('statechange', () => {
-                        if (nuevoWorker.state === 'installed') {
-                            if (navigator.serviceWorker.controller) {
-                                mostrarNotificacion('🔄 Nueva versión disponible. Recarga la página.');
-                            }
-                        }
-                    });
-                });
-            })
-            .catch(error => console.log('❌ Error en Service Worker:', error));
-    }
-}
-
-// === CONFIGURACIÓN DE BÚSQUEDA ===
-function configurarBusqueda() {
-    const campoBusqueda = document.getElementById('campoBusqueda');
-    let tiempoBusqueda;
-    
-    campoBusqueda.addEventListener('input', function() {
-        clearTimeout(tiempoBusqueda);
-        tiempoBusqueda = setTimeout(() => {
-            filtrarProductos();
-        }, 300);
-    });
-}
-
-// === CONFIGURAR EVENTOS ===
-function configurarEventos() {
-    // Cerrar carrito con tecla Escape
-    document.addEventListener('keydown', function(evento) {
-        if (evento.key === 'Escape') {
-            const carrito = document.getElementById('sidebarCarrito');
-            if (carrito && carrito.classList.contains('abierto')) {
-                cerrarCarrito();
-            }
-        }
-    });
-
-    // Cerrar notificación al hacer click
-    const notificacion = document.getElementById('notificacion');
-    if (notificacion) {
-        notificacion.addEventListener('click', function() {
-            this.classList.remove('mostrar');
-        });
-    }
-
-    // Evento cuando la PWA se instala exitosamente
-    window.addEventListener('appinstalled', (evento) => {
-        console.log('✅ PWA instalada exitosamente');
-        deferredPrompt = null;
-        mostrarNotificacion('🎉 ¡App instalada! Búscala en tu pantalla de inicio');
-    });
-    
-    // Detectar si se está ejecutando como PWA instalada
-    if (window.matchMedia('(display-mode: standalone)').matches) {
-        console.log('ℹ️ La app está ejecutándose en modo standalone (instalada)');
-    }
-}
-
-// === PERSISTENCIA DEL CARRITO ===
-function guardarCarrito() {
-    try {
-        localStorage.setItem('carritoAlimentoDelCielo', JSON.stringify(carritoCompras));
-    } catch (error) {
-        console.error('Error al guardar carrito:', error);
-    }
-}
-
-function cargarCarritoGuardado() {
-    try {
-        const carritoGuardado = localStorage.getItem('carritoAlimentoDelCielo');
-        if (carritoGuardado) {
-            carritoCompras = JSON.parse(carritoGuardado);
-            actualizarCarrito();
-        }
-    } catch (error) {
-        console.error('Error al cargar carrito:', error);
-        carritoCompras = [];
-    }
-}
-
-// === HISTORIAL DE PEDIDOS ===
-function guardarPedidoEnHistorial() {
-    try {
-        const historialPedidos = JSON.parse(localStorage.getItem('historialPedidos') || '[]');
-        
-        const nuevoPedido = {
-            fecha: new Date().toISOString(),
-            items: [...carritoCompras],
-            total: carritoCompras.reduce((suma, item) => suma + (item.precio * item.cantidad), 0)
-        };
-        
-        historialPedidos.push(nuevoPedido);
-        
-        // Mantener solo los últimos 10 pedidos
-        if (historialPedidos.length > 10) {
-            historialPedidos.splice(0, historialPedidos.length - 10);
-        }
-        
-        localStorage.setItem('historialPedidos', JSON.stringify(historialPedidos));
-    } catch (error) {
-        console.error('Error al guardar historial:', error);
-    }
-}
-
-function obtenerHistorialPedidos() {
-    try {
-        return JSON.parse(localStorage.getItem('historialPedidos') || '[]');
-    } catch (error) {
-        console.error('Error al obtener historial:', error);
-        return [];
-    }
-}
-
-// === FUNCIONES AUXILIARES ===
-function scrollearAProductos() {
-    const grilla = document.querySelector('.grilla-productos');
-    if (grilla) {
-        grilla.scrollIntoView({
-            behavior: 'smooth',
-            block: 'start'
-        });
-    }
-}
-
-function formatearPrecio(precio) {
-    return `${precio.toLocaleString('es-CO')}`;
-}
-
-function validarEmail(email) {
-    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return regex.test(email);
-}
-
-function validarTelefono(telefono) {
-    const regex = /^(\+57|57)?[0-9]{10}$/;
-    return regex.test(telefono.replace(/\s/g, ''));
-}
-
-// === ANALÍTICAS BÁSICAS ===
-function enviarEventoAnalytics(evento, categoria, accion) {
-    // Google Analytics 4 (gtag)
-    if (typeof gtag !== 'undefined') {
-        gtag('event', evento, {
-            event_category: categoria,
-            event_label: accion
-        });
-    }
-    
-    // Console log para desarrollo
-    console.log(`📊 Analytics: ${categoria} - ${evento} - ${accion}`);
-}
-
-// === GESTIÓN DE ERRORES ===
-window.addEventListener('error', function(evento) {
-    console.error('❌ Error en la aplicación:', evento.error);
-    mostrarNotificacion('⚠️ Ocurrió un error. Intenta recargar la página.', 'error');
-});
-
-window.addEventListener('unhandledrejection', function(evento) {
-    console.error('❌ Promise rechazada:', evento.reason);
-});
-
-// === CONECTIVIDAD ===
-function verificarConectividad() {
-    if (navigator.onLine) {
-        document.body.classList.remove('modo-offline');
-        mostrarNotificacion('🌐 Conexión restaurada');
-    } else {
-        document.body.classList.add('modo-offline');
-        mostrarNotificacion('📶 Sin conexión - Modo offline', 'error');
-    }
-}
-
-window.addEventListener('online', verificarConectividad);
-window.addEventListener('offline', verificarConectividad);
-
-// === OPTIMIZACIONES DE RENDIMIENTO ===
-function optimizarImagenes() {
-    // Lazy loading para imágenes futuras
-    if ('IntersectionObserver' in window) {
-        const imageObserver = new IntersectionObserver((entries, observer) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    const img = entry.target;
-                    if (img.dataset.src) {
-                        img.src = img.dataset.src;
-                        img.classList.remove('lazy');
-                        observer.unobserve(img);
-                    }
-                }
-            });
-        });
-
-        // Observar imágenes con data-src
-        document.querySelectorAll('img[data-src]').forEach(img => {
-            imageObserver.observe(img);
-        });
-    }
-}
-
-// === FUNCIONES PÚBLICAS DE LA API ===
-window.AlimentoDelCielo = {
-    // Carrito
-    agregarProducto: agregarAlCarrito,
-    removerProducto: removerDelCarrito,
-    limpiarCarrito: limpiarCarrito,
-    obtenerCarrito: () => [...carritoCompras],
-    
-    // Productos
-    obtenerProductos: () => [...productos],
-    buscarProductos: (termino) => productos.filter(p => 
-        p.nombre.toLowerCase().includes(termino.toLowerCase()) ||
-        p.descripcion.toLowerCase().includes(termino.toLowerCase())
-    ),
-    
-    // Utilidades
-    formatearPrecio: formatearPrecio,
-    mostrarNotificacion: mostrarNotificacion,
-    
-    // Historial
-    obtenerHistorial: obtenerHistorialPedidos,
-    
-    // PWA
-    instalar: instalarPWA,
-    
-    // Analytics - Sistema unificado
-    analytics: {
-        track: function(eventName, parameters = {}) {
-            try {
-                // Google Analytics (gtag)
-                if (typeof gtag !== 'undefined') {
-                    gtag('event', eventName, {
-                        custom_parameter: parameters,
-                        ...parameters
-                    });
-                }
-                
-                // También llamar a la función global de analytics si existe
-                if (typeof enviarEventoAnalytics === 'function') {
-                    enviarEventoAnalytics(eventName, parameters);
-                }
-                
-                console.log(`📊 Analytics Track: ${eventName}`, parameters);
-                
-            } catch (error) {
-                console.warn('⚠️ Error en analytics.track:', error);
-            }
-        }
+    // Configuración de sonidos
+    sonidos: {
+        alta: true,
+        media: true,
+        baja: false
     }
 };
 
+/**
+ * CLASE GESTORA DE NOTIFICACIONES
+ */
+class GestorNotificaciones {
+    constructor() {
+        this.ultimasNotificaciones = this.cargarUltimasNotificaciones();
+        this.preferencias = this.cargarPreferencias();
+        this.cola = [];
+    }
+    
+    /**
+     * Carga las últimas notificaciones enviadas
+     */
+    cargarUltimasNotificaciones() {
+        try {
+            const data = localStorage.getItem('ultimas_notificaciones');
+            return data ? JSON.parse(data) : {};
+        } catch (error) {
+            console.error('Error al cargar últimas notificaciones:', error);
+            return {};
+        }
+    }
+    
+    /**
+     * Guarda las últimas notificaciones
+     */
+    guardarUltimasNotificaciones() {
+        try {
+            localStorage.setItem('ultimas_notificaciones', JSON.stringify(this.ultimasNotificaciones));
+        } catch (error) {
+            console.error('Error al guardar últimas notificaciones:', error);
+        }
+    }
+    
+    /**
+     * Carga preferencias del usuario
+     */
+    cargarPreferencias() {
+        try {
+            const data = localStorage.getItem('preferencias_notificaciones');
+            return data ? JSON.parse(data) : {
+                promocion: true,
+                lanzamiento: true,
+                recordatorio: true,
+                combo: true,
+                oferta_flash: true,
+                carrito_abandonado: true,
+                actualizacion: true,
+                pedido: true,
+                horaInicio: '08:00',
+                horaFin: '22:00',
+                noMolestar: false
+            };
+        } catch (error) {
+            console.error('Error al cargar preferencias:', error);
+            return {};
+        }
+    }
+    
+    /**
+     * Guarda preferencias del usuario
+     */
+    guardarPreferencias(preferencias) {
+        try {
+            this.preferencias = { ...this.preferencias, ...preferencias };
+            localStorage.setItem('preferencias_notificaciones', JSON.stringify(this.preferencias));
+            console.log('✅ Preferencias guardadas:', this.preferencias);
+        } catch (error) {
+            console.error('Error al guardar preferencias:', error);
+        }
+    }
+    
+    /**
+     * Verifica si se puede enviar una notificación de un tipo
+     */
+    puedeEnviar(tipo) {
+        // Verificar permisos del navegador
+        if (Notification.permission !== 'granted') {
+            console.log('⚠️ No hay permisos de notificación');
+            return false;
+        }
+        
+        // Verificar preferencias del usuario
+        if (!this.preferencias[tipo]) {
+            console.log(`⚠️ Usuario desactivó notificaciones de tipo: ${tipo}`);
+            return false;
+        }
+        
+        // Verificar modo no molestar
+        if (this.preferencias.noMolestar) {
+            console.log('⚠️ Modo no molestar activado');
+            return false;
+        }
+        
+        // Verificar horario permitido
+        if (!this.estaEnHorarioPermitido()) {
+            console.log('⚠️ Fuera del horario permitido');
+            return false;
+        }
+        
+        // Verificar intervalo mínimo
+        const ultimaNotif = this.ultimasNotificaciones[tipo];
+        const intervaloMinimo = NOTIFICACIONES_CONFIG.intervalos[tipo] || 0;
+        
+        if (ultimaNotif && (Date.now() - ultimaNotif) < intervaloMinimo) {
+            console.log(`⚠️ Intervalo mínimo no cumplido para tipo: ${tipo}`);
+            return false;
+        }
+        
+        return true;
+    }
+    
+    /**
+     * Verifica si está en horario permitido
+     */
+    estaEnHorarioPermitido() {
+        const ahora = new Date();
+        const horaActual = ahora.getHours() * 60 + ahora.getMinutes();
+        
+        const [horaIni, minIni] = this.preferencias.horaInicio.split(':').map(Number);
+        const [horaFin, minFin] = this.preferencias.horaFin.split(':').map(Number);
+        
+        const minutosInicio = horaIni * 60 + minIni;
+        const minutosFin = horaFin * 60 + minFin;
+        
+        return horaActual >= minutosInicio && horaActual <= minutosFin;
+    }
+    
+    /**
+     * Envía una notificación
+     */
+    async enviar(config) {
+        const {
+            tipo,
+            titulo,
+            mensaje,
+            url = '/',
+            imagen = null,
+            prioridad = 'media',
+            datos = {}
+        } = config;
+        
+        // Verificar si se puede enviar
+        if (!this.puedeEnviar(tipo)) {
+            console.log(`❌ No se puede enviar notificación de tipo: ${tipo}`);
+            return false;
+        }
+        
+        // Registrar envío
+        this.ultimasNotificaciones[tipo] = Date.now();
+        this.guardarUltimasNotificaciones();
+        
+        // Configurar opciones según prioridad
+        const opciones = {
+            body: mensaje,
+            icon: './Imagenes/logo/Logo.png',
+            badge: './Imagenes/iconos/96x96/96x96.png',
+            vibrate: prioridad === 'alta' ? [300, 100, 300] : [200, 100, 200],
+            tag: `${tipo}-${Date.now()}`,
+            requireInteraction: prioridad === 'alta',
+            silent: prioridad === 'baja',
+            data: {
+                tipo,
+                url,
+                timestamp: Date.now(),
+                prioridad,
+                ...datos
+            }
+        };
+        
+        // Agregar imagen si se proporciona
+        if (imagen) {
+            opciones.image = imagen;
+        }
+        
+        // Guardar en centro de notificaciones
+        guardarNotificacion(titulo, mensaje, url);
+        
+        // Mostrar notificación
+        try {
+            const notificacion = new Notification(titulo, opciones);
+            
+            notificacion.onclick = function(event) {
+                event.preventDefault();
+                window.focus();
+                if (url && url !== '/') {
+                    window.location.href = url;
+                }
+                notificacion.close();
+                
+                // Registrar click (analytics)
+                registrarEventoNotificacion('click', tipo);
+            };
+            
+            // Auto-cerrar según prioridad
+            const tiempoCierre = prioridad === 'alta' ? 15000 : (prioridad === 'media' ? 10000 : 5000);
+            setTimeout(() => {
+                notificacion.close();
+            }, tiempoCierre);
+            
+            // Registrar envío (analytics)
+            registrarEventoNotificacion('enviada', tipo);
+            
+            console.log(`✅ Notificación ${tipo} enviada:`, titulo);
+            return true;
+            
+        } catch (error) {
+            console.error('❌ Error al enviar notificación:', error);
+            return false;
+        }
+    }
+    
+    /**
+     * Programa una notificación para enviar después
+     */
+    programar(config, delay) {
+        setTimeout(() => {
+            this.enviar(config);
+        }, delay);
+        console.log(`📅 Notificación programada para dentro de ${delay}ms`);
+    }
+    
+    /**
+     * Envía múltiples notificaciones respetando intervalos
+     */
+    async enviarLote(notificaciones, intervalo = 5000) {
+        for (const config of notificaciones) {
+            await this.enviar(config);
+            if (notificaciones.indexOf(config) < notificaciones.length - 1) {
+                await new Promise(resolve => setTimeout(resolve, intervalo));
+            }
+        }
+    }
+}
+
+// Instancia global del gestor
+const gestorNotificaciones = new GestorNotificaciones();
 
 
-// === INICIALIZACIÓN FINAL ===
+/**
+ * TEMPLATES DE NOTIFICACIONES PREDEFINIDOS
+ */
+const TEMPLATES_NOTIFICACIONES = {
+    /**
+     * Promoción de producto
+     */
+    promocionProducto: (nombreProducto, descuento) => ({
+        tipo: NOTIFICACIONES_CONFIG.tipos.PROMOCION,
+        titulo: `🔥 ¡${descuento}% OFF en ${nombreProducto}!`,
+        mensaje: `Aprovecha este descuento exclusivo. ¡Por tiempo limitado!`,
+        url: '/index.html#productos',
+        prioridad: 'media',
+        datos: { producto: nombreProducto, descuento }
+    }),
+    
+    /**
+     * Lanzamiento de producto nuevo
+     */
+    nuevoProducto: (nombreProducto) => ({
+        tipo: NOTIFICACIONES_CONFIG.tipos.LANZAMIENTO,
+        titulo: `🆕 ¡Nuevo! ${nombreProducto}`,
+        mensaje: `Ya disponible en nuestro catálogo. ¡Sé el primero en probarlo!`,
+        url: '/index.html#productos',
+        prioridad: 'media',
+        datos: { producto: nombreProducto }
+    }),
+    
+    /**
+     * Combo especial
+     */
+    comboEspecial: (nombreCombo, precio) => ({
+        tipo: NOTIFICACIONES_CONFIG.tipos.COMBO,
+        titulo: `🎁 ${nombreCombo}`,
+        mensaje: `Ahorra más con este combo por solo $${precio.toLocaleString()}. ¡Oferta especial!`,
+        url: '/index.html#combos',
+        prioridad: 'alta',
+        datos: { combo: nombreCombo, precio }
+    }),
+    
+    /**
+     * Oferta flash
+     */
+    ofertaFlash: (duracion) => ({
+        tipo: NOTIFICACIONES_CONFIG.tipos.OFERTA_FLASH,
+        titulo: `⚡ ¡FLASH SALE! ${duracion}`,
+        mensaje: `Descuentos increíbles por tiempo limitado. ¡Aprovecha ahora!`,
+        url: '/index.html#productos',
+        prioridad: 'alta',
+        datos: { duracion }
+    }),
+    
+    /**
+     * Carrito abandonado
+     */
+    carritoAbandonado: (cantidadItems) => ({
+        tipo: NOTIFICACIONES_CONFIG.tipos.CARRITO_ABANDONADO,
+        titulo: `🛒 ¡No olvides tu carrito!`,
+        mensaje: `Tienes ${cantidadItems} producto${cantidadItems > 1 ? 's' : ''} esperándote. ¡Completa tu compra!`,
+        url: '/index.html#carrito',
+        prioridad: 'media',
+        datos: { cantidadItems }
+    }),
+    
+    /**
+     * Recordatorio de pedido
+     */
+    recordatorioPedido: () => ({
+        tipo: NOTIFICACIONES_CONFIG.tipos.RECORDATORIO,
+        titulo: `💭 ¿Ya pensaste en tu pedido?`,
+        mensaje: `Tenemos productos frescos esperándote. ¡Haz tu pedido hoy!`,
+        url: '/index.html#productos',
+        prioridad: 'baja',
+        datos: {}
+    }),
+    
+    /**
+     * Envío gratis
+     */
+    envioGratis: () => ({
+        tipo: NOTIFICACIONES_CONFIG.tipos.PROMOCION,
+        titulo: `🚚 ¡Envío GRATIS en todo Montelíbano!`,
+        mensaje: `Hoy todos los pedidos tienen envío sin costo. ¡Aprovecha!`,
+        url: '/index.html#productos',
+        prioridad: 'alta',
+        datos: { promocion: 'envio_gratis' }
+    }),
+    
+    /**
+     * Fin de semana especial
+     */
+    finDeSemana: () => ({
+        tipo: NOTIFICACIONES_CONFIG.tipos.PROMOCION,
+        titulo: `🎉 ¡Ofertas de Fin de Semana!`,
+        mensaje: `Descuentos especiales en productos seleccionados. ¡Solo hoy!`,
+        url: '/index.html#productos',
+        prioridad: 'media',
+        datos: { evento: 'fin_de_semana' }
+    }),
+    
+    /**
+     * Actualización de la app
+     */
+    actualizacionApp: () => ({
+        tipo: NOTIFICACIONES_CONFIG.tipos.ACTUALIZACION,
+        titulo: `🔄 Nueva versión disponible`,
+        mensaje: `Actualiza la app para disfrutar de nuevas funciones y mejoras.`,
+        url: '/index.html',
+        prioridad: 'baja',
+        datos: { tipo_actualizacion: 'app' }
+    })
+};
+
+
+/**
+ * FUNCIONES PÚBLICAS PARA ENVIAR NOTIFICACIONES
+ */
+
+/**
+ * Notifica sobre una promoción
+ */
+function notificarPromocion(nombreProducto, descuento) {
+    const config = TEMPLATES_NOTIFICACIONES.promocionProducto(nombreProducto, descuento);
+    return gestorNotificaciones.enviar(config);
+}
+
+/**
+ * Notifica sobre un nuevo producto
+ */
+function notificarNuevoProducto(nombreProducto) {
+    const config = TEMPLATES_NOTIFICACIONES.nuevoProducto(nombreProducto);
+    return gestorNotificaciones.enviar(config);
+}
+
+/**
+ * Notifica sobre un combo especial
+ */
+function notificarComboEspecial(nombreCombo, precio) {
+    const config = TEMPLATES_NOTIFICACIONES.comboEspecial(nombreCombo, precio);
+    return gestorNotificaciones.enviar(config);
+}
+
+/**
+ * Notifica sobre oferta flash
+ */
+function notificarOfertaFlash(duracion = "2 horas") {
+    const config = TEMPLATES_NOTIFICACIONES.ofertaFlash(duracion);
+    return gestorNotificaciones.enviar(config);
+}
+
+/**
+ * Notifica sobre carrito abandonado
+ */
+function notificarCarritoAbandonado() {
+    const cantidadItems = carritoCompras.reduce((total, item) => total + item.cantidad, 0);
+    if (cantidadItems > 0) {
+        const config = TEMPLATES_NOTIFICACIONES.carritoAbandonado(cantidadItems);
+        // Programar para 30 minutos después
+        gestorNotificaciones.programar(config, 30 * 60 * 1000);
+    }
+}
+
+/**
+ * Notifica recordatorio general
+ */
+function notificarRecordatorio() {
+    const config = TEMPLATES_NOTIFICACIONES.recordatorioPedido();
+    return gestorNotificaciones.enviar(config);
+}
+
+/**
+ * Notifica envío gratis
+ */
+function notificarEnvioGratis() {
+    const config = TEMPLATES_NOTIFICACIONES.envioGratis();
+    return gestorNotificaciones.enviar(config);
+}
+
+/**
+ * Notifica ofertas de fin de semana
+ */
+function notificarFinDeSemana() {
+    const config = TEMPLATES_NOTIFICACIONES.finDeSemana();
+    return gestorNotificaciones.enviar(config);
+}
+
+
+/**
+ * SISTEMA DE ANALYTICS PARA NOTIFICACIONES
+ */
+function registrarEventoNotificacion(evento, tipo) {
+    try {
+        const analytics = JSON.parse(localStorage.getItem('analytics_notificaciones') || '{}');
+        
+        if (!analytics[tipo]) {
+            analytics[tipo] = {
+                enviadas: 0,
+                clicks: 0,
+                tasa_click: 0
+            };
+        }
+        
+        if (evento === 'enviada') {
+            analytics[tipo].enviadas++;
+        } else if (evento === 'click') {
+            analytics[tipo].clicks++;
+        }
+        
+        // Calcular tasa de click
+        if (analytics[tipo].enviadas > 0) {
+            analytics[tipo].tasa_click = ((analytics[tipo].clicks / analytics[tipo].enviadas) * 100).toFixed(2);
+        }
+        
+        localStorage.setItem('analytics_notificaciones', JSON.stringify(analytics));
+    } catch (error) {
+        console.error('Error al registrar evento:', error);
+    }
+}
+
+/**
+ * Obtiene estadísticas de notificaciones
+ */
+function obtenerEstadisticasNotificaciones() {
+    try {
+        return JSON.parse(localStorage.getItem('analytics_notificaciones') || '{}');
+    } catch (error) {
+        console.error('Error al obtener estadísticas:', error);
+        return {};
+    }
+}
+
+
+/**
+ * SISTEMA DE NOTIFICACIONES INTELIGENTES
+ */
+
+/**
+ * Detecta carrito abandonado y programa notificación
+ */
+function inicializarDeteccionCarritoAbandonado() {
+    let timeoutCarrito = null;
+    
+    // Observar cambios en el carrito
+    const observer = new MutationObserver(() => {
+        if (timeoutCarrito) clearTimeout(timeoutCarrito);
+        
+        if (carritoCompras.length > 0) {
+            timeoutCarrito = setTimeout(() => {
+                notificarCarritoAbandonado();
+            }, 30 * 60 * 1000); // 30 minutos
+        }
+    });
+    
+    // Observar el carrito
+    const carritoElement = document.getElementById('itemsCarrito');
+    if (carritoElement) {
+        observer.observe(carritoElement, {
+            childList: true,
+            subtree: true
+        });
+    }
+}
+
+/**
+ * Programa notificaciones periódicas
+ */
+function programarNotificacionesPeriodicas() {
+    // Verificar día de la semana para ofertas de fin de semana
+    const verificarFinDeSemana = () => {
+        const hoy = new Date().getDay();
+        // 5 = Viernes, 6 = Sábado
+        if (hoy === 5 || hoy === 6) {
+            notificarFinDeSemana();
+        }
+    };
+    
+    // Verificar cada 6 horas
+    setInterval(verificarFinDeSemana, 6 * 60 * 60 * 1000);
+    verificarFinDeSemana(); // Verificar inmediatamente
+}
+
+/**
+ * Inicializar sistema de notificaciones inteligentes
+ */
+function inicializarNotificacionesInteligentes() {
+    if (Notification.permission === 'granted') {
+        inicializarDeteccionCarritoAbandonado();
+        programarNotificacionesPeriodicas();
+        console.log('🤖 Sistema de notificaciones inteligentes activado');
+    }
+}
+
+
+/**
+ * PANEL DE CONFIGURACIÓN DE NOTIFICACIONES
+ */
+function mostrarConfiguracionNotificaciones() {
+    const preferencias = gestorNotificaciones.preferencias;
+    
+    const modal = document.createElement('div');
+    modal.className = 'modal-instalacion';
+    modal.style.display = 'flex';
+    
+    modal.innerHTML = `
+        <div class="contenido-modal-instalacion" style="max-width: 600px;">
+            <button class="cerrar-modal" onclick="this.parentElement.parentElement.remove()">✕</button>
+            
+            <h3 style="margin-bottom: 2rem;">⚙️ Configuración de Notificaciones</h3>
+            
+            <div style="margin-bottom: 2rem;">
+                <h4 style="margin-bottom: 1rem;">📬 Tipos de notificaciones</h4>
+                
+                <label style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; padding: 0.8rem; background: var(--color-fondo-secundario); border-radius: 8px;">
+                    <span>🔥 Promociones y ofertas</span>
+                    <input type="checkbox" id="pref_promocion" ${preferencias.promocion ? 'checked' : ''}>
+                </label>
+                
+                <label style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; padding: 0.8rem; background: var(--color-fondo-secundario); border-radius: 8px;">
+                    <span>🆕 Nuevos productos</span>
+                    <input type="checkbox" id="pref_lanzamiento" ${preferencias.lanzamiento ? 'checked' : ''}>
+                </label>
+                
+                <label style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; padding: 0.8rem; background: var(--color-fondo-secundario); border-radius: 8px;">
+                    <span>🎁 Combos especiales</span>
+                    <input type="checkbox" id="pref_combo" ${preferencias.combo ? 'checked' : ''}>
+                </label>
+                
+                <label style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; padding: 0.8rem; background: var(--color-fondo-secundario); border-radius: 8px;">
+                    <span>⚡ Ofertas flash</span>
+                    <input type="checkbox" id="pref_oferta_flash" ${preferencias.oferta_flash ? 'checked' : ''}>
+                </label>
+                
+                <label style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; padding: 0.8rem; background: var(--color-fondo-secundario); border-radius: 8px;">
+                    <span>🛒 Recordatorios de carrito</span>
+                    <input type="checkbox" id="pref_carrito_abandonado" ${preferencias.carrito_abandonado ? 'checked' : ''}>
+                </label>
+                
+                <label style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; padding: 0.8rem; background: var(--color-fondo-secundario); border-radius: 8px;">
+                    <span>💭 Recordatorios generales</span>
+                    <input type="checkbox" id="pref_recordatorio" ${preferencias.recordatorio ? 'checked' : ''}>
+                </label>
+            </div>
+            
+            <div style="margin-bottom: 2rem;">
+                <h4 style="margin-bottom: 1rem;">⏰ Horario de notificaciones</h4>
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+                    <div>
+                        <label style="display: block; margin-bottom: 0.5rem;">Desde:</label>
+                        <input type="time" id="pref_horaInicio" value="${preferencias.horaInicio}" 
+                               style="width: 100%; padding: 0.5rem; border-radius: 4px; border: 1px solid #ddd;">
+                    </div>
+                    <div>
+                        <label style="display: block; margin-bottom: 0.5rem;">Hasta:</label>
+                        <input type="time" id="pref_horaFin" value="${preferencias.horaFin}" 
+                               style="width: 100%; padding: 0.5rem; border-radius: 4px; border: 1px solid #ddd;">
+                    </div>
+                </div>
+            </div>
+            
+            <div style="margin-bottom: 2rem;">
+                <label style="display: flex; align-items: center; justify-content: space-between; padding: 1rem; background: var(--color-error); color: white; border-radius: 8px;">
+                    <span>🔕 Modo No Molestar</span>
+                    <input type="checkbox" id="pref_noMolestar" ${preferencias.noMolestar ? 'checked' : ''}>
+                </label>
+            </div>
+            
+            <div style="display: flex; gap: 1rem;">
+                <button class="boton boton-primario" onclick="guardarConfiguracionNotificaciones()" style="flex: 1;">
+                    💾 Guardar Configuración
+                </button>
+                <button class="boton" onclick="this.closest('.modal-instalacion').remove()" style="flex: 1; background: #6c757d;">
+                    Cancelar
+                </button>
+            </div>
+            
+            <div style="margin-top: 2rem; padding: 1rem; background: var(--color-info); border-radius: 8px; opacity: 0.8;">
+                <p style="margin: 0; font-size: 0.9rem;">
+                    ℹ️ Tus preferencias se guardan localmente y solo afectan a este dispositivo.
+                </p>
+            </div>
+        </div>
+    `;
+    
+    document.body.appendChild(modal);
+}
+
+/**
+ * Guarda la configuración de notificaciones
+ */
+function guardarConfiguracionNotificaciones() {
+    const preferencias = {
+        promocion: document.getElementById('pref_promocion').checked,
+        lanzamiento: document.getElementById('pref_lanzamiento').checked,
+        recordatorio: document.getElementById('pref_recordatorio').checked,
+        combo: document.getElementById('pref_combo').checked,
+        oferta_flash: document.getElementById('pref_oferta_flash').checked,
+        carrito_abandonado: document.getElementById('pref_carrito_abandonado').checked,
+        actualizacion: true,
+        pedido: true,
+        horaInicio: document.getElementById('pref_horaInicio').value,
+        horaFin: document.getElementById('pref_horaFin').value,
+        noMolestar: document.getElementById('pref_noMolestar').checked
+    };
+    
+    gestorNotificaciones.guardarPreferencias(preferencias);
+    mostrarNotificacion('✅ Configuración guardada correctamente');
+    
+    // Cerrar modal
+    document.querySelector('.modal-instalacion').remove();
+}
+
+
+// ========================================
+// INICIALIZACIÓN AL CARGAR
+// ========================================
+
+// Modificar la función inicializarNotificaciones existente
+const inicializarNotificacionesOriginal = inicializarNotificaciones;
+
+function inicializarNotificaciones() {
+    // Llamar a la función original
+    inicializarNotificacionesOriginal();
+    
+    // Agregar funcionalidad profesional
+    if (Notification.permission === 'granted') {
+        inicializarNotificacionesInteligentes();
+    }
+}
+
+// Agregar botón de configuración al panel de notificaciones
 document.addEventListener('DOMContentLoaded', function() {
-    // Optimizar imágenes
-    optimizarImagenes();
-    
-    // Verificar conectividad inicial
-    verificarConectividad();
-    
-    console.log('✅ Alimento del Cielo PWA completamente inicializada');
-    console.log('📱 Funcionalidades disponibles:');
-    console.log('  🛒 Carrito de compras completo');
-    console.log('  💬 Integración WhatsApp Business');
-    console.log('  🎁 Sistema de combos');
-    console.log('  🔍 Búsqueda y filtros');
-    console.log('  🌙 Modo claro/oscuro');
-    console.log('  📱 PWA instalable');
-    console.log('  💾 Persistencia de datos');
-    console.log('  📊 Analytics básicas');
-    console.log('Usa window.AlimentoDelCielo para acceder a la API');
+    setTimeout(() => {
+        const accionesNotif = document.querySelector('.acciones-notificaciones');
+        if (accionesNotif) {
+            const btnConfig = document.createElement('button');
+            btnConfig.className = 'btn-limpiar-notificaciones';
+            btnConfig.innerHTML = '⚙️ Configurar';
+            btnConfig.style.background = 'var(--color-primario)';
+            btnConfig.onclick = mostrarConfiguracionNotificaciones;
+            accionesNotif.appendChild(btnConfig);
+        }
+    }, 1000);
 });
 
 
+console.log('✅ Sistema profesional de notificaciones cargado');
+console.log('📊 Funciones disponibles:');
+console.log('  - notificarPromocion(producto, descuento)');
+console.log('  - notificarNuevoProducto(producto)');
+console.log('  - notificarComboEspecial(combo, precio)');
+console.log('  - notificarOfertaFlash(duracion)');
+console.log('  - notificarEnvioGratis()');
+console.log('  - mostrarConfiguracionNotificaciones()');
+console.log('  - obtenerEstadisticasNotificaciones()');
 
 // ========================================
 // INTEGRACIÓN DE WOMPI - FRONTEND
@@ -2609,7 +3117,6 @@ function validarTelefono(telefono) {
 }
 
 console.log('✅ Integración de Wompi cargada correctamente');
-console.log('🔑 Llave pública:', WOMPI_CONFIG.publicKey);
 
 
 // === SIMULADOR DE PRECIO POR PESO (Pollo entero) ===
@@ -3079,7 +3586,7 @@ class BeneficiosEffects {
 }
 
 /**
- * Inicialización de los beneficios cuando el DOM esté listo
+ * Inicializar la sección de beneficios cuando el DOM esté listo
  */
 function inicializarBeneficios() {
     // Esperar a que la sección de beneficios esté en el DOM
@@ -3186,7 +3693,7 @@ class CarruselRecetas {
     }
 
     init() {
-        this.track = document.getElementById('recetasTrack');
+        this.track = document.getElementById('resenasTrack');
         this.cards = document.querySelectorAll('.receta-card');
         this.btnPrev = document.getElementById('btnPrev');
         this.btnNext = document.getElementById('btnNext');
@@ -3509,37 +4016,8 @@ function mostrarNotificacionReceta(nombreReceta, categoria) {
                 opacity: 1;
                 background: rgba(255, 255, 255, 0.1);
             }
-            
-            @keyframes slideInRight {
-                from {
-                    transform: translateX(100%);
-                    opacity: 0;
-                }
-                to {
-                    transform: translateX(0);
-                    opacity: 1;
-                }
-            }
-            
-            @keyframes slideOutRight {
-                from {
-                    transform: translateX(0);
-                    opacity: 1;
-                }
-                to {
-                    transform: translateX(100%);
-                    opacity: 0;
-                }
-            }
-            
-            @media (max-width: 480px) {
-                .notificacion-receta {
-                    left: 10px;
-                    right: 10px;
-                    max-width: none;
-                }
-            }
-        `;
+        }
+    `;
         document.head.appendChild(estilos);
     }
     
@@ -3707,8 +4185,8 @@ class SistemaResenas {
         this.elementos = {
             // Carrusel
             track: document.getElementById('resenasTrack'),
-            btnPrev: document.getElementById('btnPrevResenas'),
-            btnNext: document.getElementById('btnNextResenas'),
+            btnPrev: document.getElementById('btnPrev'),
+            btnNext: document.getElementById('btnNext'),
             indicadores: document.getElementById('indicadoresResenas'),
             
             // Estadísticas
@@ -4270,6 +4748,8 @@ class SistemaResenas {
                         'published': 'Publicado',
                         'moderation': 'En espera de moderación'
                     };
+                    estadoElement.textContent = estados[status] || 'Publicado';
+                    estadoElement.className = `resena-estado ${status}`;
                 }
             }
         }
@@ -4432,39 +4912,6 @@ function inicializarResenas() {
     }
 }
 
-// ===== FUNCIONES GLOBALES PÚBLICAS =====
-
-/**
- * Funciones públicas esperadas para integración externa
- */
-
-// Enviar reseña al servidor (función global)
-async function enviarResenaAlServidor(resenaData) {
-    if (window.sistemaResenas) {
-        return await window.sistemaResenas.enviarResenaAlServidor(resenaData);
-    } else {
-        throw new Error('Sistema de reseñas no inicializado');
-    }
-}
-
-// Obtener reseñas públicas (función global)
-async function obtenerResenasPublicas() {
-    if (window.sistemaResenas) {
-        return await window.sistemaResenas.obtenerResenasPublicas();
-    } else {
-        throw new Error('Sistema de reseñas no inicializado');
-    }
-}
-
-// Sincronizar reseñas pendientes (función global)
-async function sincronizarResenasPendientes() {
-    if (window.sistemaResenas) {
-        return await window.sistemaResenas.sincronizarResenasPendientes();
-    } else {
-        throw new Error('Sistema de reseñas no inicializado');
-    }
-}
-
 // === GESTIÓN DEL BOTÓN FLOTANTE DE WHATSAPP ===
 
 /**
@@ -4593,3 +5040,14 @@ function actualizarBadgeWhatsApp(cantidad) {
 // Exponer funciones globalmente para uso externo
 window.actualizarBadgeWhatsApp = actualizarBadgeWhatsApp;
 window.cerrarTooltipWhatsApp = cerrarTooltipWhatsApp;
+
+// === LISTENER PARA MENSAJES DEL SERVICE WORKER ===
+if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.addEventListener('message', (event) => {
+        if (event.data && event.data.type === 'GUARDAR_NOTIFICACION') {
+            const { titulo, mensaje, url } = event.data.data;
+            guardarNotificacion(titulo, mensaje, url);
+            console.log('📬 Notificación guardada desde Service Worker:', titulo);
+        }
+    });
+}
