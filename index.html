@@ -29,10 +29,6 @@
                 <button class="btn-tema" onclick="alternarTema()" title="Cambiar tema">
                     <span id="iconoTema">🌙</span>
                 </button>
-                <button class="btn-centro-notificaciones" id="btnCentroNotif" onclick="alternarCentroNotificaciones()" title="Centro de notificaciones">
-                    🔔
-                    <span class="contador-notif" id="contadorNotif">0</span>
-                </button>
                 <button class="btn-carrito" onclick="alternarCarrito()" title="Ver carrito">
                     🛒
                     <span class="contador-carrito" id="contadorCarrito">0</span>
@@ -843,31 +839,6 @@
             </script>
         </section>
     </main>
-
-    <!-- Centro de Notificaciones -->
-    <div class="sidebar-notificaciones" id="sidebarNotificaciones">
-        <div class="encabezado-notificaciones">
-            <h2>🔔 Notificaciones</h2>
-            <button class="btn-cerrar-sidebar" onclick="cerrarCentroNotificaciones()">✕</button>
-        </div>
-        
-        <div class="acciones-notificaciones">
-            <button class="btn-marcar-todas-leidas" onclick="marcarTodasLeidas()" title="Marcar todas como leídas">
-                ✅ Marcar todas leídas
-            </button>
-            <button class="btn-limpiar-notificaciones" onclick="limpiarHistorialNotificaciones()" title="Limpiar historial">
-                🗑️ Limpiar
-            </button>
-        </div>
-        
-        <div id="listaNotificaciones" class="lista-notificaciones">
-            <div class="notificaciones-vacio" id="notificacionesVacio">
-                <div class="vacio-icono">📭</div>
-                <h3>Sin notificaciones</h3>
-                <p>No tienes notificaciones nuevas</p>
-            </div>
-        </div>
-    </div>
 
     <!-- Sidebar del Carrito -->
     <div class="sidebar-carrito" id="sidebarCarrito">
