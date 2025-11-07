@@ -5079,27 +5079,46 @@ class SistemaResenas {
      */
     async obtenerResenasPublicas() {
         try {
-            const response = await fetch('/.netlify/functions/getReviews', {
+            const response = await fetch('/.netlify/functions/getReviews?stats=true&limit=50', {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json'
                 }
             });
 
+            const text = await response.text();
+            let data = {};
+            try { data = text ? JSON.parse(text) : {}; } catch (_) {}
+
             if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
+                const msg = data.message || data.error || `HTTP ${response.status}`;
+                throw new Error(msg);
             }
 
-            const data = await response.json();
-            
+            // Guardar copia local para fallback
+            try {
+                localStorage.setItem('ultima_lista_resenas', JSON.stringify({
+                    reviews: data.reviews || [],
+                    timestamp: Date.now()
+                }));
+            } catch (_) {}
+
             return {
                 ok: true,
                 reviews: data.reviews || [],
-                total: data.total || 0
+                total: data.totalCount || data.total || (data.reviews?.length ?? 0)
             };
 
         } catch (error) {
             console.error('Error obteniendo reseñas:', error);
+            // Fallback: usar última lista guardada si existe
+            try {
+                const cache = JSON.parse(localStorage.getItem('ultima_lista_resenas') || 'null');
+                if (cache && Array.isArray(cache.reviews) && cache.reviews.length > 0) {
+                    console.warn('Usando reseñas cacheadas en localStorage como fallback');
+                    return { ok: true, reviews: cache.reviews, total: cache.reviews.length, cached: true };
+                }
+            } catch (_) {}
             return {
                 ok: false,
                 error: error.message,

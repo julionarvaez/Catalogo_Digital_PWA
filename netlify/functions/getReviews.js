@@ -79,11 +79,21 @@ async function getReviews(useCache = true) {
         const db = initFirebase();
         
         // Query: solo reseñas publicadas, ordenadas por fecha descendente
-        const snapshot = await db.collection('reviews')
-            .where('published', '==', true)
-            .orderBy('createdAt', 'desc')
-            .limit(50) // Máximo 50 reseñas
-            .get();
+        let snapshot;
+        try {
+            snapshot = await db.collection('reviews')
+                .where('published', '==', true)
+                .orderBy('createdAt', 'desc')
+                .limit(50) // Máximo 50 reseñas
+                .get();
+        } catch (queryError) {
+            console.warn('⚠️ Fallback: error usando orderBy(createdAt). Intentando sin orden explícito. Razón:', queryError.message);
+            // Fallback sin orderBy (si índice no creado o campo faltante)
+            snapshot = await db.collection('reviews')
+                .where('published', '==', true)
+                .limit(50)
+                .get();
+        }
         
         const reviews = [];
         snapshot.forEach(doc => {
@@ -106,7 +116,8 @@ async function getReviews(useCache = true) {
             return reviewsCache;
         }
         
-        throw error;
+        // Propagar error con mensaje controlado
+        throw new Error('Fallo al consultar reseñas en Firestore: ' + (error.message || 'desconocido'));
     }
 }
 
