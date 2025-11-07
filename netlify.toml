@@ -1,36 +1,87 @@
 # netlify.toml
-# Configuración para desplegar en Netlify con funciones serverless
+# Configuración optimizada para Wompi + Netlify + Firebase (opcional)
 
 [build]
   publish = "."
   functions = "netlify/functions"
+  command = "echo 'Build completado - Sitio estático con funciones serverless'"
 
+# Redirecciones para las funciones serverless
 [[redirects]]
   from = "/api/*"
   to = "/.netlify/functions/:splat"
   status = 200
 
+# ============================================
+# VARIABLES DE ENTORNO - PRODUCCIÓN
+# ============================================
+# ⚠️ IMPORTANTE: Configura estas variables en Netlify Dashboard
+# Site settings > Environment variables
+# NO las dejes hardcodeadas aquí por seguridad
+# ============================================
+
 [context.production.environment]
-  WOMPI_PUBLIC_KEY = "pub_prod_tu_llave_publica_de_produccion"
-  WOMPI_PRIVATE_KEY = "prv_prod_tu_llave_privada_de_produccion"
-  WOMPI_EVENTS_SECRET = "prod_events_tu_evento_secreto"
+  # Wompi - Llaves de PRODUCCIÓN
+  # WOMPI_PUBLIC_KEY = "pub_prod_TU_LLAVE_PUBLICA_REAL"
+  # WOMPI_PRIVATE_KEY = "prv_prod_TU_LLAVE_PRIVADA_REAL"
+  
+  # Firebase (opcional - solo para reseñas)
+  # FIREBASE_PROJECT_ID = "tu-proyecto-firebase"
+  # FIREBASE_SERVICE_ACCOUNT_B64 = "base64_de_tu_service_account"
 
-[context.development.environment]
-  WOMPI_PUBLIC_KEY = "pub_test_tu_llave_publica_de_prueba"
-  WOMPI_PRIVATE_KEY = "prv_test_tu_llave_privada_de_prueba"
-  WOMPI_EVENTS_SECRET = "test_events_tu_evento_secreto"
+# ============================================
+# VARIABLES DE ENTORNO - DEPLOY PREVIEWS
+# ============================================
+[context.deploy-preview.environment]
+  # Wompi - Llaves de PRUEBA
+  # WOMPI_PUBLIC_KEY = "pub_test_QhUoFSL5mYyzHcfweWwfHT4JNI3jHujU"
+  # WOMPI_PRIVATE_KEY = "prv_test_TU_LLAVE_PRIVADA_DE_PRUEBA"
 
-# Headers de seguridad
+# ============================================
+# VARIABLES DE ENTORNO - BRANCH DEPLOYS
+# ============================================
+[context.branch-deploy.environment]
+  # Wompi - Llaves de PRUEBA
+  # WOMPI_PUBLIC_KEY = "pub_test_QhUoFSL5mYyzHcfweWwfHT4JNI3jHujU"
+  # WOMPI_PRIVATE_KEY = "prv_test_TU_LLAVE_PRIVADA_DE_PRUEBA"
+
+# ============================================
+# HEADERS DE SEGURIDAD
+# ============================================
 [[headers]]
   for = "/*"
   [headers.values]
     X-Frame-Options = "DENY"
     X-Content-Type-Options = "nosniff"
+    X-XSS-Protection = "1; mode=block"
     Referrer-Policy = "strict-origin-when-cross-origin"
+    Permissions-Policy = "geolocation=(), microphone=(), camera=()"
 
+# Headers CORS para las funciones serverless
 [[headers]]
   for = "/.netlify/functions/*"
   [headers.values]
     Access-Control-Allow-Origin = "*"
     Access-Control-Allow-Methods = "GET, POST, OPTIONS"
-    Access-Control-Allow-Headers = "Content-Type"
+    Access-Control-Allow-Headers = "Content-Type, Authorization"
+
+# Headers para recursos estáticos (cache)
+[[headers]]
+  for = "/Imagenes/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/*.css"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/*.js"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/sw.js"
+  [headers.values]
+    Cache-Control = "public, max-age=0, must-revalidate"
