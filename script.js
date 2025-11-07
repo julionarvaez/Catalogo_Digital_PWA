@@ -4434,6 +4434,24 @@ class SistemaResenas {
     }
 
     /**
+     * Estado de carga
+     */
+    setLoadingState(isLoading) {
+        this.isLoading = isLoading;
+        
+        if (this.elementos.track) {
+            if (isLoading) {
+                this.elementos.track.innerHTML = `
+                    <div class="loading-reviews">
+                        <div class="spinner"></div>
+                        <p>Cargando reseñas...</p>
+                    </div>
+                `;
+            }
+        }
+    }
+
+    /**
      * Cargar reseñas públicas desde el servidor
      */
     async loadReviews() {
@@ -5180,24 +5198,6 @@ class SistemaResenas {
             console.log('💾 Reseña guardada en localStorage');
         } catch (error) {
             console.error('Error guardando en localStorage:', error);
-        }
-    }
-
-    /**
-     * Estado de carga
-     */
-    setLoadingState(isLoading) {
-        this.isLoading = isLoading;
-        
-        if (this.elementos.track) {
-            if (isLoading) {
-                this.elementos.track.innerHTML = `
-                    <div class="loading-reviews">
-                        <div class="spinner"></div>
-                        <p>Cargando reseñas...</p>
-                    </div>
-                `;
-            }
         }
     }
 
