@@ -1,10 +1,10 @@
 // netlify/functions/crear-transaccion-wompi.js
-// Backend serverless para procesar pagos con Wompi
+// Backend serverless para procesar pagos con Wompi (crear transacción)
 
-const fetch = require('node-fetch');
+// En Node 18+ fetch es global; si Netlify usa versión anterior se puede requerir node-fetch
+const fetchFn = (typeof fetch !== 'undefined') ? fetch : require('node-fetch');
 
-exports.handler = async (event, context) => {
-  // Headers CORS
+exports.handler = async (event) => {
   const headers = {
     'Access-Control-Allow-Origin': '*',
     'Access-Control-Allow-Headers': 'Content-Type',
@@ -12,157 +12,83 @@ exports.handler = async (event, context) => {
     'Content-Type': 'application/json'
   };
 
-  // Manejar preflight CORS
+  // Preflight
   if (event.httpMethod === 'OPTIONS') {
     return { statusCode: 200, headers, body: '' };
   }
 
-  // Solo permitir POST
   if (event.httpMethod !== 'POST') {
-    return {
-      statusCode: 405,
-      headers,
-      body: JSON.stringify({ error: 'Método no permitido' })
-    };
+    return { statusCode: 405, headers, body: JSON.stringify({ error: 'Método no permitido. Use POST.' }) };
+  }
+
+  let payload;
+  try {
+    payload = JSON.parse(event.body || '{}');
+  } catch (e) {
+    return { statusCode: 400, headers, body: JSON.stringify({ error: 'JSON inválido' }) };
+  }
+
+  const { monto, moneda = 'COP', referencia, email, telefono = '', nombre = '', productos = [] } = payload;
+
+  // Validaciones básicas
+  const errores = [];
+  if (typeof monto !== 'number' || isNaN(monto) || monto <= 0) errores.push('monto debe ser un número positivo');
+  if (!referencia) errores.push('referencia es requerida');
+  if (!email) errores.push('email es requerido');
+
+  if (errores.length) {
+    return { statusCode: 400, headers, body: JSON.stringify({ error: 'Datos inválidos', detalles: errores }) };
+  }
+
+  const WOMPI_PUBLIC_KEY = process.env.WOMPI_PUBLIC_KEY;
+  const WOMPI_PRIVATE_KEY = process.env.WOMPI_PRIVATE_KEY;
+
+  if (!WOMPI_PRIVATE_KEY || !WOMPI_PUBLIC_KEY) {
+    console.error('❌ Llaves Wompi no configuradas');
+    return { statusCode: 500, headers, body: JSON.stringify({ error: 'Servidor sin llaves Wompi configuradas' }) };
   }
 
   try {
-    // Parsear datos del pedido
-    const datos = JSON.parse(event.body);
-    const { monto, moneda, referencia, email, telefono, nombre, productos } = datos;
+    const body = {
+      amount_in_cents: Math.round(monto * 100),
+      currency: moneda,
+      customer_email: email,
+      reference: referencia,
+      redirect_url: `${process.env.URL || 'https://alimento-del-cielo.netlify.app'}/confirmacion-pago`,
+      customer_data: { phone_number: telefono, full_name: nombre || 'Cliente' },
+      payment_method: { type: 'CARD', installments: 1 },
+      shipping_address: { address_line_1: 'Montelíbano, Córdoba', country: 'CO', phone_number: telefono || '3135212887' },
+      metadata: { productos: productos.slice(0, 20) }
+    };
 
-    // Validar datos requeridos
-    if (!monto || !referencia || !email) {
-      return {
-        statusCode: 400,
-        headers,
-        body: JSON.stringify({ 
-          error: 'Faltan datos requeridos: monto, referencia, email' 
-        })
-      };
-    }
-
-    // ⚠️ IMPORTANTE: Cambiar estas llaves por las tuyas
-    const WOMPI_PUBLIC_KEY = process.env.WOMPI_PUBLIC_KEY || 'pub_test_tu_llave_publica_aqui';
-    const WOMPI_PRIVATE_KEY = process.env.WOMPI_PRIVATE_KEY || 'prv_test_tu_llave_privada_aqui';
-
-    // Crear transacción en Wompi
-    const wompiResponse = await fetch('https://production.wompi.co/v1/transactions', {
+    console.log('📤 Creando transacción Wompi referencia', referencia, 'monto', body.amount_in_cents);
+    const wompiResponse = await fetchFn('https://production.wompi.co/v1/transactions', {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${WOMPI_PRIVATE_KEY}`,
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify({
-        amount_in_cents: monto * 100, // Wompi usa centavos
-        currency: moneda || 'COP',
-        customer_email: email,
-        reference: referencia,
-        redirect_url: `${process.env.URL || 'https://tu-sitio.netlify.app'}/confirmacion-pago`,
-        customer_data: {
-          phone_number: telefono || '',
-          full_name: nombre || 'Cliente Alimento del Cielo'
-        },
-        payment_method: {
-          type: 'CARD',
-          installments: 1
-        },
-        shipping_address: {
-          address_line_1: 'Montelíbano, Córdoba',
-          country: 'CO',
-          phone_number: telefono || '3135212887'
-        }
-      })
+      body: JSON.stringify(body)
     });
 
     const resultado = await wompiResponse.json();
-
     if (!wompiResponse.ok) {
-      console.error('Error Wompi:', resultado);
-      return {
-        statusCode: wompiResponse.status,
-        headers,
-        body: JSON.stringify({
-          error: 'Error al crear transacción en Wompi',
-          detalles: resultado
-        })
-      };
+      console.error('❌ Error Wompi:', resultado);
+      return { statusCode: wompiResponse.status, headers, body: JSON.stringify({ error: 'Error Wompi', detalles: resultado }) };
     }
 
-    // Guardar transacción en base de datos (opcional)
-    // await guardarTransaccion(referencia, resultado);
+    const checkoutUrl = resultado.data?.checkout_url || null;
+    if (!checkoutUrl) {
+      console.warn('⚠️ Transacción sin checkout_url');
+    }
 
     return {
       statusCode: 200,
       headers,
-      body: JSON.stringify({
-        exito: true,
-        transaccion: resultado,
-        checkout_url: resultado.data?.checkout_url || null,
-        referencia: referencia
-      })
+      body: JSON.stringify({ exito: true, referencia, checkout_url: checkoutUrl, transaccion: resultado.data })
     };
-
-  } catch (error) {
-    console.error('Error en función:', error);
-    return {
-      statusCode: 500,
-      headers,
-      body: JSON.stringify({
-        error: 'Error interno del servidor',
-        mensaje: error.message
-      })
-    };
-  }
-};
-
-// ============================================
-// FUNCIÓN ADICIONAL: Verificar estado de pago
-// ============================================
-// Crear archivo: netlify/functions/verificar-pago-wompi.js
-
-exports.handler = async (event, context) => {
-  const headers = {
-    'Access-Control-Allow-Origin': '*',
-    'Access-Control-Allow-Headers': 'Content-Type',
-    'Content-Type': 'application/json'
-  };
-
-  try {
-    const { id } = event.queryStringParameters;
-    
-    if (!id) {
-      return {
-        statusCode: 400,
-        headers,
-        body: JSON.stringify({ error: 'ID de transacción requerido' })
-      };
-    }
-
-    const WOMPI_PUBLIC_KEY = process.env.WOMPI_PUBLIC_KEY || 'pub_test_tu_llave_publica_aqui';
-
-    const response = await fetch(
-      `https://production.wompi.co/v1/transactions/${id}`,
-      {
-        headers: {
-          'Authorization': `Bearer ${WOMPI_PUBLIC_KEY}`
-        }
-      }
-    );
-
-    const resultado = await response.json();
-
-    return {
-      statusCode: 200,
-      headers,
-      body: JSON.stringify(resultado)
-    };
-
-  } catch (error) {
-    return {
-      statusCode: 500,
-      headers,
-      body: JSON.stringify({ error: error.message })
-    };
+  } catch (e) {
+    console.error('❌ Excepción creando transacción:', e);
+    return { statusCode: 500, headers, body: JSON.stringify({ error: 'Error interno creando transacción', mensaje: e.message }) };
   }
 };
