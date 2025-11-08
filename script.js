@@ -2902,7 +2902,7 @@ console.log('  - obtenerEstadisticasNotificaciones()');
 // === CONFIGURACIÓN WOMPI ===
 const WOMPI_CONFIG = {
     // ⚠️ CAMBIAR POR TU LLAVE PÚBLICA
-    publicKey: 'pub_test_QhUoFSL5mYyzHcfweWwfHT4JNI3jHujU', // Ejemplo de llave de prueba
+    publicKey: 'pub_prod_oBaaR0X7Wr4IAHkaFEWbZU1orcnq9vNf', // Ejemplo de llave de prueba
     apiUrl: 'https://production.wompi.co/v1',
     // URL de tu backend serverless (Netlify Functions)
     backendUrl: '/.netlify/functions', // O tu URL de producción
