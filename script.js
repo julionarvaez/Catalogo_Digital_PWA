@@ -934,7 +934,7 @@ function actualizarCarrito() {
 // === LIMPIAR CARRITO ===
 
 function limpiarCarrito() {
-    carritoCompas = [];
+    carritoCompras = [];
     actualizarCarrito();
     guardarCarrito();
     mostrarNotificacion('🧹 Carrito vaciado');
@@ -952,6 +952,29 @@ function cargarCarritoDesdeLocalStorage() {
     } catch (error) {
         console.error('Error al cargar carrito:', error);
         carritoCompras = [];
+    }
+}
+
+// === GUARDAR CARRITO EN LOCALSTORAGE ===
+function guardarCarrito() {
+    try {
+        if (!Array.isArray(carritoCompras)) {
+            console.warn('⚠️ carritoCompras no es un array, abortando guardado');
+            return;
+        }
+        localStorage.setItem('carritoAlimentoDelCielo', JSON.stringify(carritoCompras));
+        // Emitir evento para otros módulos (analytics, sincronización)
+        dispatchEvent(new CustomEvent('carritoActualizado', {
+            detail: {
+                totalItems: carritoCompras.reduce((t,i)=>t+i.cantidad,0),
+                totalPrecio: carritoCompras.reduce((t,i)=>t+i.precio*i.cantidad,0),
+                timestamp: Date.now()
+            }
+        }));
+        // Log ligero
+        // console.log('🗂️ Carrito guardado:', carritoCompras.length, 'items'); // (silenciado para no saturar)
+    } catch (error) {
+        console.error('❌ Error guardando carrito:', error);
     }
 }
 
@@ -1414,6 +1437,12 @@ ${item.emoji} *${item.nombre}*
 
 ¡Gracias! 😊`;
 
+    // Adjuntar info de referido si existe
+    const ref = localStorage.getItem('referenteActivo');
+    if (ref) {
+        mensaje += `\n\n🤝 Código de referido aplicado: ${ref}`;
+    }
+
     // Guardar pedido en historial
     guardarPedidoEnHistorial();
 
@@ -1456,27 +1485,30 @@ function generarCodigoReferido() {
     const prefijo = prefijos[Math.floor(Math.random() * prefijos.length)];
     const sufijo = sufijos[Math.floor(Math.random() * sufijos.length)];
     
-    const codigo = `${prefijo}-${sufijo}-${numero}`;
-    document.getElementById('codigoReferido').textContent = codigo;
+    // Si ya existe mi código, no regenerar
+    let codigo = localStorage.getItem('miCodigoReferido');
+    if (!codigo) {
+        codigo = `${prefijo}-${sufijo}-${numero}`;
+        localStorage.setItem('miCodigoReferido', codigo);
+    }
+    const el = document.getElementById('codigoReferido');
+    if (el) el.textContent = codigo;
 }
 
 function compartirCodigoReferido() {
-    const codigo = document.getElementById('codigoReferido').textContent;
-    const mensaje = `🎉 ¡Te invito a conocer Alimento del Cielo! 
-
-Usa mi código de referido: *${codigo}* 
-y obtén 10% de descuento en tu primera compra.
-
-🍽️ Los mejores alimentos congelados de Bogotá
-⚡ Perfectos para airfryer
-🚚 Entrega rápida y segura
-
-¡No te pierdas esta oportunidad! 😋`;
+    const codigo = (document.getElementById('codigoReferido')?.textContent || localStorage.getItem('miCodigoReferido') || '').trim();
+    if (!codigo) {
+        generarCodigoReferido();
+    }
+    const finalCodigo = (document.getElementById('codigoReferido')?.textContent || localStorage.getItem('miCodigoReferido') || '').trim();
+    const enlaceLanding = `${location.origin}${location.pathname}?ref=${encodeURIComponent(finalCodigo)}`;
+    const mensaje = `🎉 ¡Te invito a conocer Alimento del Cielo! \n\nUsa mi código de referido: *${finalCodigo}* \ny obtén 10% de descuento en tu primera compra.\n\n🍽️ Los mejores alimentos congelados de Bogotá\n⚡ Perfectos para airfryer\n🚚 Entrega rápida y segura\n\nEntra aquí: ${enlaceLanding}\n\n¡No te pierdas esta oportunidad! 😋`;
 
     if (navigator.share) {
         navigator.share({
             title: 'Alimento del Cielo - Código de Referido',
-            text: mensaje
+            text: mensaje,
+            url: enlaceLanding
         }).then(() => {
             mostrarNotificacion('📱 ¡Código compartido exitosamente!');
         });
@@ -1486,6 +1518,60 @@ y obtén 10% de descuento en tu primera compra.
         });
     }
 }
+
+// === CAPTURAR ?ref= DE LA URL Y GUARDARLO ===
+function capturarCodigoReferenteDesdeURL() {
+    try {
+        const params = new URLSearchParams(window.location.search);
+        const ref = params.get('ref');
+        if (ref && /^[A-Z0-9\-]{5,30}$/.test(ref)) {
+            const miCodigo = localStorage.getItem('miCodigoReferido');
+            if (miCodigo && miCodigo === ref) return; // evitar auto-referido
+            localStorage.setItem('referenteActivo', ref);
+            localStorage.setItem('referenteTimestamp', String(Date.now()));
+            mostrarNotificacion('🤝 Código de referido aplicado');
+            console.log('Referente capturado:', ref);
+        }
+    } catch (e) {
+        console.warn('No se pudo procesar ref de URL:', e.message);
+    }
+}
+
+// === HISTORIAL DE PEDIDOS (LOCAL) ===
+function guardarPedidoEnHistorial() {
+    try {
+        const total = carritoCompras.reduce((suma, item) => suma + item.precio * item.cantidad, 0);
+        const pedido = {
+            id: 'PED-' + Date.now(),
+            items: carritoCompras.map(i => ({ id: i.id, nombre: i.nombre, cantidad: i.cantidad, precio: i.precio })),
+            total,
+            referente: localStorage.getItem('referenteActivo') || null,
+            timestamp: new Date().toISOString()
+        };
+        const arr = JSON.parse(localStorage.getItem('historialPedidosAlimento') || '[]');
+        arr.push(pedido);
+        localStorage.setItem('historialPedidosAlimento', JSON.stringify(arr));
+
+        // métrica local por referente
+        if (pedido.referente) {
+            const m = JSON.parse(localStorage.getItem('referidosConteo') || '{}');
+            m[pedido.referente] = (m[pedido.referente] || 0) + 1;
+            localStorage.setItem('referidosConteo', JSON.stringify(m));
+        }
+    } catch (e) {
+        console.error('Error guardando historial de pedido:', e);
+    }
+}
+
+// Inicializar captura de ref al cargar
+document.addEventListener('DOMContentLoaded', () => {
+    capturarCodigoReferenteDesdeURL();
+    const mi = localStorage.getItem('miCodigoReferido');
+    if (mi) {
+        const el = document.getElementById('codigoReferido');
+        if (el) el.textContent = mi;
+    }
+});
 
 // === TEMA CLARO/OSCURO ===
 function alternarTema() {
