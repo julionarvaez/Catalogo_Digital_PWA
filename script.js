@@ -601,9 +601,99 @@ let carritoCompras = [];
 let filtroActual = 'todos';
 let deferredPrompt = null; // Variable global para capturar el evento de instalación
 
+// === SISTEMA DE INSTALACIÓN PWA ===
+// Captura el evento beforeinstallprompt para diferir el prompt nativo
+window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredPrompt = e; // Guardamos para usarlo cuando el usuario haga clic
+    console.log('📲 Evento beforeinstallprompt capturado');
+    actualizarEstadoBotonInstalacion(true);
+    // Mostrar prompt visual si el usuario aún no instaló
+    mostrarPromptInstalacion();
+});
+
+// Detectar instalación exitosa
+window.addEventListener('appinstalled', () => {
+    console.log('✅ Aplicación instalada');
+    deferredPrompt = null; // ya no necesitamos el prompt diferido
+    ocultarPromptInstalacion();
+    actualizarEstadoBotonInstalacion(false);
+    mostrarNotificacion('🎉 Aplicación instalada correctamente');
+});
+
+function instalarPWA() {
+    // Si no tenemos el evento diferido, ofrecer instrucciones manuales
+    if (!deferredPrompt) {
+        console.warn('⚠️ No hay prompt de instalación disponible');
+        mostrarNotificacion('Instala usando el menú del navegador (Añadir a pantalla de inicio)');
+        return;
+    }
+    try {
+        console.log('📲 Mostrando prompt de instalación nativo');
+        deferredPrompt.prompt();
+        deferredPrompt.userChoice.then(choice => {
+            console.log('📊 Resultado instalación:', choice.outcome);
+            if (choice.outcome === 'accepted') {
+                mostrarNotificacion('✅ Instalación aceptada');
+            } else {
+                mostrarNotificacion('Instalación cancelada');
+            }
+            deferredPrompt = null; // limpiar referencia
+            ocultarPromptInstalacion();
+            actualizarEstadoBotonInstalacion(false);
+        });
+    } catch (error) {
+        console.error('❌ Error mostrando prompt de instalación:', error);
+    }
+}
+
+function mostrarPromptInstalacion() {
+    // Mostrar solo si hay deferredPrompt y no está instalada (heurística sencilla)
+    const prompt = document.getElementById('promptInstalacion');
+    if (!prompt) return;
+    if (!deferredPrompt) {
+        prompt.style.display = 'none';
+        return;
+    }
+    prompt.style.display = 'block';
+}
+
+function cerrarPromptInstalacion() {
+    ocultarPromptInstalacion();
+}
+
+function ocultarPromptInstalacion() {
+    const prompt = document.getElementById('promptInstalacion');
+    if (prompt) prompt.style.display = 'none';
+}
+
+function actualizarEstadoBotonInstalacion(disponible) {
+    const fab = document.getElementById('btnFabInstalar');
+    if (!fab) return;
+    if (disponible) {
+        fab.style.display = 'flex';
+        fab.classList.add('pwa-disponible');
+    } else {
+        fab.style.display = 'none';
+        fab.classList.remove('pwa-disponible');
+    }
+}
+
 // === INICIALIZACIÓN DE LA APP ===
 document.addEventListener('DOMContentLoaded', function() {
     console.log('🚀 Iniciando Alimento del Cielo PWA...');
+
+    // Filtro para silenciar errores conocidos de extensiones (Grammarly / Iterable)
+    const originalConsoleError = console.error;
+    console.error = function(...args) {
+        const joined = args.map(a => (typeof a === 'string' ? a : (a && a.message) || '')).join(' ');
+        if (/grm ERROR \[iterable\]/i.test(joined) || /Iterable.+not supported/i.test(joined)) {
+            // Silenciar sólo este tipo específico
+            console.warn('🔇 Error externo silenciado (Grammarly/Iterable):', joined);
+            return;
+        }
+        originalConsoleError.apply(console, args);
+    };
     renderizarProductos();
     cargarTema();
     cargarCarritoDesdeLocalStorage();

@@ -28,6 +28,13 @@ class AutoUpdateManager {
         
         this.init();
     }
+
+    /**
+     * Detecta si una versión es "mayor" (requiere aviso) usando convención de sufijo "-major"
+     */
+    isMajorVersion(version) {
+        return typeof version === 'string' && version.includes('-major');
+    }
     
     /**
      * Inicializar el sistema de actualizaciones
@@ -93,6 +100,16 @@ class AutoUpdateManager {
             console.log('🌐 Conexión restaurada, verificando actualizaciones...');
             this.checkForUpdates();
         });
+
+        // Verificar cuando la pestaña gana foco o vuelve a ser visible
+        window.addEventListener('focus', () => {
+            this.checkForUpdates();
+        });
+        document.addEventListener('visibilitychange', () => {
+            if (document.visibilityState === 'visible') {
+                this.checkForUpdates();
+            }
+        });
     }
     
     /**
@@ -106,7 +123,8 @@ class AutoUpdateManager {
                 case 'SW_UPDATED':
                     console.log('📣 SW actualizado a versión:', version);
                     this.currentVersion = version;
-                    this.showUpdateNotification(version);
+                    // Ya está ACTIVA la nueva versión; no mostramos banner de "disponible".
+                    // Si quisieras un toast de "actualizado", se podría agregar aquí.
                     break;
                     
                 case 'CACHE_CLEARED':
@@ -115,7 +133,7 @@ class AutoUpdateManager {
                     
                 case 'UPDATE_AVAILABLE':
                     console.log('🆕 Actualización disponible:', version);
-                    this.handleUpdateAvailable();
+                    this.handleUpdateAvailable(version);
                     break;
             }
         });
@@ -190,24 +208,27 @@ class AutoUpdateManager {
     /**
      * Manejar actualización disponible
      */
-    handleUpdateAvailable() {
+    handleUpdateAvailable(targetVersion = null) {
         this.updateAvailable = true;
-        
-        if (this.config.forceUpdate) {
-            // Actualizar inmediatamente sin preguntar
-            this.applyUpdate();
-        } else if (this.config.showNotifications) {
-            // Mostrar notificación elegante
-            this.showUpdateNotification();
+        const version = targetVersion || this.currentVersion;
+
+        // Modo recomendado: silencioso para versiones menores, banner para "-major"
+        if (this.isMajorVersion(version)) {
+            // Mostrar aviso y auto-aplicar rápido (10s)
+            this.showUpdateNotification(version, { autoApplyMs: 10000 });
+        } else {
+            // Aplicar en silencio
+            this.applyUpdate({ silent: true });
         }
     }
     
     /**
      * Mostrar notificación de actualización
      */
-    showUpdateNotification(version = null) {
+    showUpdateNotification(version = null, options = {}) {
         // Verificar si ya existe una notificación
         if (document.getElementById('update-notification')) return;
+        const autoApplyMs = Number(options.autoApplyMs || 30000);
         
         const notification = document.createElement('div');
         notification.id = 'update-notification';
@@ -237,28 +258,31 @@ class AutoUpdateManager {
             notification.classList.add('show');
         }, 100);
         
-        // Auto-actualizar después de 30 segundos si no hay respuesta
+        // Auto-actualizar después del tiempo configurado si no hay respuesta
         setTimeout(() => {
             if (document.getElementById('update-notification')) {
                 console.log('⏰ Auto-actualizando después del timeout...');
                 this.applyUpdate();
             }
-        }, 30000);
+        }, autoApplyMs);
     }
     
     /**
      * Aplicar actualización
      */
-    async applyUpdate() {
+    async applyUpdate(opts = {}) {
         console.log('🔄 Aplicando actualización...');
-        this.showLoadingIndicator();
+        const silent = Boolean(opts.silent);
+        if (!silent) {
+            this.showLoadingIndicator();
+        }
 
         try {
             await this.clearOldCache();
 
             // Intentar activar el worker que está esperando o instalándose
             const waitingOrInstalling = this.registration.waiting || this.registration.installing;
-            if (waitingOrInstalling) {
+                                if (waitingOrInstalling) {
                 waitingOrInstalling.postMessage({ type: 'SKIP_WAITING' });
             } else {
                 // Si no hay ninguno, pide una actualización
@@ -270,7 +294,7 @@ class AutoUpdateManager {
             }, this.config.autoReloadDelay);
         } catch (error) {
             console.error('❌ Error aplicando actualización:', error);
-            this.hideLoadingIndicator();
+            if (!silent) this.hideLoadingIndicator();
         }
     }
     
@@ -291,6 +315,10 @@ class AutoUpdateManager {
             
             await Promise.all(deletePromises);
             console.log('✅ Cache antiguo eliminado');
+            // Avisar al SW para emitir evento CACHE_CLEARED a clientes
+            if (this.registration && this.registration.active) {
+                this.registration.active.postMessage({ type: 'CLEAR_OLD_CACHES' });
+            }
             
         } catch (error) {
             console.warn('⚠️ Error limpiando cache:', error);

@@ -94,6 +94,27 @@ self.addEventListener('activate', function(event) {
     );
 });
 
+// === MENSAJES DESDE EL CLIENTE ===
+self.addEventListener('message', (event) => {
+    try {
+        const data = event.data || {};
+        if (data.type === 'SKIP_WAITING') {
+            console.log('⏭️ Recibido SKIP_WAITING desde cliente');
+            self.skipWaiting();
+        }
+        if (data.type === 'CLEAR_OLD_CACHES') {
+            console.log('🧹 Solicitud de limpieza de caches antigua');
+            event.waitUntil(limpiarCacheAntiguo().then(() => {
+                return self.clients.matchAll({ includeUncontrolled: true }).then((clients) => {
+                    clients.forEach((client) => client.postMessage({ type: 'CACHE_CLEARED' }));
+                });
+            }));
+        }
+    } catch (e) {
+        console.error('❌ Error manejando mensaje:', e);
+    }
+});
+
 // === INTERCEPTAR REQUESTS (ESTRATEGIA DINÁMICA POR TIPO) ===
 self.addEventListener('fetch', function(event) {
     const url = event.request.url;
@@ -103,6 +124,11 @@ self.addEventListener('fetch', function(event) {
         url.startsWith('moz-extension') ||
         url.startsWith('safari-extension')) {
         return;
+    }
+
+    // No interceptar métodos distintos a GET (evita errores con POST/PUT/PATCH en Cache API)
+    if (event.request.method !== 'GET') {
+        return; // dejar que el navegador maneje la solicitud normalmente
     }
 
     // Usa las estrategias declaradas abajo según el tipo de request
@@ -404,7 +430,8 @@ async function cacheFirst(request) {
     
     try {
         const networkResponse = await fetch(request);
-        if (networkResponse.ok && debeCachear(request.url)) {
+        // Solo cachear peticiones GET exitosas
+        if (request.method === 'GET' && networkResponse.ok && debeCachear(request.url)) {
             const cache = await caches.open(CACHE_NAME);
             cache.put(request, networkResponse.clone());
         }
@@ -418,7 +445,8 @@ async function cacheFirst(request) {
 async function networkFirst(request) {
     try {
         const networkResponse = await fetch(request);
-        if (networkResponse.ok && debeCachear(request.url)) {
+        // Evitar intentar cachear métodos no soportados (POST, PUT, etc.)
+        if (request.method === 'GET' && networkResponse.ok && debeCachear(request.url)) {
             const cache = await caches.open(CACHE_NAME);
             cache.put(request, networkResponse.clone());
         }
