@@ -8,6 +8,7 @@ const productos = [
         precio: 7500, 
         descripcion: 'Pollo semicriollo entero, fresco y jugoso. Ideal para cualquier preparación. Precio por kilogramo 15.000 COP.',
         emoji: '🍗',
+        imagen: './Imagenes/Productos/Pollo/pollo Semicriollo.jpg',
         etiqueta: 'Bestseller',
         tipoEtiqueta: 'etiqueta-producto',
         unidadMedida: 'Peso aproximado',
@@ -16,24 +17,16 @@ const productos = [
     },
     {
         id: 2,
-        nombre: 'Bandeja de Menudencia 500g',
+        nombre: 'Bandeja de Menudencia con Vicera 500g',
         categoria: 'pollo',
         precio: 4990,
-        descripcion: 'Bandeja con menudencias de pollo, ideal para sopas, guisos y más.',
+        descripcion: 'Bandeja con menudencias con Vicera de pollo, ideal para sopas, guisos y más.',
         emoji: '🔥',
+        imagen: './Imagenes/Productos/Pollo/bandeja-menudencias-vicera.jpg',
         etiqueta: 'Especial',
         tipoEtiqueta: 'etiqueta-oferta'
     },
-    {
-        id: 3,
-        nombre: 'Bandeja de Vicera 500g',
-        categoria: 'pollo',
-        precio: 4990,
-        descripcion: 'Bandeja con vísceras de pollo, ideal para sopas, guisos y más.',
-        emoji: '🦃',
-        etiqueta: 'Fitness',
-        tipoEtiqueta: 'etiqueta-producto'
-    },
+
 
     // === CARNES ===
     {
@@ -43,6 +36,7 @@ const productos = [
         precio: 14990,
         descripcion: 'Carne de res fresca y jugosa, ideal para cualquier preparación.',
         emoji: '🥩',
+        imagen: './Imagenes/Productos/Carnes/carne-de-res.jpg',
         etiqueta: 'Nuevo',
         tipoEtiqueta: 'etiqueta-nuevo',
     },
@@ -53,6 +47,7 @@ const productos = [
         precio: 13990,
         descripcion: 'Carne de cerdo tierna y jugosa, ideal para cualquier preparación.',
         emoji: '🍔',
+        imagen: './Imagenes/Productos/Carnes/carne-de-cerdo.jpg',
         etiqueta: 'Familiar',
         tipoEtiqueta: 'etiqueta-producto'
     },
@@ -63,6 +58,7 @@ const productos = [
         precio: 15490,
         descripcion: 'Carne molida de res, ideal para cualquier preparación.',
         emoji: '🐷',
+        imagen: './Imagenes/Productos/Carnes/carne-molida-res-1.jpg',
         etiqueta: 'Delicioso',
         tipoEtiqueta: 'etiqueta-oferta'
     },
@@ -73,6 +69,7 @@ const productos = [
         precio: 14490,
         descripcion: 'Carne molida de cerdo, ideal para cualquier preparación.',
         emoji: '🐷',
+        imagen: './Imagenes/Productos/Carnes/carne-molida-cerdo.jpg',
         etiqueta: 'Delicioso',
         tipoEtiqueta: 'etiqueta-oferta'
     },
@@ -83,6 +80,7 @@ const productos = [
         precio: 12990,
         descripcion: 'Carne molida mixta res y cerdo, ideal para cualquier preparación.',
         emoji: '🐷',
+        imagen: './Imagenes/Productos/Carnes/carne-molida-mixta.jpg',
         etiqueta: 'Delicioso',
         tipoEtiqueta: 'etiqueta-oferta'
     },
@@ -1263,11 +1261,11 @@ function obtenerBadgePopularidad(productoId) {
     const esTopValoracion = datos.valoracion >= 4.8;
     
     if (esTopVentas && esTopValoracion) {
-        return '<div class="badge-popularidad badge-top">🏆 Top Producto</div>';
+        return '<div class="badge-popularidad badge-top" aria-label="Top producto">🏆 Top Producto</div>';
     } else if (esTopVentas) {
-        return '<div class="badge-popularidad badge-ventas">🔥 Más Vendido</div>';
+        return '<div class="badge-popularidad badge-ventas" aria-label="Más vendido">🔥 Más Vendido</div>';
     } else if (esTopValoracion) {
-        return '<div class="badge-popularidad badge-valoracion">⭐ Top Rated</div>';
+        return '<div class="badge-popularidad badge-valoracion" aria-label="Mejor valorado">⭐ Mejor Valorado</div>';
     }
     
     return '';
@@ -1424,7 +1422,7 @@ function finalizarPorWhatsApp() {
     carritoCompras.forEach(item => {
         mensaje += `
 ${item.emoji} *${item.nombre}*
-   Cantidad: ${item.cantidad}
+    Cantidad: ${item.cantidad}
    Precio: $${(item.precio * item.cantidad).toLocaleString('es-CO')}
 `;
     });

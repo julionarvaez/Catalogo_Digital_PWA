@@ -660,11 +660,31 @@
         <!-- Programa de Referidos -->
         <section class="seccion-referidos">
             <h2>🎉 Programa de Referidos - ¡Gana con tus Amigos!</h2>
-            <p>¡Comparte y gana! Por cada amigo que compre con tu código, <strong>ambos reciben 10% de descuento</strong> en su próxima compra</p>
+            <p>Por cada amigo que llegue con tu enlace, <strong>ambos reciben 10% de descuento</strong> en su primera compra.</p>
+            
+            <!-- Código amigable (visual) -->
             <div class="codigo-referido" id="codigoReferido">AMIGO-DEL-CIELO-123</div>
-            <button class="boton boton-primario" onclick="compartirCodigoReferido()">
-                📱 Compartir mi código
-            </button>
+            <button class="boton boton-primario" onclick="compartirCodigoReferido()">📱 Compartir mi código</button>
+
+            <!-- Enlace personalizado basado en tu ID (UUID local) -->
+            <div style="margin-top:1rem">
+                <small>Tu enlace personal:</small>
+                <div style="display:flex; gap:.5rem; align-items:center; flex-wrap:wrap;">
+                    <a id="enlaceReferido" href="#" target="_blank" rel="noopener" style="word-break:break-all; text-decoration:underline;">
+                        <!-- Se completa por JS -->
+                    </a>
+                    <button class="boton" onclick="copiarEnlaceReferido()">� Copiar enlace</button>
+                    <button class="boton" onclick="compartirCodigoReferido()">🔗 Compartir enlace</button>
+                </div>
+            </div>
+
+            <!-- Métricas locales -->
+            <div style="margin-top:1rem">
+                <small>Referidos detectados (local): <strong id="contadorReferidos">0</strong></small>
+                <ul id="listaReferidos" style="margin:.5rem 0 0 1rem;">
+                    <li><small>(Aún no hay referidos)</small></li>
+                </ul>
+            </div>
         </section>
 
         <!-- Sección de Reseñas -->

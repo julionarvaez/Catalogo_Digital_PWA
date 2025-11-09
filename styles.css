@@ -982,6 +982,58 @@ body.modo-oscuro .tarjeta-producto {
     font-weight: bold;
 }
 
+/* Badge de popularidad: no invade la imagen y mantiene el estilo del proyecto */
+.badge-popularidad {
+    position: absolute;
+    top: 0.85rem;
+    left: 0.85rem; /* En el lado opuesto a .etiqueta-producto para no chocar */
+    z-index: 2;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.3rem 0.6rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    line-height: 1;
+    border-radius: 999px; /* estilo pill */
+    color: #0f172a;
+    background: rgba(255, 255, 255, 0.9);
+    border: 1px solid rgba(15, 23, 42, 0.08);
+    box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+    backdrop-filter: saturate(180%) blur(6px);
+    -webkit-backdrop-filter: saturate(180%) blur(6px);
+    pointer-events: none; /* evita clics sobre la imagen */
+}
+
+body.modo-oscuro .badge-popularidad {
+    background: rgba(15, 23, 42, 0.65);
+    color: #e2e8f0;
+    border-color: rgba(148, 163, 184, 0.2);
+}
+
+/* Variantes con sutileza cromática acorde a la identidad */
+.badge-popularidad.badge-top {
+    border-color: rgba(59, 130, 246, 0.45); /* azul */
+    box-shadow: 0 10px 20px -8px rgba(59, 130, 246, 0.35);
+}
+.badge-popularidad.badge-ventas {
+    border-color: rgba(239, 68, 68, 0.5); /* rojo */
+    box-shadow: 0 10px 20px -8px rgba(239, 68, 68, 0.35);
+}
+.badge-popularidad.badge-valoracion {
+    border-color: rgba(250, 204, 21, 0.55); /* amarillo */
+    box-shadow: 0 10px 20px -8px rgba(250, 204, 21, 0.35);
+}
+
+@media (max-width: 480px) {
+    .badge-popularidad {
+        font-size: 0.7rem;
+        padding: 0.28rem 0.5rem;
+        top: 0.6rem;
+        left: 0.6rem;
+    }
+}
+
 .etiqueta-nuevo { background: var(--color-acento); }
 .etiqueta-premium { background: var(--color-primario); }
 .etiqueta-oferta { background: var(--color-error); }

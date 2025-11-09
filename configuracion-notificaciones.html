@@ -1,0 +1,1144 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Configuración de Notificaciones - Catálogo Digital PWA</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --color-primario: #1a73e8;
+            --color-primario-hover: #1557b0;
+            --color-secundario: #5f6368;
+            --color-fondo: #f4f5f7;
+            --color-blanco: #ffffff;
+            --color-texto: #202124;
+            --color-texto-secundario: #5f6368;
+            --color-borde: #dadce0;
+            --color-error: #e63946;
+            --color-exito: #34a853;
+            --radio-borde: 16px;
+            --sombra-card: 0 2px 8px rgba(0,0,0,0.08);
+            --sombra-hover: 0 4px 16px rgba(0,0,0,0.12);
+            --transicion: all 0.3s ease-in-out;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        /* Modo Oscuro */
+        body.modo-oscuro {
+            background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 50%, #16213e 100%);
+        }
+
+        body.modo-oscuro .panel-config {
+            background: linear-gradient(145deg, #1e1e2e 0%, #242435 100%);
+            color: #e8eaed;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5),
+                        0 0 0 1px rgba(255, 255, 255, 0.05);
+        }
+
+        body.modo-oscuro .header-config {
+            border-bottom-color: rgba(255, 255, 255, 0.08);
+        }
+
+        body.modo-oscuro .icono-header {
+            background: linear-gradient(135deg, #4a90e2, #357abd);
+            box-shadow: 0 4px 16px rgba(74, 144, 226, 0.4),
+                        0 0 30px rgba(74, 144, 226, 0.2);
+        }
+
+        body.modo-oscuro .header-texto h1 {
+            color: #e8eaed;
+            text-shadow: 0 2px 10px rgba(255, 255, 255, 0.1);
+        }
+
+        body.modo-oscuro .header-texto p {
+            color: #9aa0a6;
+        }
+
+        body.modo-oscuro .seccion-titulo {
+            color: #e8eaed;
+        }
+
+        body.modo-oscuro .seccion-card {
+            background: linear-gradient(135deg, #252535 0%, #2a2a3e 100%);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3),
+                        inset 0 1px 0 rgba(255, 255, 255, 0.05);
+        }
+
+        body.modo-oscuro .notif-item {
+            border-bottom-color: rgba(255, 255, 255, 0.08);
+        }
+
+        body.modo-oscuro .notif-item:hover {
+            background: rgba(74, 144, 226, 0.08);
+            box-shadow: 0 0 20px rgba(74, 144, 226, 0.1);
+        }
+
+        body.modo-oscuro .notif-icono {
+            background: linear-gradient(135deg, #2d2d3f 0%, #35354a 100%);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3),
+                        0 1px 0 rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        body.modo-oscuro .notif-item:hover .notif-icono {
+            box-shadow: 0 4px 12px rgba(74, 144, 226, 0.3),
+                        0 2px 6px rgba(0, 0, 0, 0.4),
+                        0 0 15px rgba(74, 144, 226, 0.2);
+            border-color: rgba(74, 144, 226, 0.3);
+        }
+
+        body.modo-oscuro .notif-texto h3 {
+            color: #e8eaed;
+            font-weight: 600;
+        }
+
+        body.modo-oscuro .notif-texto p {
+            color: #9aa0a6;
+        }
+
+        body.modo-oscuro .toggle-slider {
+            background: #3a3a4a;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        body.modo-oscuro .toggle-switch input:checked + .toggle-slider {
+            background: linear-gradient(135deg, #4a90e2, #357abd);
+            box-shadow: 0 0 15px rgba(74, 144, 226, 0.4);
+        }
+
+        body.modo-oscuro .toggle-slider:before {
+            background: linear-gradient(135deg, #f0f0f5, #e0e0e8);
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+        }
+
+        body.modo-oscuro .input-hora {
+            background: #2a2a3e;
+            border-color: rgba(255, 255, 255, 0.1);
+            color: #e8eaed;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        body.modo-oscuro .input-hora:focus {
+            border-color: #4a90e2;
+            box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.25),
+                        inset 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        body.modo-oscuro .input-group label {
+            color: #9aa0a6;
+        }
+
+        body.modo-oscuro .horario-info {
+            background: rgba(74, 144, 226, 0.12);
+            border-left-color: #4a90e2;
+            color: #b8c5d6;
+        }
+
+        body.modo-oscuro .no-molestar-card {
+            background: linear-gradient(135deg, #c93d4a 0%, #a82835 100%);
+            box-shadow: 0 8px 24px rgba(201, 61, 74, 0.4),
+                        0 0 40px rgba(201, 61, 74, 0.2);
+        }
+
+        body.modo-oscuro .no-molestar-card .notif-icono {
+            background: rgba(255, 255, 255, 0.15);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        body.modo-oscuro .btn-primario {
+            background: linear-gradient(135deg, #4a90e2, #357abd);
+            box-shadow: 0 4px 16px rgba(74, 144, 226, 0.4),
+                        0 0 30px rgba(74, 144, 226, 0.2);
+        }
+
+        body.modo-oscuro .btn-primario:hover {
+            background: linear-gradient(135deg, #5a9ff2, #4589cd);
+            box-shadow: 0 6px 20px rgba(74, 144, 226, 0.5),
+                        0 0 40px rgba(74, 144, 226, 0.3);
+            transform: translateY(-2px);
+        }
+
+        body.modo-oscuro .btn-secundario {
+            background: linear-gradient(135deg, #2a2a3e 0%, #35354a 100%);
+            color: #e8eaed;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        body.modo-oscuro .btn-secundario:hover {
+            background: linear-gradient(135deg, #35354a 0%, #3a3a4f 100%);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+        }
+
+        body.modo-oscuro .info-footer {
+            background: rgba(74, 144, 226, 0.08);
+            border-color: rgba(74, 144, 226, 0.2);
+            color: #9aa0a6;
+        }
+
+        body.modo-oscuro .btn-modo-oscuro {
+            background: linear-gradient(135deg, #2a2a3e 0%, #35354a 100%);
+            color: #fbbf24;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4),
+                        0 0 20px rgba(251, 191, 36, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        body.modo-oscuro .btn-modo-oscuro:hover {
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.5),
+                        0 0 30px rgba(251, 191, 36, 0.3);
+        }
+
+        /* Panel Principal */
+        .panel-config {
+            background: var(--color-blanco);
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+            max-width: 680px;
+            width: 100%;
+            animation: slideIn 0.4s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Encabezado */
+        .header-config {
+            padding: 32px 32px 24px;
+            border-bottom: 1px solid var(--color-borde);
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .icono-header {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, var(--color-primario), #4285f4);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            box-shadow: 0 4px 12px rgba(26, 115, 232, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .icono-header:hover {
+            transform: scale(1.05) rotate(5deg);
+        }
+
+        @keyframes icon-glow {
+            0%, 100% {
+                box-shadow: 0 4px 16px rgba(74, 144, 226, 0.4),
+                            0 0 30px rgba(74, 144, 226, 0.2);
+            }
+            50% {
+                box-shadow: 0 4px 16px rgba(74, 144, 226, 0.6),
+                            0 0 40px rgba(74, 144, 226, 0.3);
+            }
+        }
+
+        body.modo-oscuro .icono-header {
+            animation: icon-glow 3s ease-in-out infinite;
+        }
+
+        .header-texto h1 {
+            font-size: 24px;
+            font-weight: 600;
+            color: var(--color-texto);
+            margin-bottom: 4px;
+        }
+
+        .header-texto p {
+            font-size: 14px;
+            color: var(--color-texto-secundario);
+            font-weight: 400;
+        }
+
+        /* Contenido */
+        .contenido-config {
+            padding: 32px;
+        }
+
+        /* Secciones */
+        .seccion {
+            margin-bottom: 32px;
+        }
+
+        .seccion:last-child {
+            margin-bottom: 0;
+        }
+
+        .seccion-titulo {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--color-texto);
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .seccion-card {
+            background: var(--color-fondo);
+            border: 1px solid var(--color-borde);
+            border-radius: var(--radio-borde);
+            padding: 20px;
+        }
+
+        /* Items de Notificación */
+        .notif-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 0;
+            border-bottom: 1px solid var(--color-borde);
+            transition: all 0.3s ease;
+            border-radius: 8px;
+            margin: 0 -8px;
+            padding-left: 8px;
+            padding-right: 8px;
+        }
+
+        .notif-item:hover {
+            background: rgba(26, 115, 232, 0.03);
+            transform: translateX(4px);
+        }
+
+        .notif-item:last-child {
+            border-bottom: none;
+            padding-bottom: 0;
+        }
+
+        .notif-item:first-child {
+            padding-top: 0;
+        }
+
+        .notif-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex: 1;
+        }
+
+        .notif-icono {
+            width: 40px;
+            height: 40px;
+            background: var(--color-blanco);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+            transition: all 0.3s ease;
+        }
+
+        .notif-item:hover .notif-icono {
+            transform: scale(1.1) rotate(5deg);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.12);
+        }
+
+        .notif-texto h3 {
+            font-size: 15px;
+            font-weight: 500;
+            color: var(--color-texto);
+            margin-bottom: 2px;
+        }
+
+        .notif-texto p {
+            font-size: 13px;
+            color: var(--color-texto-secundario);
+        }
+
+        /* Toggle Switch */
+        .toggle-switch {
+            position: relative;
+            width: 52px;
+            height: 28px;
+            flex-shrink: 0;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: #dadce0;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            border-radius: 28px;
+        }
+
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 22px;
+            width: 22px;
+            left: 3px;
+            bottom: 3px;
+            background: white;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            border-radius: 50%;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2),
+                        0 1px 3px rgba(0, 0, 0, 0.15);
+        }
+
+        .toggle-switch:hover .toggle-slider {
+            background: #c1c3c7;
+        }
+
+        .toggle-switch input:checked + .toggle-slider {
+            background: var(--color-primario);
+        }
+
+        .toggle-switch input:checked + .toggle-slider:before {
+            transform: translateX(24px);
+        }
+
+        .toggle-switch input:checked:hover + .toggle-slider {
+            background: var(--color-primario-hover);
+        }
+
+        .toggle-switch input:focus + .toggle-slider {
+            box-shadow: 0 0 0 4px rgba(26, 115, 232, 0.2);
+        }
+
+        /* Horario */
+        .horario-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .input-group label {
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--color-texto-secundario);
+        }
+
+        .input-hora {
+            padding: 12px 16px;
+            border: 1px solid var(--color-borde);
+            border-radius: 10px;
+            font-size: 14px;
+            font-family: 'Poppins', sans-serif;
+            transition: var(--transicion);
+            background: var(--color-blanco);
+            color: var(--color-texto);
+        }
+
+        .input-hora:focus {
+            outline: none;
+            border-color: var(--color-primario);
+            box-shadow: 0 0 0 4px rgba(26, 115, 232, 0.1);
+        }
+
+        .horario-info {
+            margin-top: 12px;
+            padding: 12px;
+            background: rgba(26, 115, 232, 0.05);
+            border-left: 3px solid var(--color-primario);
+            border-radius: 6px;
+            font-size: 13px;
+            color: var(--color-texto-secundario);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Modo No Molestar */
+        .no-molestar-card {
+            background: linear-gradient(135deg, #ff5e5e 0%, #e63946 100%);
+            border: none;
+            color: white;
+            text-align: center;
+            padding: 24px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .no-molestar-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+            animation: pulse-glow 3s ease-in-out infinite;
+        }
+
+        @keyframes pulse-glow {
+            0%, 100% {
+                transform: scale(1);
+                opacity: 0.5;
+            }
+            50% {
+                transform: scale(1.1);
+                opacity: 0.8;
+            }
+        }
+
+        .no-molestar-card .notif-icono {
+            background: rgba(255, 255, 255, 0.2);
+            width: 56px;
+            height: 56px;
+            margin: 0 auto 16px;
+            font-size: 28px;
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            position: relative;
+            z-index: 1;
+        }
+
+        .no-molestar-card h3 {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: white;
+            position: relative;
+            z-index: 1;
+        }
+
+        .no-molestar-card p {
+            font-size: 14px;
+            opacity: 0.9;
+            margin-bottom: 20px;
+            color: white;
+            position: relative;
+            z-index: 1;
+        }
+
+        .toggle-no-molestar {
+            width: 68px;
+            height: 36px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        .toggle-no-molestar .toggle-slider:before {
+            height: 28px;
+            width: 28px;
+            left: 4px;
+            bottom: 4px;
+        }
+
+        .toggle-no-molestar input:checked + .toggle-slider {
+            background: rgba(255, 255, 255, 0.3);
+            backdrop-filter: blur(10px);
+        }
+
+        .toggle-no-molestar input:checked + .toggle-slider:before {
+            transform: translateX(32px);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3),
+                        0 0 15px rgba(255, 255, 255, 0.3);
+        }
+
+        body.modo-oscuro .toggle-no-molestar input:checked + .toggle-slider {
+            background: rgba(255, 255, 255, 0.25);
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
+        }
+
+        /* Acciones */
+        .acciones {
+            display: flex;
+            gap: 12px;
+            margin-top: 32px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 14px 24px;
+            border: none;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: 500;
+            font-family: 'Poppins', sans-serif;
+            cursor: pointer;
+            transition: var(--transicion);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-primario {
+            background: var(--color-primario);
+            color: white;
+            box-shadow: 0 4px 12px rgba(26, 115, 232, 0.3);
+        }
+
+        .btn-primario:hover {
+            background: var(--color-primario-hover);
+            box-shadow: 0 6px 16px rgba(26, 115, 232, 0.4);
+            transform: translateY(-2px);
+        }
+
+        .btn-primario:active {
+            transform: translateY(0);
+        }
+
+        .btn-secundario {
+            background: var(--color-fondo);
+            color: var(--color-texto-secundario);
+            border: 1px solid var(--color-borde);
+        }
+
+        .btn-secundario:hover {
+            background: #e8eaed;
+            border-color: #c1c3c7;
+        }
+
+        /* Nota inferior */
+        .nota-inferior {
+            margin-top: 24px;
+            padding: 16px;
+            background: rgba(95, 99, 104, 0.05);
+            border-radius: 10px;
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            border: 1px solid rgba(95, 99, 104, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .nota-inferior:hover {
+            background: rgba(95, 99, 104, 0.08);
+            border-color: rgba(95, 99, 104, 0.2);
+        }
+
+        body.modo-oscuro .nota-inferior {
+            background: rgba(74, 144, 226, 0.08);
+            border-color: rgba(74, 144, 226, 0.15);
+        }
+
+        body.modo-oscuro .nota-inferior:hover {
+            background: rgba(74, 144, 226, 0.12);
+            border-color: rgba(74, 144, 226, 0.25);
+        }
+
+        .nota-inferior span {
+            font-size: 20px;
+        }
+
+        .nota-inferior p {
+            font-size: 13px;
+            color: var(--color-texto-secundario);
+            line-height: 1.5;
+        }
+
+        /* Toggle Modo Oscuro */
+        .btn-modo-oscuro {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #ffffff, #f0f0f5);
+            border: none;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15),
+                        0 2px 6px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 1000;
+            overflow: hidden;
+        }
+
+        .btn-modo-oscuro::before {
+            content: '';
+            position: absolute;
+            inset: -2px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #fbbf24, #f59e0b);
+            opacity: 0;
+            transition: opacity 0.4s ease;
+            z-index: -1;
+        }
+
+        .btn-modo-oscuro:hover {
+            transform: scale(1.1) rotate(15deg);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25),
+                        0 3px 10px rgba(0, 0, 0, 0.15);
+        }
+
+        .btn-modo-oscuro:hover::before {
+            opacity: 0.2;
+        }
+
+        .btn-modo-oscuro:active {
+            transform: scale(0.95) rotate(0deg);
+        }
+
+        /* Responsive */
+        @media (max-width: 640px) {
+            .panel-config {
+                border-radius: 16px;
+            }
+
+            .header-config {
+                padding: 24px 20px 20px;
+            }
+
+            .contenido-config {
+                padding: 24px 20px;
+            }
+
+            .header-texto h1 {
+                font-size: 20px;
+            }
+
+            .header-texto p {
+                font-size: 13px;
+            }
+
+            .horario-container {
+                grid-template-columns: 1fr;
+            }
+
+            .acciones {
+                flex-direction: column;
+            }
+
+            .notif-texto h3 {
+                font-size: 14px;
+            }
+
+            .notif-texto p {
+                font-size: 12px;
+            }
+
+            .btn-modo-oscuro {
+                top: 10px;
+                right: 10px;
+                width: 44px;
+                height: 44px;
+            }
+        }
+
+        /* Animaciones de entrada */
+        .seccion {
+            animation: fadeInUp 0.4s ease-out backwards;
+        }
+
+        .seccion:nth-child(1) { animation-delay: 0.1s; }
+        .seccion:nth-child(2) { animation-delay: 0.2s; }
+        .seccion:nth-child(3) { animation-delay: 0.3s; }
+        .seccion:nth-child(4) { animation-delay: 0.4s; }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Efecto de carga en botón */
+        .btn-primario.guardando {
+            pointer-events: none;
+            opacity: 0.7;
+        }
+
+        .btn-primario.guardando::after {
+            content: "";
+            width: 16px;
+            height: 16px;
+            border: 2px solid white;
+            border-top-color: transparent;
+            border-radius: 50%;
+            animation: spin 0.6s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Toast de confirmación */
+        .toast {
+            position: fixed;
+            bottom: 24px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: linear-gradient(135deg, #2d3436, #1e272e);
+            color: white;
+            padding: 16px 24px;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3),
+                        0 4px 12px rgba(0, 0, 0, 0.2);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 14px;
+            opacity: 0;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 2000;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .toast.mostrar {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+
+        .toast.exito {
+            background: linear-gradient(135deg, #34a853, #2d9048);
+            box-shadow: 0 8px 24px rgba(52, 168, 83, 0.4),
+                        0 4px 12px rgba(52, 168, 83, 0.3),
+                        0 0 30px rgba(52, 168, 83, 0.2);
+        }
+
+        body.modo-oscuro .toast {
+            background: linear-gradient(135deg, #1e1e2e, #2a2a3e);
+            border-color: rgba(255, 255, 255, 0.15);
+        }
+
+        body.modo-oscuro .toast.exito {
+            background: linear-gradient(135deg, #34a853, #2d9048);
+            box-shadow: 0 8px 24px rgba(52, 168, 83, 0.5),
+                        0 4px 12px rgba(52, 168, 83, 0.4),
+                        0 0 40px rgba(52, 168, 83, 0.3);
+        }
+    </style>
+</head>
+<body>
+    <!-- Botón Modo Oscuro -->
+    <button class="btn-modo-oscuro" onclick="toggleModoOscuro()" title="Cambiar tema">
+        <span id="icono-tema">🌙</span>
+    </button>
+
+    <!-- Panel de Configuración -->
+    <div class="panel-config">
+        <!-- Encabezado -->
+        <div class="header-config">
+            <div class="icono-header">
+                🔔
+            </div>
+            <div class="header-texto">
+                <h1>Configuración de Notificaciones</h1>
+                <p>Personaliza los avisos que deseas recibir</p>
+            </div>
+        </div>
+
+        <!-- Contenido -->
+        <div class="contenido-config">
+            <!-- Sección: Tipos de Notificaciones -->
+            <div class="seccion">
+                <h2 class="seccion-titulo">
+                    <span>📬</span>
+                    Tipos de notificaciones
+                </h2>
+                <div class="seccion-card">
+                    <!-- Promociones y ofertas -->
+                    <div class="notif-item">
+                        <div class="notif-info">
+                            <div class="notif-icono">🎉</div>
+                            <div class="notif-texto">
+                                <h3>Promociones y ofertas</h3>
+                                <p>Descuentos especiales y ofertas exclusivas</p>
+                            </div>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="notif-promociones" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+
+                    <!-- Nuevos productos -->
+                    <div class="notif-item">
+                        <div class="notif-info">
+                            <div class="notif-icono">✨</div>
+                            <div class="notif-texto">
+                                <h3>Nuevos productos</h3>
+                                <p>Novedades y lanzamientos del catálogo</p>
+                            </div>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="notif-nuevos" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+
+                    <!-- Combos especiales -->
+                    <div class="notif-item">
+                        <div class="notif-info">
+                            <div class="notif-icono">🍽️</div>
+                            <div class="notif-texto">
+                                <h3>Combos especiales</h3>
+                                <p>Paquetes y ofertas combinadas</p>
+                            </div>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="notif-combos" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+
+                    <!-- Ofertas flash -->
+                    <div class="notif-item">
+                        <div class="notif-info">
+                            <div class="notif-icono">⚡</div>
+                            <div class="notif-texto">
+                                <h3>Ofertas flash</h3>
+                                <p>Promociones por tiempo limitado</p>
+                            </div>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="notif-flash" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+
+                    <!-- Recordatorios de carrito -->
+                    <div class="notif-item">
+                        <div class="notif-info">
+                            <div class="notif-icono">🛒</div>
+                            <div class="notif-texto">
+                                <h3>Recordatorios de carrito</h3>
+                                <p>Productos pendientes en tu carrito</p>
+                            </div>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="notif-carrito">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+
+                    <!-- Recordatorios generales -->
+                    <div class="notif-item">
+                        <div class="notif-info">
+                            <div class="notif-icono">🎁</div>
+                            <div class="notif-texto">
+                                <h3>Recordatorios generales</h3>
+                                <p>Avisos y recordatorios importantes</p>
+                            </div>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="notif-generales" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sección: Horario de Notificaciones -->
+            <div class="seccion">
+                <h2 class="seccion-titulo">
+                    <span>⏰</span>
+                    Horario de notificaciones
+                </h2>
+                <div class="seccion-card">
+                    <div class="horario-container">
+                        <div class="input-group">
+                            <label for="hora-desde">Desde</label>
+                            <input type="time" id="hora-desde" class="input-hora" value="08:00">
+                        </div>
+                        <div class="input-group">
+                            <label for="hora-hasta">Hasta</label>
+                            <input type="time" id="hora-hasta" class="input-hora" value="22:00">
+                        </div>
+                    </div>
+                    <div class="horario-info">
+                        <span>ℹ️</span>
+                        <span>Recibirás notificaciones solo dentro de este horario</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sección: Modo No Molestar -->
+            <div class="seccion">
+                <h2 class="seccion-titulo">
+                    <span>🔕</span>
+                    Modo No Molestar
+                </h2>
+                <div class="seccion-card no-molestar-card">
+                    <div class="notif-icono">🔕</div>
+                    <h3>Silenciar todas las notificaciones</h3>
+                    <p>Desactiva temporalmente todas las notificaciones</p>
+                    <label class="toggle-switch toggle-no-molestar">
+                        <input type="checkbox" id="modo-no-molestar">
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Acciones -->
+            <div class="acciones">
+                <button class="btn btn-primario" onclick="guardarConfiguracion()">
+                    <span>💾</span>
+                    Guardar configuración
+                </button>
+                <button class="btn btn-secundario" onclick="cancelar()">
+                    Cancelar
+                </button>
+            </div>
+
+            <!-- Nota Inferior -->
+            <div class="nota-inferior">
+                <span>🔒</span>
+                <p>Tus preferencias se guardan localmente y solo afectan a este dispositivo. Puedes cambiarlas en cualquier momento.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast de confirmación -->
+    <div id="toast" class="toast">
+        <span>✅</span>
+        <span id="toast-mensaje">Configuración guardada correctamente</span>
+    </div>
+
+    <script>
+        // Modo Oscuro
+        function toggleModoOscuro() {
+            document.body.classList.toggle('modo-oscuro');
+            const icono = document.getElementById('icono-tema');
+            icono.textContent = document.body.classList.contains('modo-oscuro') ? '☀️' : '🌙';
+            
+            // Guardar preferencia
+            localStorage.setItem('modoOscuro', document.body.classList.contains('modo-oscuro'));
+        }
+
+        // Cargar preferencia de modo oscuro
+        if (localStorage.getItem('modoOscuro') === 'true') {
+            document.body.classList.add('modo-oscuro');
+            document.getElementById('icono-tema').textContent = '☀️';
+        }
+
+        // Guardar Configuración
+        function guardarConfiguracion() {
+            const btn = event.target;
+            btn.classList.add('guardando');
+            btn.innerHTML = '<span>💾</span> Guardando...';
+
+            // Recopilar configuración
+            const config = {
+                promociones: document.getElementById('notif-promociones').checked,
+                nuevos: document.getElementById('notif-nuevos').checked,
+                combos: document.getElementById('notif-combos').checked,
+                flash: document.getElementById('notif-flash').checked,
+                carrito: document.getElementById('notif-carrito').checked,
+                generales: document.getElementById('notif-generales').checked,
+                horaDesde: document.getElementById('hora-desde').value,
+                horaHasta: document.getElementById('hora-hasta').value,
+                noMolestar: document.getElementById('modo-no-molestar').checked
+            };
+
+            // Simular guardado
+            setTimeout(() => {
+                localStorage.setItem('configNotificaciones', JSON.stringify(config));
+                
+                btn.classList.remove('guardando');
+                btn.innerHTML = '<span>💾</span> Guardar configuración';
+                
+                mostrarToast('Configuración guardada correctamente', true);
+                
+                console.log('Configuración guardada:', config);
+            }, 1500);
+        }
+
+        // Cancelar
+        function cancelar() {
+            if (confirm('¿Deseas descartar los cambios?')) {
+                cargarConfiguracion();
+                mostrarToast('Cambios descartados', false);
+            }
+        }
+
+        // Cargar configuración guardada
+        function cargarConfiguracion() {
+            const configGuardada = localStorage.getItem('configNotificaciones');
+            if (configGuardada) {
+                const config = JSON.parse(configGuardada);
+                document.getElementById('notif-promociones').checked = config.promociones;
+                document.getElementById('notif-nuevos').checked = config.nuevos;
+                document.getElementById('notif-combos').checked = config.combos;
+                document.getElementById('notif-flash').checked = config.flash;
+                document.getElementById('notif-carrito').checked = config.carrito;
+                document.getElementById('notif-generales').checked = config.generales;
+                document.getElementById('hora-desde').value = config.horaDesde;
+                document.getElementById('hora-hasta').value = config.horaHasta;
+                document.getElementById('modo-no-molestar').checked = config.noMolestar;
+            }
+        }
+
+        // Mostrar Toast
+        function mostrarToast(mensaje, exito = true) {
+            const toast = document.getElementById('toast');
+            const toastMensaje = document.getElementById('toast-mensaje');
+            
+            toastMensaje.textContent = mensaje;
+            toast.className = `toast ${exito ? 'exito' : ''}`;
+            
+            setTimeout(() => toast.classList.add('mostrar'), 100);
+            
+            setTimeout(() => {
+                toast.classList.remove('mostrar');
+            }, 3000);
+        }
+
+        // Cargar configuración al iniciar
+        cargarConfiguracion();
+
+        // Validar horario
+        document.getElementById('hora-hasta').addEventListener('change', function() {
+            const desde = document.getElementById('hora-desde').value;
+            const hasta = this.value;
+            
+            if (hasta <= desde) {
+                alert('La hora final debe ser posterior a la hora inicial');
+                this.value = '22:00';
+            }
+        });
+    </script>
+</body>
+</html>

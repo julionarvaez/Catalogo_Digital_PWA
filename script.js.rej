@@ -1,0 +1,11 @@
+diff a/script.js b/script.js	(rejected hunks)
+@@ -614,6 +614,9 @@
+     configurarEventos();
+     inicializarBotonWhatsApp();
+     
++    // Inicializar contador de notificaciones
++    actualizarContadorNotificaciones();
++    
+     // Inicializar sistema de notificaciones
+     setTimeout(() => {
+         inicializarNotificaciones();
