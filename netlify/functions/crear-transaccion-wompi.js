@@ -49,47 +49,39 @@ exports.handler = async (event) => {
   }
 
   try {
-    // Construir checkout link (método recomendado por Wompi)
-    const body = {
-      public_key: WOMPI_PUBLIC_KEY,
-      currency: moneda,
-      amount_in_cents: Math.round(monto * 100),
-      reference: referencia,
-      redirect_url: `${process.env.URL || 'https://alimentodelcielo-congeladosmonteliban.netlify.app'}/confirmacion-pago.html`,
-      customer_data: {
-        email: email,
-        full_name: nombre || 'Cliente',
-        phone_number: telefono || '3135212887'
-      }
-    };
+    // Wompi requiere usar su widget de checkout, no crear transacciones directamente
+    // Retornamos los datos para que el frontend abra el widget
+    const amountInCents = Math.round(monto * 100);
+    const redirectUrl = `${process.env.URL || 'https://alimentodelcielo-congeladosmonteliban.netlify.app'}/confirmacion-pago.html`;
+    
+    // Construir URL del widget de Wompi
+    const checkoutUrl = `https://checkout.wompi.co/p/?` + new URLSearchParams({
+      'public-key': WOMPI_PUBLIC_KEY,
+      'currency': moneda,
+      'amount-in-cents': amountInCents.toString(),
+      'reference': referencia,
+      'redirect-url': redirectUrl,
+      'customer-data:email': email,
+      'customer-data:full-name': nombre || 'Cliente',
+      'customer-data:phone-number': telefono || '3135212887'
+    }).toString();
 
-    console.log('📤 Creando payment link Wompi referencia', referencia, 'monto', body.amount_in_cents);
-    const wompiResponse = await fetchFn('https://production.wompi.co/v1/payment_links', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${WOMPI_PRIVATE_KEY}`,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(body)
-    });
-
-    const resultado = await wompiResponse.json();
-    if (!wompiResponse.ok) {
-      console.error('❌ Error Wompi:', wompiResponse.status, resultado);
-      return { statusCode: wompiResponse.status, headers, body: JSON.stringify({ error: 'Error Wompi', detalles: resultado }) };
-    }
-
-    const checkoutUrl = resultado.data?.url || resultado.data?.payment_link_url || null;
-    if (!checkoutUrl) {
-      console.warn('⚠️ Respuesta sin URL de pago:', resultado);
-      return { statusCode: 500, headers, body: JSON.stringify({ error: 'No se generó URL de pago', detalles: resultado }) };
-    }
-
-    console.log('✅ Payment link creado:', checkoutUrl);
+    console.log('✅ URL de checkout generada para referencia:', referencia, 'monto:', amountInCents);
+    
     return {
       statusCode: 200,
       headers,
-      body: JSON.stringify({ exito: true, referencia, checkout_url: checkoutUrl, transaccion: resultado.data })
+      body: JSON.stringify({ 
+        exito: true, 
+        referencia, 
+        checkout_url: checkoutUrl,
+        transaccion: {
+          reference: referencia,
+          amount_in_cents: amountInCents,
+          currency: moneda,
+          customer_email: email
+        }
+      })
     };
   } catch (e) {
     console.error('❌ Excepción creando transacción:', e);
