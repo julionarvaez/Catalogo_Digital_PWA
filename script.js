@@ -95,6 +95,7 @@ const productos = [
         precio: 19990,
         descripcion: 'Salmón fresco, rico en omega-3. Porciones de 200g cada una.',
         emoji: '🐟',
+        imagen: './Imagenes/Productos/Pescado/Filete de Salmón.jpg',
         etiqueta: 'Premium',
         tipoEtiqueta: 'etiqueta-premium'
     },
@@ -105,6 +106,7 @@ const productos = [
         precio: 21990,
         descripcion: 'Camarones precociso, pelados y desvenados.',
         emoji: '🦐',
+        imagen: './Imagenes/Productos/Pescado/Camarones Precocido.jpg',
         etiqueta: 'Gourmet',
         tipoEtiqueta: 'etiqueta-premium'
     },
@@ -115,6 +117,7 @@ const productos = [
         precio: 14990,
         descripcion: 'Cachama fresca y limpia, lista para cocinar. Su sabor suave y natural es perfecto para disfrutar en familia.',
         emoji: '🐟',
+        imagen: './Imagenes/Productos/Pescado/Cachama Entera x3.jpg',
         etiqueta: 'Premium',
         tipoEtiqueta: 'etiqueta-premium'
     },
@@ -125,6 +128,7 @@ const productos = [
         precio: 15990,
         descripcion: 'Tilapia roja fresca y limpia, lista para cocinar. Ideal para cualquier preparación y disfrutar en familia.',
         emoji: '🐟',
+        imagen: './Imagenes/Productos/Pescado/Tilapia Roja Entera x3.jpg',
         etiqueta: 'Premium',
         tipoEtiqueta: 'etiqueta-premium'
     },
@@ -135,6 +139,7 @@ const productos = [
         precio: 14990,
         descripcion: 'Mojarra fresca y limpia, lista para cocinar. Ideal para cualquier preparación y disfrutar en familia.',
         emoji: '🐟',
+        imagen: './Imagenes/Productos/Pescado/Mojarra Entera x3.jpg',
         etiqueta: 'Premium',
         tipoEtiqueta: 'etiqueta-premium'
     },
@@ -147,6 +152,7 @@ const productos = [
         precio: 6490,
         descripcion: 'Selección gourmet de brócoli, arveja, apio, cebollín y maíz tierno. Congelado al instante para preservar nutrientes, color y textura.',
         emoji: '🥬',
+        imagen: './Imagenes/Productos/Verduras/Mix Gourmet - Verduras Congeladas 500g.jpg',
         etiqueta: 'Saludable',
         tipoEtiqueta: 'etiqueta-producto'
     },
@@ -157,6 +163,7 @@ const productos = [
         precio: 6490,
         descripcion: 'Mezcla colorida de arveja, zanahoria, maíz y pimentón rojo, lista para saltear o acompañar tus comidas. Congelado al instante para mantener su frescura y sabor natural.',
         emoji: '🥬',
+        imagen: './Imagenes/Productos/Verduras/Mix Primavera - Verduras Congeladas 500g.jpg',
         etiqueta: 'Saludable',
         tipoEtiqueta: 'etiqueta-producto'
     },
@@ -167,6 +174,7 @@ const productos = [
         precio: 6490,
         descripcion: 'Deliciosa combinación de brócoli, zanahoria, pimentón y cebolla, perfecta para comidas saludables. Producto 100% natural sin conservantes.',
         emoji: '🥬',
+        imagen: './Imagenes/Productos/Verduras/Salteado Campestre - Verduras Congeladas 500g.jpg',
         etiqueta: 'Saludable',
         tipoEtiqueta: 'etiqueta-producto'
     },
@@ -177,6 +185,7 @@ const productos = [
         precio: 12000,
         descripcion: 'Papas cortadas en bastones, listas para freír o hornear. ideal para acompañar tus comidas favoritas.',
         emoji: '🥔',
+        imagen: './Imagenes/Productos/Verduras/Papas a la Francesa 1000g.jpg',     
         etiqueta: 'Tradicional',
         tipoEtiqueta: 'etiqueta-producto'
     },
@@ -188,7 +197,8 @@ const productos = [
         categoria: 'empanadas',
         precio: 8990,
         descripcion: 'Empanadas rellenas de jamón, piña y queso fundido. Pack x7 Unidades.',
-        emoji: '🥟',   
+        emoji: '🥟',
+        imagen: './Imagenes/Productos/Empanadas/Empanadas x7.jpg',
         etiqueta: 'Exótico',
         tipoEtiqueta: 'etiqueta-producto'
     },
@@ -199,6 +209,7 @@ const productos = [
         precio: 11990,
         descripcion: 'Empanadas rellenas de jamón, piña y queso fundido. Pack x10 Unidades.',
         emoji: '🥟',
+        imagen: './Imagenes/Productos/Empanadas/Empanadas x10.jpg',
         etiqueta: 'Exótico',
         tipoEtiqueta: 'etiqueta-producto'
     },
@@ -209,6 +220,7 @@ const productos = [
         precio: 14990,
         descripcion: 'Empanadas rellenas de jamón, piña y queso fundido. Pack x15 Unidades.',
         emoji: '🥟',
+        imagen: './Imagenes/Productos/Empanadas/Empanadas x15.jpg',
         etiqueta: 'Exótico',
         tipoEtiqueta: 'etiqueta-producto'
     },
@@ -220,6 +232,7 @@ const productos = [
         precio: 8990,
         descripcion: 'Empanadas rellenas de jamón y queso fundido. Pack x7 Unidades.',
         emoji: '🥟',
+        imagen: './Imagenes/Productos/Empanadas/Empanadas x7.jpg',
         etiqueta: 'Delicioso',
         tipoEtiqueta: 'etiqueta-producto'
     },
@@ -230,6 +243,7 @@ const productos = [
         precio: 11990,
         descripcion: 'Empanadas rellenas de jamón y queso fundido. Pack x10 Unidades.',
         emoji: '🥟',
+        imagen: './Imagenes/Productos/Empanadas/Empanadas x10.jpg',
         etiqueta: 'Delicioso',
         tipoEtiqueta: 'etiqueta-producto'
     },
@@ -240,6 +254,7 @@ const productos = [
         precio: 14990,
         descripcion: 'Empanadas rellenas de jamón y queso fundido. Pack x15 Unidades.',
         emoji: '🥟',
+        imagen: './Imagenes/Productos/Empanadas/Empanadas x15.jpg',
         etiqueta: 'Delicioso',
         tipoEtiqueta: 'etiqueta-producto'
     },
@@ -250,6 +265,7 @@ const productos = [
         precio: 8990,
         descripcion: 'Empanadas rellenas de pollo desmechado con un toque de especias. Pack x7 unidades.',
         emoji: '🥟',
+        imagen: './Imagenes/Productos/Empanadas/Empanadas x7.jpg',
         etiqueta: 'Clásico',
         tipoEtiqueta: 'etiqueta-producto'
     },
@@ -260,6 +276,7 @@ const productos = [
         precio: 11990,
         descripcion: 'Empanadas rellenas de pollo desmechado con un toque de especias. Pack x10 unidades.',
         emoji: '🥟',
+        imagen: './Imagenes/Productos/Empanadas/Empanadas x10.jpg',
         etiqueta: 'Clásico',
         tipoEtiqueta: 'etiqueta-producto'
     },
@@ -270,6 +287,7 @@ const productos = [
         precio: 14990,
         descripcion: 'Empanadas rellenas de pollo desmechado con un toque de especias. Pack x15 unidades.',
         emoji: '🥟',
+        imagen: './Imagenes/Productos/Empanadas/Empanadas x15.jpg',
         etiqueta: 'Clásico',
         tipoEtiqueta: 'etiqueta-producto'
     },
@@ -280,6 +298,7 @@ const productos = [
         precio: 8990,
         descripcion: 'Empanadas rellenas de carne molida sazonada con especias tradicionales. Pack x7 unidades.',
         emoji: '🥟',
+        imagen: './Imagenes/Productos/Empanadas/Empanadas x7.jpg',
         etiqueta: 'Clásico',
         tipoEtiqueta: 'etiqueta-producto'
     },
@@ -290,16 +309,18 @@ const productos = [
         precio: 11990,
         descripcion: 'Empanadas rellenas de carne molida sazonada con especias tradicionales. Pack x10 unidades.',
         emoji: '🥟',
+        imagen: './Imagenes/Productos/Empanadas/Empanadas x10.jpg',
         etiqueta: 'Mixtas',
         tipoEtiqueta: 'etiqueta-producto'
     },
     {
         id: 91,
-        nombre: 'Empanadas de Carne x12',
+        nombre: 'Empanadas de Carne x15',
         categoria: 'empanadas',
         precio: 14990,
         descripcion: 'Empanadas rellenas de carne molida sazonada con especias tradicionales. Pack x12 unidades.',
         emoji: '🥟',
+        imagen: './Imagenes/Productos/Empanadas/Empanadas x15.jpg',
         etiqueta: 'Vegetariano',
         tipoEtiqueta: 'etiqueta-producto'
     },
@@ -310,7 +331,7 @@ const productos = [
         categoria: 'pasabocas',
         precio: 28990,
         descripcion: 'Incluye 25 deditos y 25 empanadas en tamaño pasaboca sin Fritar. Ideal para reuniones pequeñas.',
-        imagen: './Imagenes/Productos/combo_1.png',
+        imagen: './Imagenes/Productos/Pasabocas/Sin Fritar/Combo_01.jpg',
         emoji: '🥟',
         etiqueta: 'Económico',
         tipoEtiqueta: 'etiqueta-producto'
@@ -321,7 +342,7 @@ const productos = [
         categoria: 'pasabocas',
         precio: 55990,
         descripcion: 'Incluye 50 deditos, 30 empanadas y 20 medallones en tamaño pasaboca sin Fritar. Perfecto para compartir.',
-        imagen: './Imagenes/Productos/combo_2.png',
+        imagen: './Imagenes/Productos/Pasabocas/Sin Fritar/Combo_02---.jpg',
         emoji: '🍢',
         etiqueta: 'Popular',
         tipoEtiqueta: 'etiqueta-producto'
@@ -332,7 +353,7 @@ const productos = [
         categoria: 'pasabocas',
         precio: 83990,
         descripcion: 'Incluye 100 deditos, 30 empanadas y 20 medallones en tamaño pasaboca sin Fritar. Ideal para eventos medianos.',
-        imagen: './Imagenes/Productos/combo_3.png',
+        imagen: './Imagenes/Productos/Pasabocas/Sin Fritar/Combo_02---.jpg',
         emoji: '🍴',
         etiqueta: 'Recomendado',
         tipoEtiqueta: 'etiqueta-producto'
@@ -344,7 +365,7 @@ const productos = [
         precio: 94990,
         descripcion: 'Incluye 100 deditos, 50 empanadas y 20 medallones en tamaño pasaboca sin Fritar. Excelente opción para celebraciones.',
         emoji: '🎉',
-        imagen: './Imagenes/Productos/combo_4.png',
+        imagen: './Imagenes/Productos/Pasabocas/Sin Fritar/Combo_02---.jpg',
         etiqueta: 'Favorito',
         tipoEtiqueta: 'etiqueta-producto'
     },
@@ -355,6 +376,7 @@ const productos = [
         precio: 111990,
         descripcion: 'Incluye 100 deditos, 50 empanadas y 50 medallones en tamaño pasaboca sin Fritar. Ideal para eventos grandes.',
         emoji: '🥳',
+        imagen: './Imagenes/Productos/Pasabocas/Sin Fritar/Combo_02---.jpg',
         etiqueta: 'Premium',
         tipoEtiqueta: 'etiqueta-producto'
     },
@@ -365,6 +387,7 @@ const productos = [
         precio: 167990,
         descripcion: 'Incluye 200 deditos, 100 empanadas y 100 medallones en tamaño pasaboca sin Fritar. Ideal para eventos grandes.',
         emoji: '🥳',
+        imagen: './Imagenes/Productos/Pasabocas/Sin Fritar/Combo_02---.jpg',
         etiqueta: 'Premium',
         tipoEtiqueta: 'etiqueta-producto'
     },
@@ -376,8 +399,8 @@ const productos = [
         categoria: 'pasabocas',
         precio: 34990,
         descripcion: 'Incluye 25 deditos y 25 empanadas en tamaño pasaboca ya Fritos. Ideal para reuniones pequeñas.',
-        imagen: './Imagenes/Productos/combo_1.png',
         emoji: '🥟',
+        imagen: './Imagenes/Productos/Pasabocas/Combo-1.jpg',
         etiqueta: 'Económico',
         tipoEtiqueta: 'etiqueta-producto'
     },
@@ -387,8 +410,8 @@ const productos = [
         categoria: 'pasabocas',
         precio: 64990,
         descripcion: 'Incluye 50 deditos, 30 empanadas y 20 medallones en tamaño pasaboca ya Fritos. Perfecto para compartir.',
-        imagen: './Imagenes/Productos/combo_2.png',
         emoji: '🍢',
+        imagen: './Imagenes/Productos/Pasabocas/Combos-2---.jpg',
         etiqueta: 'Popular',
         tipoEtiqueta: 'etiqueta-producto'
     },
@@ -398,7 +421,7 @@ const productos = [
         categoria: 'pasabocas',
         precio: 97990,
         descripcion: 'Incluye 100 deditos, 30 empanadas y 20 medallones en tamaño pasaboca ya Fritos. Ideal para eventos medianos.',
-        imagen: './Imagenes/Productos/combo_3.png',
+        imagen: './Imagenes/Productos/Pasabocas/Combos-2---.jpg',
         emoji: '🍴',
         etiqueta: 'Recomendado',
         tipoEtiqueta: 'etiqueta-producto'
@@ -410,7 +433,7 @@ const productos = [
         precio: 111990,
         descripcion: 'Incluye 100 deditos, 50 empanadas y 20 medallones en tamaño pasaboca ya Fritos. Excelente opción para celebraciones.',
         emoji: '🎉',
-        imagen: './Imagenes/Productos/combo_4.png',
+        imagen: './Imagenes/Productos/Pasabocas/Combos-2---.jpg',
         etiqueta: 'Favorito',
         tipoEtiqueta: 'etiqueta-producto'
     },
@@ -421,6 +444,7 @@ const productos = [
         precio: 128990,
         descripcion: 'Incluye 100 deditos, 50 empanadas y 50 medallones en tamaño pasaboca ya Fritos. Ideal para eventos grandes.',
         emoji: '🥳',
+        imagen: './Imagenes/Productos/Pasabocas/Combos-2---.jpg',
         etiqueta: 'Premium',
         tipoEtiqueta: 'etiqueta-producto'
     },
@@ -431,6 +455,7 @@ const productos = [
         precio: 194990,
         descripcion: 'Incluye 200 deditos, 100 empanadas y 100 medallones en tamaño pasaboca ya Fritos. Ideal para eventos grandes.',
         emoji: '🥳',
+        imagen: './Imagenes/Productos/Pasabocas/Combos-2---.jpg',
         etiqueta: 'Premium',
         tipoEtiqueta: 'etiqueta-producto'
     },
@@ -443,7 +468,7 @@ const productos = [
         precio: 8990,
         descripcion: 'Crujientes deditos rellenos de queso. Pack x10 unidades.',
         emoji: '🧀',
-        imagen: './Imagenes/Productos/Deditos/deditos.png',
+        imagen: './Imagenes/Productos/Deditos/Deditos x10.jpg',
         etiqueta: 'Clásico',
         tipoEtiqueta: 'etiqueta-producto'
     },
@@ -454,6 +479,7 @@ const productos = [
         precio: 12990,
         descripcion: 'Crujientes deditos rellenos de queso. Pack x13 unidades.',
         emoji: '🧀',
+        imagen: './Imagenes/Productos/Deditos/Deditos x13.jpg',
         etiqueta: 'Clásico',
         tipoEtiqueta: 'etiqueta-producto'
     },
@@ -464,6 +490,7 @@ const productos = [
         precio: 16990,
         descripcion: 'Crujientes deditos rellenos de queso. Pack x18 unidades.',
         emoji: '🧀',
+        imagen: './Imagenes/Productos/Deditos/Deditos x18.jpg',
         etiqueta: 'Clásico',
         tipoEtiqueta: 'etiqueta-producto'
     },
@@ -474,7 +501,7 @@ const productos = [
         precio: 8990,
         descripcion: 'Mezcla de deditos de queso y bocadillo. 5 queso y 5 bocadillo. Pack x10 unidades.',
         emoji: '🧀',
-        imagen: './Imagenes/Productos/Deditos/deditos_mixtos.png',
+        imagen: './Imagenes/Productos/Deditos/Deditos x10.jpg',
         etiqueta: 'Mixto',
         tipoEtiqueta: 'etiqueta-producto'
     },
@@ -485,7 +512,7 @@ const productos = [
         precio: 11990,
         descripcion: 'Mezcla de deditos de queso y bocadillo. 6 o 7 queso y 6 o 7 bocadillo. Pack x13 unidades.',
         emoji: '🧀',
-        imagen: './Imagenes/Productos/Deditos/deditos_mixtos.png',
+        imagen: './Imagenes/Productos/Deditos/Deditos x13.jpg',
         etiqueta: 'Mixto',
         tipoEtiqueta: 'etiqueta-producto'
     },
@@ -496,7 +523,7 @@ const productos = [
         precio: 16990,
         descripcion: 'Mezcla de deditos de queso y bocadillo. 9 queso y 9 bocadillo. Pack x18 unidades.',
         emoji: '🧀',
-        imagen: './Imagenes/Productos/Deditos/deditos_mixtos.png',
+        imagen: './Imagenes/Productos/Deditos/Deditos x18.jpg',
         etiqueta: 'Mixto',
         tipoEtiqueta: 'etiqueta-producto'
     },
@@ -506,8 +533,7 @@ const productos = [
         categoria: 'deditos',
         precio: 8990,
         descripcion: 'Mezcla de queso y bocadillo en cada dedito. Pack x10 unidades.',
-       
-        imagen: './Imagenes/Productos/Deditos/deditos_combinados.png',
+        imagen: './Imagenes/Productos/Deditos/Deditos x10.jpg',
         etiqueta: 'Combinado',
         tipoEtiqueta: 'etiqueta-producto'
     },
@@ -518,7 +544,7 @@ const productos = [
         precio: 11990,
         descripcion: 'Mezcla de queso y bocadillo en cada dedito. Pack x13 unidades.',
         emoji: '🧀',
-        imagen: './Imagenes/Productos/Deditos/deditos_combinados.png',
+        imagen: './Imagenes/Productos/Deditos/Deditos x13.jpg',
         etiqueta: 'Combinado',
         tipoEtiqueta: 'etiqueta-producto'
     },
@@ -528,8 +554,7 @@ const productos = [
         categoria: 'deditos',
         precio: 16990,
         descripcion: 'Mezcla de queso y bocadillo en cada dedito. Pack x18 unidades.',
-       
-        imagen: './Imagenes/Productos/Deditos/deditos_combinados.png',
+        imagen: './Imagenes/Productos/Deditos/Deditos x18.jpg',
         etiqueta: 'Combinado',
         tipoEtiqueta: 'etiqueta-producto'
     },
@@ -540,7 +565,7 @@ const productos = [
         precio: 8990,
         descripcion: 'Deditos rellenos de bocadillo. Pack x10 unidades.',
         emoji: '🍬',
-        imagen: './Imagenes/Productos/Deditos/deditos_bocadillo.png',
+        imagen: './Imagenes/Productos/Deditos/Deditos x10.jpg',
         etiqueta: 'Dulce',
         tipoEtiqueta: 'etiqueta-producto'
     },
@@ -551,7 +576,7 @@ const productos = [
         precio: 11990,
         descripcion: 'Deditos rellenos de bocadillo. Pack x13 unidades.',
         emoji: '🍬',
-        imagen: './Imagenes/Productos/Deditos/deditos_bocadillo.png',
+        imagen: './Imagenes/Productos/Deditos/Deditos x13.jpg',
         etiqueta: 'Dulce',
         tipoEtiqueta: 'etiqueta-producto'
     },
@@ -562,7 +587,7 @@ const productos = [
         precio: 16990,
         descripcion: 'Deditos rellenos de bocadillo. Pack x18 unidades.',
         emoji: '🍬',
-        imagen: './Imagenes/Productos/Deditos/deditos_bocadillo.png',
+        imagen: './Imagenes/Productos/Deditos/Deditos x18.jpg',
         etiqueta: 'Dulce',
         tipoEtiqueta: 'etiqueta-producto'
     },
@@ -575,7 +600,7 @@ const productos = [
         precio: 11990,
         descripcion: 'Medallones tradicionales. Pack x20 unidades.',
         emoji: '🍖',
-        imagen: './Imagenes/Productos/Medallones/medallones_carne.png',
+        imagen: './Imagenes/Productos/Medallones/Medallones x20.jpg',
         etiqueta: 'Clásico',
         tipoEtiqueta: 'etiqueta-producto'
     },
@@ -586,7 +611,7 @@ const productos = [
         precio: 16990,
         descripcion: 'Medallones tradicionales. Pack x20 unidades.',
         emoji: '🍖',
-        imagen: './Imagenes/Productos/Medallones/medallones_carne.png',
+        imagen: './Imagenes/Productos/Medallones/Medallones x30.jpg',
         etiqueta: 'Clásico',
         tipoEtiqueta: 'etiqueta-producto'
     },
