@@ -49,20 +49,22 @@ exports.handler = async (event) => {
   }
 
   try {
+    // Construir checkout link (método recomendado por Wompi)
     const body = {
-      amount_in_cents: Math.round(monto * 100),
+      public_key: WOMPI_PUBLIC_KEY,
       currency: moneda,
-      customer_email: email,
+      amount_in_cents: Math.round(monto * 100),
       reference: referencia,
-      redirect_url: `${process.env.URL || 'https://alimento-del-cielo.netlify.app'}/confirmacion-pago`,
-      customer_data: { phone_number: telefono, full_name: nombre || 'Cliente' },
-      payment_method: { type: 'CARD', installments: 1 },
-      shipping_address: { address_line_1: 'Montelíbano, Córdoba', country: 'CO', phone_number: telefono || '3135212887' },
-      metadata: { productos: productos.slice(0, 20) }
+      redirect_url: `${process.env.URL || 'https://alimentodelcielo-congeladosmonteliban.netlify.app'}/confirmacion-pago.html`,
+      customer_data: {
+        email: email,
+        full_name: nombre || 'Cliente',
+        phone_number: telefono || '3135212887'
+      }
     };
 
-    console.log('📤 Creando transacción Wompi referencia', referencia, 'monto', body.amount_in_cents);
-    const wompiResponse = await fetchFn('https://production.wompi.co/v1/transactions', {
+    console.log('📤 Creando payment link Wompi referencia', referencia, 'monto', body.amount_in_cents);
+    const wompiResponse = await fetchFn('https://production.wompi.co/v1/payment_links', {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${WOMPI_PRIVATE_KEY}`,
@@ -73,15 +75,17 @@ exports.handler = async (event) => {
 
     const resultado = await wompiResponse.json();
     if (!wompiResponse.ok) {
-      console.error('❌ Error Wompi:', resultado);
+      console.error('❌ Error Wompi:', wompiResponse.status, resultado);
       return { statusCode: wompiResponse.status, headers, body: JSON.stringify({ error: 'Error Wompi', detalles: resultado }) };
     }
 
-    const checkoutUrl = resultado.data?.checkout_url || null;
+    const checkoutUrl = resultado.data?.url || resultado.data?.payment_link_url || null;
     if (!checkoutUrl) {
-      console.warn('⚠️ Transacción sin checkout_url');
+      console.warn('⚠️ Respuesta sin URL de pago:', resultado);
+      return { statusCode: 500, headers, body: JSON.stringify({ error: 'No se generó URL de pago', detalles: resultado }) };
     }
 
+    console.log('✅ Payment link creado:', checkoutUrl);
     return {
       statusCode: 200,
       headers,
