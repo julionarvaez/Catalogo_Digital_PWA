@@ -967,7 +967,6 @@ body.modo-oscuro .tarjeta-producto {
     display: flex;
     align-items: center;
     justify-content: center;
-    
 }
 
 .etiqueta-producto {
@@ -2546,6 +2545,7 @@ ESTILOS PARA IMÁGENES DE PRODUCTOS
     object-fit: cover;
     object-position: center;
     transition: transform 0.3s ease;
+    display: block;
 }
 
 /* Efecto hover zoom en imagen */
@@ -2596,8 +2596,8 @@ ESTILOS PARA IMÁGENES DE PRODUCTOS
 /* Tablets */
 @media (max-width: 768px) {
     .producto-img {
-        object-fit: contain;
-        padding: 0.5rem;
+        object-fit: cover;
+        padding: 0;
     }
     
     .emoji-fallback {
@@ -2607,6 +2607,11 @@ ESTILOS PARA IMÁGENES DE PRODUCTOS
 
 /* Móviles */
 @media (max-width: 480px) {
+    .producto-img {
+        object-fit: cover;
+        padding: 0;
+    }
+    
     .emoji-fallback {
         font-size: 2rem;
     }
