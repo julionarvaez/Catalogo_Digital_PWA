@@ -1055,6 +1055,18 @@ function filtrarProductos() {
     renderizarProductos();
 }
 
+function scrollearAProductos() {
+    const grillaProductos = document.getElementById('grillaProductos');
+    if (grillaProductos) {
+        grillaProductos.scrollIntoView({ 
+            behavior: 'smooth', 
+            block: 'start' 
+        });
+    } else {
+        console.warn('⚠️ No se encontró la sección de productos');
+    }
+}
+
 function limpiarFiltros() {
     filtroActual = 'todos';
     document.getElementById('campoBusqueda').value = '';
@@ -1287,7 +1299,7 @@ function obtenerBadgePopularidad(productoId) {
     const esTopValoracion = datos.valoracion >= 4.8;
     
     if (esTopVentas && esTopValoracion) {
-        return '<div class="badge-popularidad badge-top" aria-label="Top producto">🏆 Top Producto</div>';
+        return '<div class="badge-top-producto" aria-label="Top producto">🏆 Top Producto</div>';
     } else if (esTopVentas) {
         return '<div class="badge-popularidad badge-ventas" aria-label="Más vendido">🔥 Más Vendido</div>';
     } else if (esTopValoracion) {
@@ -1338,7 +1350,7 @@ function renderizarProductos() {
     }
 
     grilla.innerHTML = productosFiltrados.map(producto => `
-        <article class="tarjeta-producto entrada-animada">
+        <article class="tarjeta-producto product-card entrada-animada">
             <div class="imagen-producto">
                 ${producto.imagen ? `
                     <img src="${producto.imagen}" 
@@ -1349,9 +1361,7 @@ function renderizarProductos() {
                 ` : `
                     <div class="emoji-fallback">${producto.emoji}</div>
                 `}
-                <div class="etiqueta-producto ${producto.tipoEtiqueta}">
-                    ${producto.etiqueta || ''}
-                </div>
+                ${producto.etiqueta === 'Delicioso' ? `<div class="badge-delicioso">${producto.etiqueta}</div>` : producto.etiqueta ? `<div class="etiqueta-producto ${producto.tipoEtiqueta}">${producto.etiqueta}</div>` : ''}
                 ${obtenerBadgePopularidad(producto.id)}
             </div>
             <div class="info-producto">
@@ -5854,4 +5864,41 @@ function comprarWhatsAppModal() {
     window.open(url, '_blank');
     
     cerrarModalProducto();
+}
+
+// Ver productos similares desde el modal
+function verProductosSimilares() {
+    if (!productoModalActual) return;
+    
+    const categoria = productoModalActual.categoria;
+    
+    // Cerrar el modal primero
+    cerrarModalProducto();
+    
+    // Esperar a que se cierre el modal y luego filtrar
+    setTimeout(() => {
+        // Buscar el botón de filtro correspondiente a la categoría
+        const botones = document.querySelectorAll('.btn-filtro');
+        let botonCategoria = null;
+        
+        botones.forEach(btn => {
+            const onclickAttr = btn.getAttribute('onclick');
+            if (onclickAttr && onclickAttr.includes(`'${categoria}'`)) {
+                botonCategoria = btn;
+            }
+        });
+        
+        // Si se encuentra el botón, simular el filtrado
+        if (botonCategoria) {
+            filtrarPorCategoria(categoria, botonCategoria);
+            scrollearAProductos();
+            mostrarNotificacion(`Mostrando productos de: ${categoria.charAt(0).toUpperCase() + categoria.slice(1)}`, 'info');
+        } else {
+            // Si no se encuentra el botón, filtrar directamente
+            filtroActual = categoria;
+            renderizarProductos();
+            scrollearAProductos();
+            mostrarNotificacion(`Mostrando productos de: ${categoria.charAt(0).toUpperCase() + categoria.slice(1)}`, 'info');
+        }
+    }, 300);
 }

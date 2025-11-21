@@ -7,12 +7,15 @@
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#2563eb">
     <meta name="description" content="Catálogo digital de alimentos congelados - Alimento del Cielo">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300..800&family=Poppins:wght@500;600;700&display=swap" rel="stylesheet">
     <link rel="apple-touch-icon" sizes="120x120" href="./Imagenes/logo/Logo.png">
     <link rel="apple-touch-icon" sizes="152x152" href="./Imagenes/logo/Logo.png">
     <link rel="apple-touch-icon" sizes="180x180" href="./Imagenes/logo/Logo.png">
     <link rel="icon" type="image/png" href="./Imagenes/logo/Logo.png">
     <link rel="stylesheet" href="styles.css">
-    
 </head>
 <body>
     <!-- Overlay -->
@@ -172,321 +175,85 @@
         <section class="seccion-recetas" id="seccionRecetas">
             <div class="recetas-contenedor">
                 <div class="recetas-header">
-                    <h2 class="recetas-titulo">👩‍🍳 Inspiración y Recetas</h2>
+                    <h2 class="recetas-titulo">Inspiración y Recetas</h2>
                     <p class="recetas-descripcion">
                         Descubre ideas deliciosas para preparar con nuestros productos congelados frescos y listos para disfrutar.
                     </p>
                 </div>
 
-                <div class="carrusel-recetas" id="carruselRecetas">
-                    <!-- Controles de navegación -->
-                    <button class="carrusel-btn carrusel-prev" id="btnPrev" aria-label="Receta anterior">
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-                            <path d="M15 18L9 12L15 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                        </svg>
-                    </button>
-                    
-                    <button class="carrusel-btn carrusel-next" id="btnNext" aria-label="Siguiente receta">
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-                            <path d="M9 18L15 12L9 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                        </svg>
-                    </button>
+                <div class="carousel" mask>
+                    <article>
+                        <img src="./Imagenes/Productos/Pollo/pollo Semicriollo.jpg" alt="Pollo Semicriollo Entero">
+                        <h2>Pollo Semicriollo</h2>
+                        <div>
+                            <p>Pollo semicriollo entero, fresco y jugoso. Ideal para cualquier preparación. Precio por kilogramo 15.000 COP. Peso aproximado 2400-3000g. ¡Bestseller!</p>
 
-                    <!-- Contenedor de recetas -->
-                    <div class="recetas-track" id="recetasTrack">
-                        <!-- Receta 1: Empanadas al Airfryer -->
-                        <div class="receta-card" data-categoria="empanadas">
-                            <div class="receta-media">
-                                <div class="receta-video-placeholder">
-                                    <div class="placeholder-content">
-                                        <span class="placeholder-emoji">🥟</span>
-                                        <span class="placeholder-text">Empanadas<br>al Airfryer</span>
-                                    </div>
-                                </div>
-                                <div class="receta-overlay">
-                                    <span class="receta-duracion">⏱️ 15 min</span>
-                                </div>
-                            </div>
-                            <div class="receta-contenido">
-                                <h3 class="receta-nombre">Empanadas al Airfryer</h3>
-                                <p class="receta-descripcion">Crujientes y doradas, perfectas para cualquier momento del día.</p>
-                                <button class="btn-ver-productos" 
-                                        onclick="filtrarReceta('empanadas', 'Empanadas al Airfryer')"
-                                        aria-label="Ver productos para Empanadas al Airfryer">
-                                    🛒 Ver productos para esta receta
-                                </button>
-                            </div>
+                            <button class="btn-ver-productos" onclick="abrirModalProducto(1)">
+                                🛒 Ver producto
+                            </button>
                         </div>
+                    </article>
 
-                        <!-- Receta 2: Deditos de queso -->
-                        <div class="receta-card" data-categoria="deditos">
-                            <div class="receta-media">
-                                <div class="receta-video-placeholder">
-                                    <div class="placeholder-content">
-                                        <span class="placeholder-emoji">🧀</span>
-                                        <span class="placeholder-text">Deditos de<br>Queso</span>
-                                    </div>
-                                </div>
-                                <div class="receta-overlay">
-                                    <span class="receta-duracion">⏱️ 12 min</span>
-                                </div>
-                            </div>
-                            <div class="receta-contenido">
-                                <h3 class="receta-nombre">Deditos de Queso Crujientes</h3>
-                                <p class="receta-descripcion">El snack perfecto para compartir en familia o con amigos.</p>
-                                <button class="btn-ver-productos" 
-                                        onclick="filtrarReceta('deditos', 'Deditos de Queso Crujientes')"
-                                        aria-label="Ver productos para Deditos de Queso Crujientes">
-                                    🛒 Ver productos para esta receta
-                                </button>
-                            </div>
+                    <article>
+                        <img src="./Imagenes/ChatGPT Image 20 nov 2025, 10_26_52 p.m..png" alt="Carne de Res">
+                        <h2>Empanadas Hawaiana</h2>
+                        <div>
+                            <p>Empieza tu día con un sabor que enamora: empanadas hawaianas doradas, crujientes y rellenas de piña, jamón y queso fundido. Un desayuno irresistible que no querrás compartir.</p>
+
+                            <button class="btn-ver-productos" onclick="abrirModalProducto(80)">
+                                🛒 Ver producto
+                            </button>
                         </div>
+                    </article>
 
-                        <!-- Receta 3: Pollo semicriollo al horno -->
-                        <div class="receta-card" data-categoria="pollo">
-                            <div class="receta-media">
-                                <div class="receta-video-placeholder">
-                                    <div class="placeholder-content">
-                                        <span class="placeholder-emoji">🍗</span>
-                                        <span class="placeholder-text">Pollo<br>en arroz revuelto</span>
-                                    </div>
-                                </div>
-                                <div class="receta-overlay">
-                                    <span class="receta-duracion">⏱️ 45 min</span>
-                                </div>
-                            </div>
-                            <div class="receta-contenido">
-                                <h3 class="receta-nombre">Pollo Semicriollo en Arroz Revuelto</h3>
-                                <p class="receta-descripcion">Jugoso, dorado y lleno de sabor casero tradicional.</p>
-                                <button class="btn-ver-productos" 
-                                        onclick="filtrarReceta('pollo', 'Pollo Semicriollo en Arroz Revuelto')"
-                                        aria-label="Ver productos para Pollo Semicriollo en Arroz Revuelto">
-                                    🛒 Ver productos para esta receta
-                                </button>
-                            </div>
+                    <article>
+                        <img src="./Imagenes/Productos/Pescado/Filete de Salmón.jpg" alt="Filete de Salmón">
+                        <h2>Filete de Salmón</h2>
+                        <div>
+                            <p>Salmón fresco Premium, rico en omega-3. Porciones de 200g cada una. Perfecto para una alimentación saludable y deliciosa. $19.990 COP</p>
+
+                            <button class="btn-ver-productos" onclick="abrirModalProducto(40)">
+                                🛒 Ver producto
+                            </button>
                         </div>
+                    </article>
 
-                        <!-- Receta 4: Arroz con verduras -->
-                        <div class="receta-card" data-categoria="verduras">
-                            <div class="receta-media">
-                                <div class="receta-video-placeholder">
-                                    <div class="placeholder-content">
-                                        <span class="placeholder-emoji">🍚</span>
-                                        <span class="placeholder-text">Arroz con<br>Verduras</span>
-                                    </div>
-                                </div>
-                                <div class="receta-overlay">
-                                    <span class="receta-duracion">⏱️ 25 min</span>
-                                </div>
-                            </div>
-                            <div class="receta-contenido">
-                                <h3 class="receta-nombre">Arroz con Verduras Mixtas</h3>
-                                <p class="receta-descripcion">Nutritivo, colorido y lleno de sabor natural.</p>
-                                <button class="btn-ver-productos" 
-                                        onclick="filtrarReceta('verduras', 'Arroz con Verduras Mixtas')"
-                                        aria-label="Ver productos para Arroz con Verduras Mixtas">
-                                    🛒 Ver productos para esta receta
-                                </button>
-                            </div>
+                    <article>
+                        <img src="./Imagenes/Productos/Pescado/Camarones Precocido.jpg" alt="Camarones Precocidos">
+                        <h2>Camarones Gourmet</h2>
+                        <div>
+                            <p>Camarones precocidos, pelados y desvenados. Calidad premium para tus platillos más especiales. Listos para preparar. $21.990 COP</p>
+
+                            <button class="btn-ver-productos" onclick="abrirModalProducto(41)">
+                                🛒 Ver producto
+                            </button>
                         </div>
+                    </article>
 
-                        <!-- Receta 5: Mazorca salteada -->
-                        <div class="receta-card" data-categoria="verduras">
-                            <div class="receta-media">
-                                <div class="receta-video-placeholder">
-                                    <div class="placeholder-content">
-                                        <span class="placeholder-emoji">🌽</span>
-                                        <span class="placeholder-text">Mazorca<br>Salteada</span>
-                                    </div>
-                                </div>
-                                <div class="receta-overlay">
-                                    <span class="receta-duracion">⏱️ 10 min</span>
-                                </div>
-                            </div>
-                            <div class="receta-contenido">
-                                <h3 class="receta-nombre">Mazorca Salteada con Mantequilla</h3>
-                                <p class="receta-descripcion">Dulce, tierna y con ese toque casero irresistible.</p>
-                                <button class="btn-ver-productos" 
-                                        onclick="filtrarReceta('verduras', 'Mazorca Salteada con Mantequilla')"
-                                        aria-label="Ver productos para Mazorca Salteada con Mantequilla">
-                                    🛒 Ver productos para esta receta
-                                </button>
-                            </div>
+                    <article>
+                        <img src="./Imagenes/Productos/Pescado/Cachama Entera x3.jpg" alt="Cachama Entera">
+                        <h2>Cachama Entera</h2>
+                        <div>
+                            <p>Cachama fresca x3 unidades, limpia y lista para cocinar. Sabor suave y natural, perfecto para disfrutar en familia. $14.990 COP</p>
+
+                            <button class="btn-ver-productos" onclick="abrirModalProducto(42)">
+                                🛒 Ver producto
+                            </button>
                         </div>
+                    </article>
 
-                        <!-- Receta 6: Ensalada fría -->
-                        <div class="receta-card" data-categoria="pollo">
-                            <div class="receta-media">
-                                <div class="receta-video-placeholder">
-                                    <div class="placeholder-content">
-                                        <span class="placeholder-emoji">🥗</span>
-                                        <span class="placeholder-text">Ensalada<br>Fría</span>
-                                    </div>
-                                </div>
-                                <div class="receta-overlay">
-                                    <span class="receta-duracion">⏱️ 8 min</span>
-                                </div>
-                            </div>
-                            <div class="receta-contenido">
-                                <h3 class="receta-nombre">Ensalada Fría con Pollo y Maíz</h3>
-                                <p class="receta-descripcion">Fresca, ligera y perfecta para días calurosos.</p>
-                                <button class="btn-ver-productos" 
-                                        onclick="filtrarReceta('pollo', 'Ensalada Fría con Pollo y Maíz')"
-                                        aria-label="Ver productos para Ensalada Fría con Pollo y Maíz">
-                                    🛒 Ver productos para esta receta
-                                </button>
-                            </div>
+                    <article>
+                        <img src="./Imagenes/Productos/Carnes/carne-molida-res-1.jpg" alt="Carne Molida">
+                        <h2>Carne Molida</h2>
+                        <div>
+                            <p>Carne molida de res 1000g, ideal para hamburguesas, boloñesa, albóndigas y mucho más. Calidad garantizada. $15.490 COP</p>
+
+                            <button class="btn-ver-productos" onclick="abrirModalProducto(22)">
+                                🛒 Ver producto
+                            </button>
                         </div>
+                    </article>
 
-                        <!-- Receta 7: Salmón a la plancha -->
-                        <div class="receta-card" data-categoria="pescado">
-                            <div class="receta-media">
-                                <div class="receta-video-placeholder">
-                                    <div class="placeholder-content">
-                                        <span class="placeholder-emoji">🐟</span>
-                                        <span class="placeholder-text">Salmón a<br>la Plancha</span>
-                                    </div>
-                                </div>
-                                <div class="receta-overlay">
-                                    <span class="receta-duracion">⏱️ 20 min</span>
-                                </div>
-                            </div>
-                            <div class="receta-contenido">
-                                <h3 class="receta-nombre">Salmón a la Plancha con Limón</h3>
-                                <p class="receta-descripcion">Rico en omega-3, jugoso y con un toque cítrico irresistible.</p>
-                                <button class="btn-ver-productos" 
-                                        onclick="filtrarReceta('pescado', 'Salmón a la Plancha con Limón')"
-                                        aria-label="Ver productos para Salmón a la Plancha con Limón">
-                                    🛒 Ver productos para esta receta
-                                </button>
-                            </div>
-                        </div>
-
-                        <!-- Receta 8: Carne molida en salsa -->
-                        <div class="receta-card" data-categoria="carnes">
-                            <div class="receta-media">
-                                <div class="receta-video-placeholder">
-                                    <div class="placeholder-content">
-                                        <span class="placeholder-emoji">🍝</span>
-                                        <span class="placeholder-text">Carne<br>en Salsa</span>
-                                    </div>
-                                </div>
-                                <div class="receta-overlay">
-                                    <span class="receta-duracion">⏱️ 30 min</span>
-                                </div>
-                            </div>
-                            <div class="receta-contenido">
-                                <h3 class="receta-nombre">Carne Molida en Salsa Casera</h3>
-                                <p class="receta-descripcion">Perfecta para acompañar con pasta o arroz, llena de sabor.</p>
-                                <button class="btn-ver-productos" 
-                                        onclick="filtrarReceta('carnes', 'Carne Molida en Salsa Casera')"
-                                        aria-label="Ver productos para Carne Molida en Salsa Casera">
-                                    🛒 Ver productos para esta receta
-                                </button>
-                            </div>
-                        </div>
-
-                        <!-- Receta 9: Papas a la francesa caseras -->
-                        <div class="receta-card" data-categoria="verduras">
-                            <div class="receta-media">
-                                <div class="receta-video-placeholder">
-                                    <div class="placeholder-content">
-                                        <span class="placeholder-emoji">🍟</span>
-                                        <span class="placeholder-text">Papas a la<br>Francesa</span>
-                                    </div>
-                                </div>
-                                <div class="receta-overlay">
-                                    <span class="receta-duracion">⏱️ 18 min</span>
-                                </div>
-                            </div>
-                            <div class="receta-contenido">
-                                <h3 class="receta-nombre">Papas a la Francesa Doradas</h3>
-                                <p class="receta-descripcion">Crujientes por fuera, suaves por dentro, el acompañante perfecto.</p>
-                                <button class="btn-ver-productos" 
-                                        onclick="filtrarReceta('verduras', 'Papas a la Francesa Doradas')"
-                                        aria-label="Ver productos para Papas a la Francesa Doradas">
-                                    🛒 Ver productos para esta receta
-                                </button>
-                            </div>
-                        </div>
-
-                        <!-- Receta 10: Cachama frita -->
-                        <div class="receta-card" data-categoria="pescado">
-                            <div class="receta-media">
-                                <div class="receta-video-placeholder">
-                                    <div class="placeholder-content">
-                                        <span class="placeholder-emoji">🐠</span>
-                                        <span class="placeholder-text">Cachama<br>Frita</span>
-                                    </div>
-                                </div>
-                                <div class="receta-overlay">
-                                    <span class="receta-duracion">⏱️ 35 min</span>
-                                </div>
-                            </div>
-                            <div class="receta-contenido">
-                                <h3 class="receta-nombre">Cachama Frita Tradicional</h3>
-                                <p class="receta-descripcion">Pescado fresco con sabor auténtico, ideal para almorzar en familia.</p>
-                                <button class="btn-ver-productos" 
-                                        onclick="filtrarReceta('pescado', 'Cachama Frita Tradicional')"
-                                        aria-label="Ver productos para Cachama Frita Tradicional">
-                                    🛒 Ver productos para esta receta
-                                </button>
-                            </div>
-                        </div>
-
-                        <!-- Receta 11: Camarones al ajillo -->
-                        <div class="receta-card" data-categoria="pescado">
-                            <div class="receta-media">
-                                <div class="receta-video-placeholder">
-                                    <div class="placeholder-content">
-                                        <span class="placeholder-emoji">🦐</span>
-                                        <span class="placeholder-text">Camarones<br>al Ajillo</span>
-                                    </div>
-                                </div>
-                                <div class="receta-overlay">
-                                    <span class="receta-duracion">⏱️ 15 min</span>
-                                </div>
-                            </div>
-                            <div class="receta-contenido">
-                                <h3 class="receta-nombre">Camarones al Ajillo Gourmet</h3>
-                                <p class="receta-descripcion">Exquisitos camarones con ajo y hierbas finas, una experiencia premium.</p>
-                                <button class="btn-ver-productos" 
-                                        onclick="filtrarReceta('pescado', 'Camarones al Ajillo Gourmet')"
-                                        aria-label="Ver productos para Camarones al Ajillo Gourmet">
-                                    🛒 Ver productos para esta receta
-                                </button>
-                            </div>
-                        </div>
-
-                        <!-- Receta 12: Combo de pasabocas para fiesta -->
-                        <div class="receta-card" data-categoria="pasabocas">
-                            <div class="receta-media">
-                                <div class="receta-video-placeholder">
-                                    <div class="placeholder-content">
-                                        <span class="placeholder-emoji">🎉</span>
-                                        <span class="placeholder-text">Combo<br>Fiesta</span>
-                                    </div>
-                                </div>
-                                <div class="receta-overlay">
-                                    <span class="receta-duracion">⏱️ 25 min</span>
-                                </div>
-                            </div>
-                            <div class="receta-contenido">
-                                <h3 class="receta-nombre">Combo Fiesta Perfecta</h3>
-                                <p class="receta-descripcion">Mezcla ideal de empanadas, deditos y medallones para celebrar.</p>
-                                <button class="btn-ver-productos" 
-                                        onclick="filtrarReceta('pasabocas', 'Combo Fiesta Perfecta')"
-                                        aria-label="Ver productos para Combo Fiesta Perfecta">
-                                    🛒 Ver productos para esta receta
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Indicadores de paginación -->
-                    <div class="carrusel-indicadores" id="carruselIndicadores">
-                        <!-- Los indicadores se generarán dinámicamente con JavaScript -->
-                    </div>
                 </div>
             </div>
         </section>
@@ -1010,7 +777,11 @@
     <div class="modal-producto" id="modalProducto">
         <div class="modal-overlay" onclick="cerrarModalProducto()"></div>
         <div class="modal-contenido">
-            <button class="btn-cerrar-modal" onclick="cerrarModalProducto()">✕</button>
+            <button class="btn-cerrar-modal" onclick="cerrarModalProducto()">
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                    <path d="M15 5L5 15M5 5l10 10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+            </button>
             
             <div class="modal-imagen-container">
                 <img src="" alt="" class="modal-imagen" id="modalImagen">
@@ -1020,36 +791,56 @@
             <div class="modal-body">
                 <div class="modal-header">
                     <h2 class="modal-titulo" id="modalTitulo"></h2>
-                    <div class="modal-meta" id="modalMeta"></div>
+                    <div class="modal-precio-badge">
+                        <span class="modal-precio" id="modalPrecio"></span>
+                    </div>
                 </div>
                 
-                <div class="modal-precio-section">
-                    <div>
-                        <div class="modal-precio" id="modalPrecio"></div>
-                    </div>
+                <div class="modal-meta-info">
+                    <div class="modal-meta" id="modalMeta"></div>
                     <div class="modal-popularidad" id="modalPopularidad"></div>
                 </div>
                 
                 <div class="modal-descripcion">
-                    <h3>📝 Descripción</h3>
-                    <p id="modalDescripcion"></p>
+                    <h3 class="modal-seccion-titulo">Descripción</h3>
+                    <p class="modal-texto" id="modalDescripcion"></p>
                 </div>
                 
                 <div class="modal-cantidad-section">
-                    <span class="modal-cantidad-label">Cantidad:</span>
+                    <label class="modal-cantidad-label">Cantidad</label>
                     <div class="modal-cantidad-controls">
-                        <button class="modal-btn-cantidad" onclick="cambiarCantidadModal(-1)">−</button>
+                        <button class="modal-btn-cantidad" onclick="cambiarCantidadModal(-1)" aria-label="Disminuir cantidad">
+                            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                                <path d="M3 8h10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                            </svg>
+                        </button>
                         <span class="modal-cantidad-valor" id="modalCantidad">1</span>
-                        <button class="modal-btn-cantidad" onclick="cambiarCantidadModal(1)">+</button>
+                        <button class="modal-btn-cantidad" onclick="cambiarCantidadModal(1)" aria-label="Aumentar cantidad">
+                            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                                <path d="M8 3v10M3 8h10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                            </svg>
+                        </button>
                     </div>
                 </div>
                 
                 <div class="modal-acciones">
                     <button class="modal-btn modal-btn-agregar" onclick="agregarDesdeModal()">
-                        🛒 Agregar al carrito
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                            <path d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        <span>Agregar al carrito</span>
                     </button>
                     <button class="modal-btn modal-btn-whatsapp" onclick="comprarWhatsAppModal()">
-                        💬 Comprar por WhatsApp
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                            <path d="M10 0C4.477 0 0 4.477 0 10c0 1.89.525 3.66 1.438 5.168L.546 18.2a.75.75 0 00.908.908l3.032-.892A9.96 9.96 0 0010 20c5.523 0 10-4.477 10-10S15.523 0 10 0zm5.245 13.947c-.22.617-1.086 1.133-1.518 1.193-.433.06-.836.273-2.814-.586-2.378-1.032-3.9-3.447-4.018-3.605-.118-.158-.963-1.282-.963-2.447s.61-1.737.826-1.975c.216-.238.472-.297.629-.297.157 0 .315.001.452.008.145.007.34-.055.531.405.197.473.673 1.645.732 1.764.059.119.098.258.02.416-.08.158-.118.257-.236.397-.118.139-.248.31-.355.416-.118.118-.24.246-.103.482.137.237.61 1.006 1.31 1.629.9.802 1.658 1.05 1.894 1.169.236.118.374.099.512-.06.138-.158.59-.688.747-.924.157-.236.315-.197.532-.118.216.079 1.379.65 1.615.769.236.118.393.177.452.276.059.1.059.574-.161 1.19z"/>
+                        </svg>
+                        <span>Comprar por WhatsApp</span>
+                    </button>
+                    <button class="modal-btn modal-btn-similares" onclick="verProductosSimilares()">
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                            <path d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" fill="currentColor"/>
+                        </svg>
+                        <span>Ver similares</span>
                     </button>
                 </div>
             </div>
@@ -1058,6 +849,11 @@
 
     <!-- Sistema de Actualización Automática -->
     <script src="auto-update.js" defer></script>
+    
+    <!-- jQuery y Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
     
     <script src="script.js"></script>
 </body>
