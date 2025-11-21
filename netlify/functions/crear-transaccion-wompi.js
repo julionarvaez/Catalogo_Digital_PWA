@@ -3,6 +3,7 @@
 
 // En Node 18+ fetch es global; si Netlify usa versión anterior se puede requerir node-fetch
 const fetchFn = (typeof fetch !== 'undefined') ? fetch : require('node-fetch');
+const crypto = require('crypto');
 
 exports.handler = async (event) => {
   const headers = {
@@ -42,10 +43,16 @@ exports.handler = async (event) => {
 
   const WOMPI_PUBLIC_KEY = process.env.WOMPI_PUBLIC_KEY;
   const WOMPI_PRIVATE_KEY = process.env.WOMPI_PRIVATE_KEY;
+  const WOMPI_INTEGRITY_SECRET = process.env.WOMPI_INTEGRITY_SECRET;
 
   if (!WOMPI_PRIVATE_KEY || !WOMPI_PUBLIC_KEY) {
     console.error('❌ Llaves Wompi no configuradas');
     return { statusCode: 500, headers, body: JSON.stringify({ error: 'Servidor sin llaves Wompi configuradas' }) };
+  }
+
+  if (!WOMPI_INTEGRITY_SECRET) {
+    console.error('❌ WOMPI_INTEGRITY_SECRET no configurado');
+    return { statusCode: 500, headers, body: JSON.stringify({ error: 'Servidor sin integrity secret configurado' }) };
   }
 
   try {
@@ -54,12 +61,20 @@ exports.handler = async (event) => {
     const amountInCents = Math.round(monto * 100);
     const redirectUrl = `${process.env.URL || 'https://alimentodelcielo-congeladosmonteliban.netlify.app'}/confirmacion-pago.html`;
     
+    // Generar firma de integridad requerida por Wompi para Nequi y otros medios de pago
+    // Formato: referencia + amountInCents + moneda + integritySecret
+    const signatureString = `${referencia}${amountInCents}${moneda}${WOMPI_INTEGRITY_SECRET}`;
+    const signature = crypto.createHash('sha256').update(signatureString).digest('hex');
+    
+    console.log('🔐 Generando firma de integridad para referencia:', referencia);
+    
     // Construir URL del widget de Wompi
     const checkoutUrl = `https://checkout.wompi.co/p/?` + new URLSearchParams({
       'public-key': WOMPI_PUBLIC_KEY,
       'currency': moneda,
       'amount-in-cents': amountInCents.toString(),
       'reference': referencia,
+      'signature:integrity': signature,
       'redirect-url': redirectUrl,
       'customer-data:email': email,
       'customer-data:full-name': nombre || 'Cliente',
@@ -79,7 +94,8 @@ exports.handler = async (event) => {
           reference: referencia,
           amount_in_cents: amountInCents,
           currency: moneda,
-          customer_email: email
+          customer_email: email,
+          signature: signature
         }
       })
     };
