@@ -799,20 +799,21 @@ function renderizarProductos() {
                     ${producto.unidadMedida ? `<span class="unidad-medida">${producto.unidadMedida}</span>` : ''}
                     ${producto.pesoAproximado ? `<span class="peso-aproximado">${producto.pesoAproximado}</span>` : ''}
                 </div>
-                
-                ${datosPopularidad[producto.id] ? `
-                    <div class="info-popularidad">
-                        <span class="info-ventas" title="Unidades vendidas">
-                            📦 ${datosPopularidad[producto.id].ventas} ventas
-                        </span>
-                        <span class="info-valoracion" title="Valoración promedio">
-                            ⭐ ${datosPopularidad[producto.id].valoracion}
-                        </span>
-                    </div>
-                ` : ''}
 
-                <div class="precio-producto">
-                    ${producto.precio.toLocaleString('es-CO')}
+                <div class="precio-popularidad-wrapper">
+                    <div class="precio-producto">
+                        ${producto.precio.toLocaleString('es-CO')}
+                    </div>
+                    ${datosPopularidad[producto.id] ? `
+                        <div class="info-popularidad">
+                            <span class="info-ventas" title="Unidades vendidas">
+                                📦 ${datosPopularidad[producto.id].ventas}
+                            </span>
+                            <span class="info-valoracion" title="Valoración promedio">
+                                ⭐ ${datosPopularidad[producto.id].valoracion}
+                            </span>
+                        </div>
+                    ` : ''}
                 </div>
                 <div class="acciones-producto">
                     <button class="boton boton-primario" onclick="agregarAlCarrito(${producto.id})">
@@ -1361,34 +1362,36 @@ function renderizarProductos() {
                     ${producto.unidadMedida ? `<span class="unidad-medida">${producto.unidadMedida}</span>` : ''}
                     ${producto.pesoAproximado ? `<span class="peso-aproximado">${producto.pesoAproximado}</span>` : ''}
                 </div>
-                
-                ${datosPopularidad[producto.id] ? `
-                    <div class="info-popularidad">
-                        <span class="info-ventas" title="Unidades vendidas">
-                            📦 ${datosPopularidad[producto.id].ventas} ventas
-                        </span>
-                        <span class="info-valoracion" title="Valoración promedio">
-                            ⭐ ${datosPopularidad[producto.id].valoracion}
-                        </span>
-                    </div>
-                ` : ''}
 
-                <div class="precio-producto">
-                    ${producto.precio.toLocaleString('es-CO')}
+                <div class="precio-popularidad-wrapper">
+                    <div class="precio-producto">
+                        ${producto.precio.toLocaleString('es-CO')}
+                    </div>
+                    ${datosPopularidad[producto.id] ? `
+                        <div class="info-popularidad">
+                            <span class="info-ventas" title="Unidades vendidas">
+                                📦 ${datosPopularidad[producto.id].ventas}
+                            </span>
+                            <span class="info-valoracion" title="Valoración promedio">
+                                ⭐ ${datosPopularidad[producto.id].valoracion}
+                            </span>
+                        </div>
+                    ` : ''}
                 </div>
-                <div class="acciones-producto">
-                    <button class="boton boton-primario" onclick="agregarAlCarrito(${producto.id})">
+                <div class="acciones-producto" onclick="event.stopPropagation()">
+                    <button class="boton boton-primario" onclick="agregarAlCarrito(${producto.id}); event.stopPropagation()">
                         🛒 Agregar
                     </button>
                     <a href="${generarEnlaceWhatsApp(producto)}" 
                     class="boton boton-whatsapp" 
-                    target="_blank">
+                    target="_blank"
+                    onclick="event.stopPropagation()">
                         💬 WhatsApp
                     </a>
 
                     <!-- BOTÓN DESTACADO solo para producto id 1 -->
                     ${producto.id === 1 ? `
-                        <button class="boton boton-destacado" onclick="mostrarSimuladorPollo(${producto.id})">
+                        <button class="boton boton-destacado" onclick="mostrarSimuladorPollo(${producto.id}); event.stopPropagation()">
                         🔢 Simular peso (Pollo)
                         </button>
                     ` : ''}
@@ -1396,6 +1399,15 @@ function renderizarProductos() {
             </div>
         </article>
     `).join('');
+    
+    // Agregar listeners de clic a las tarjetas
+    setTimeout(() => {
+        document.querySelectorAll('.tarjeta-producto').forEach((tarjeta, index) => {
+            tarjeta.addEventListener('click', () => {
+                abrirModalProducto(productosFiltrados[index].id);
+            });
+        });
+    }, 0);
     
     // Mostrar mensaje de resultados si hay ordenamiento activo
     if (ordenamientoActual.precio || ordenamientoActual.popularidad) {
@@ -5680,4 +5692,166 @@ if ('serviceWorker' in navigator) {
             console.log('📬 Notificación guardada desde Service Worker:', titulo);
         }
     });
+}
+
+// ========================================
+// MODAL DE DETALLES DEL PRODUCTO
+// ========================================
+
+let productoModalActual = null;
+let cantidadModal = 1;
+
+// Abrir modal del producto
+function abrirModalProducto(idProducto) {
+    const producto = productos.find(p => p.id === idProducto);
+    if (!producto) return;
+    
+    productoModalActual = producto;
+    cantidadModal = 1;
+    
+    const modal = document.getElementById('modalProducto');
+    const modalImagen = document.getElementById('modalImagen');
+    const modalTitulo = document.getElementById('modalTitulo');
+    const modalPrecio = document.getElementById('modalPrecio');
+    const modalDescripcion = document.getElementById('modalDescripcion');
+    const modalEtiqueta = document.getElementById('modalEtiqueta');
+    const modalMeta = document.getElementById('modalMeta');
+    const modalPopularidad = document.getElementById('modalPopularidad');
+    const modalCantidad = document.getElementById('modalCantidad');
+    
+    // Actualizar imagen
+    if (producto.imagen) {
+        modalImagen.src = producto.imagen;
+        modalImagen.alt = producto.nombre;
+        modalImagen.style.display = 'block';
+    } else {
+        modalImagen.style.display = 'none';
+    }
+    
+    // Actualizar etiqueta
+    if (producto.etiqueta) {
+        modalEtiqueta.textContent = producto.etiqueta;
+        modalEtiqueta.className = `modal-etiqueta ${producto.tipoEtiqueta}`;
+        modalEtiqueta.style.display = 'block';
+    } else {
+        modalEtiqueta.style.display = 'none';
+    }
+    
+    // Actualizar contenido
+    modalTitulo.textContent = producto.nombre;
+    modalPrecio.textContent = producto.precio.toLocaleString('es-CO');
+    modalDescripcion.textContent = producto.descripcion;
+    modalCantidad.textContent = cantidadModal;
+    
+    // Meta información
+    let metaHTML = '';
+    if (producto.unidadMedida) {
+        metaHTML += `<span class="modal-badge">📏 ${producto.unidadMedida}</span>`;
+    }
+    if (producto.pesoAproximado) {
+        metaHTML += `<span class="modal-badge">⚖️ ${producto.pesoAproximado}</span>`;
+    }
+    modalMeta.innerHTML = metaHTML;
+    
+    // Popularidad
+    const datos = datosPopularidad[producto.id];
+    if (datos) {
+        modalPopularidad.innerHTML = `
+            <div class="modal-stat">
+                <span>📦</span>
+                <span>${datos.ventas} ventas</span>
+            </div>
+            <div class="modal-stat">
+                <span>⭐</span>
+                <span>${datos.valoracion}</span>
+            </div>
+        `;
+    } else {
+        modalPopularidad.innerHTML = '';
+    }
+    
+    // Mostrar modal
+    modal.classList.add('activo');
+    document.body.style.overflow = 'hidden';
+    
+    // Agregar listener para cerrar con ESC
+    document.addEventListener('keydown', cerrarModalConEsc);
+}
+
+// Cerrar modal
+function cerrarModalProducto() {
+    const modal = document.getElementById('modalProducto');
+    modal.classList.remove('activo');
+    document.body.style.overflow = '';
+    productoModalActual = null;
+    cantidadModal = 1;
+    
+    // Remover listener
+    document.removeEventListener('keydown', cerrarModalConEsc);
+}
+
+// Cerrar con tecla ESC
+function cerrarModalConEsc(e) {
+    if (e.key === 'Escape') {
+        cerrarModalProducto();
+    }
+}
+
+// Cambiar cantidad en el modal
+function cambiarCantidadModal(delta) {
+    cantidadModal = Math.max(1, cantidadModal + delta);
+    document.getElementById('modalCantidad').textContent = cantidadModal;
+}
+
+// Agregar al carrito desde el modal
+function agregarDesdeModal() {
+    if (!productoModalActual) return;
+    
+    const itemExistente = carritoCompras.find(item => item.id === productoModalActual.id);
+    
+    if (itemExistente) {
+        itemExistente.cantidad += cantidadModal;
+    } else {
+        carritoCompras.push({ ...productoModalActual, cantidad: cantidadModal });
+    }
+    
+    guardarCarrito();
+    actualizarCarrito();
+    
+    const mensaje = cantidadModal > 1 
+        ? `✅ ${cantidadModal} x ${productoModalActual.nombre} agregados al carrito`
+        : `✅ ${productoModalActual.nombre} agregado al carrito`;
+    
+    mostrarNotificacion(mensaje);
+    
+    // Cerrar modal después de agregar
+    setTimeout(() => {
+        cerrarModalProducto();
+    }, 500);
+}
+
+// Comprar por WhatsApp desde el modal
+function comprarWhatsAppModal() {
+    if (!productoModalActual) return;
+    
+    const producto = productoModalActual;
+    const cantidad = cantidadModal;
+    const precioTotal = producto.precio * cantidad;
+    
+    let mensaje = `¡Hola! 👋 Estoy interesado en:\n\n`;
+    mensaje += `🛒 *${producto.nombre}*\n`;
+    mensaje += `📦 Cantidad: ${cantidad}\n`;
+    mensaje += `💰 Precio unitario: $${producto.precio.toLocaleString('es-CO')}\n`;
+    mensaje += `💵 Total: $${precioTotal.toLocaleString('es-CO')}\n\n`;
+    
+    if (producto.pesoAproximado) {
+        mensaje += `⚖️ ${producto.pesoAproximado}\n\n`;
+    }
+    
+    mensaje += `¿Está disponible? 😊`;
+    
+    const url = `https://wa.me/573209319916?text=${encodeURIComponent(mensaje)}`;
+    window.open(url, '_blank');
+    
+    cerrarModalProducto();
 }

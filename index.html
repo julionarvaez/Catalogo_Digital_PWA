@@ -1006,6 +1006,56 @@
         <span id="textoNotificacion"></span>
     </div>
 
+    <!-- Modal de Detalles del Producto -->
+    <div class="modal-producto" id="modalProducto">
+        <div class="modal-overlay" onclick="cerrarModalProducto()"></div>
+        <div class="modal-contenido">
+            <button class="btn-cerrar-modal" onclick="cerrarModalProducto()">✕</button>
+            
+            <div class="modal-imagen-container">
+                <img src="" alt="" class="modal-imagen" id="modalImagen">
+                <div class="modal-etiqueta" id="modalEtiqueta"></div>
+            </div>
+            
+            <div class="modal-body">
+                <div class="modal-header">
+                    <h2 class="modal-titulo" id="modalTitulo"></h2>
+                    <div class="modal-meta" id="modalMeta"></div>
+                </div>
+                
+                <div class="modal-precio-section">
+                    <div>
+                        <div class="modal-precio" id="modalPrecio"></div>
+                    </div>
+                    <div class="modal-popularidad" id="modalPopularidad"></div>
+                </div>
+                
+                <div class="modal-descripcion">
+                    <h3>📝 Descripción</h3>
+                    <p id="modalDescripcion"></p>
+                </div>
+                
+                <div class="modal-cantidad-section">
+                    <span class="modal-cantidad-label">Cantidad:</span>
+                    <div class="modal-cantidad-controls">
+                        <button class="modal-btn-cantidad" onclick="cambiarCantidadModal(-1)">−</button>
+                        <span class="modal-cantidad-valor" id="modalCantidad">1</span>
+                        <button class="modal-btn-cantidad" onclick="cambiarCantidadModal(1)">+</button>
+                    </div>
+                </div>
+                
+                <div class="modal-acciones">
+                    <button class="modal-btn modal-btn-agregar" onclick="agregarDesdeModal()">
+                        🛒 Agregar al carrito
+                    </button>
+                    <button class="modal-btn modal-btn-whatsapp" onclick="comprarWhatsAppModal()">
+                        💬 Comprar por WhatsApp
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Sistema de Actualización Automática -->
     <script src="auto-update.js" defer></script>
     
