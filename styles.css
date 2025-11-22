@@ -210,9 +210,9 @@ body.banner-oculto .seccion-hero {
     background-size: cover;
     color: white;
     text-align: center;
-    padding: 4rem 2rem;
+    padding: 3rem 1.5rem;
     border-radius: 1rem;
-    margin-bottom: 3rem;
+    margin-bottom: 2rem;
     margin-top: 0;
     transition: margin-top 0.5s ease;
 }
@@ -2898,8 +2898,27 @@ body.modo-oscuro .pie-pagina {
 
 /* === RESPONSIVE === */
 @media (max-width: 768px) {
+    .seccion-hero {
+        padding: 2rem 1rem;
+        margin-bottom: 1.5rem;
+        border-radius: 0.75rem;
+    }
+
     .seccion-hero h1 {
-        font-size: 2rem;
+        font-size: 1.75rem;
+        line-height: 1.2;
+        margin-bottom: 0.75rem;
+    }
+
+    .seccion-hero p {
+        font-size: 1rem;
+        line-height: 1.5;
+        margin-bottom: 1.5rem;
+    }
+
+    .btn-llamada-accion {
+        padding: 0.875rem 1.5rem;
+        font-size: 1rem;
     }
     
     .contenedor-nav {
@@ -3071,31 +3090,71 @@ body.modo-oscuro .cerrar-modal:hover {
 /* === CORRECCIÓN DE ENCABEZADO EN MÓVILES === */
 @media (max-width: 600px) {
     .encabezado {
-    padding: 0.5rem 0.5rem;
+        padding: 0.5rem 0.5rem;
+    }
+
+    .banner-promocional {
+        margin-top: 65px;
+    }
+
+    .contenedor {
+        padding: 0 0.75rem !important;
+        padding-top: 1rem !important;
+    }
+
+    .seccion-hero {
+        padding: 1.25rem 0.875rem;
+        margin-bottom: 1rem;
+        border-radius: 0.5rem;
+    }
+
+    .seccion-hero h1 {
+        font-size: 1.25rem !important;
+        line-height: 1.25;
+        margin-bottom: 0.625rem;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+    }
+
+    .seccion-hero p {
+        font-size: 0.85rem !important;
+        line-height: 1.4;
+        margin-bottom: 1rem;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+    }
+
+    .btn-llamada-accion {
+        padding: 0.7rem 1rem;
+        font-size: 0.9rem;
+        width: 100%;
+        max-width: 100%;
+        display: block;
+    }
 }
 
-.banner-promocional {
-    margin-top: 65px; /* Ajuste específico para pantallas pequeñas */
-}
+/* === MÓVILES MUY PEQUEÑOS === */
+@media (max-width: 400px) {
+    .seccion-hero {
+        padding: 1rem 0.75rem;
+    }
 
-.contenedor {
-    padding-top: 2rem !important; /* Consistente con el nuevo espaciado */
-}
+    .seccion-hero h1 {
+        font-size: 1.1rem !important;
+        line-height: 1.2;
+        margin-bottom: 0.5rem;
+    }
 
-.seccion-hero {
-    padding-top: 1rem;
-    padding-bottom: 2rem;
-}
+    .seccion-hero p {
+        font-size: 0.8rem !important;
+        line-height: 1.35;
+        margin-bottom: 0.875rem;
+    }
 
-.seccion-hero h1 {
-    font-size: 1.8rem !important;
-    line-height: 1.2;
-}
-
-.seccion-hero p {
-    font-size: 1rem !important;
-    line-height: 1.4;
-}
+    .btn-llamada-accion {
+        padding: 0.65rem 0.875rem;
+        font-size: 0.85rem;
+    }
 }
 
 /* ========================================
