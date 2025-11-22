@@ -3421,8 +3421,8 @@ function mostrarSimuladorPollo() {
 
     // Intentar derivar peso medio desde pesoAproximado (ej: "2400 - 3000 g")
     const pesoMedioKg = obtenerPesoMedioKg(producto.pesoAproximado);
-    // Derivar precio/kg si se puede (si producto.precio se refiere a unidad)
-    const precioKgDerivado = pesoMedioKg ? (Number(producto.precio) / pesoMedioKg) : null;
+    // Usar precio por kg del producto si existe, sino usar 15000 por defecto
+    const precioKgDerivado = producto.precioPorKg || 15000;
 
     const modal = document.createElement('div');
     modal.className = 'modal-instalacion';
@@ -3430,7 +3430,7 @@ function mostrarSimuladorPollo() {
     modal.innerHTML = `
     <div class="contenido-modal-instalacion" style="max-width:720px;">
         <button class="cerrar-modal" onclick="cerrarSimuladorPollo()">✕</button>
-        <h3>🔢 Simulador: Pollo Semicriollo Entero</h3>
+        <h3>Simulador: Pollo Semicriollo Entero</h3>
         <p class="simulador-ayuda">Usa el control para elegir el peso estimado del pollo. Puedes editar el precio por kg si conoces el valor real.</p>
 
         <div class="simulador-grid" style="margin-top:1rem;">
@@ -3443,15 +3443,15 @@ function mostrarSimuladorPollo() {
             </div>
 
             <label style="margin-top:0.75rem;">Precio por kg (COP):</label>
-            <input id="sim-precio-kg" type="number" min="0" step="10" value="${precioKgDerivado ? Math.round(precioKgDerivado) : ''}" placeholder="Ej: 12000" style="padding:0.5rem; border-radius:0.4rem; border:1px solid var(--borde-claro);">
-            <div class="simulador-ayuda">Precio derivado desde producto: ${precioKgDerivado ? `${Math.round(precioKgDerivado).toLocaleString('es-CO')} COP/kg` : 'no disponible'}</div>
+            <input id="sim-precio-kg" type="number" min="0" step="10" value="${precioKgDerivado}" placeholder="Ej: 15000" style="padding:0.5rem; border-radius:0.4rem; border:1px solid var(--borde-claro);">
+            <div class="simulador-ayuda">Precio por kg: ${precioKgDerivado.toLocaleString('es-CO')} COP/kg</div>
             </div>
 
             <div>
             <div class="simulador-result">
                 <div>Producto: <strong>${producto.nombre}</strong></div>
                 <div style="margin-top:0.5rem;">Peso elegido: <strong id="sim-peso-resumen">${pesoMedioKg ? pesoMedioKg.toFixed(2) : '2.70'} kg</strong></div>
-                <div style="margin-top:0.5rem;">Precio/kg usado: <strong id="sim-precio-kg-resumen">${precioKgDerivado ? Math.round(precioKgDerivado).toLocaleString('es-CO') : '—'} COP</strong></div>
+                <div style="margin-top:0.5rem;">Precio/kg usado: <strong id="sim-precio-kg-resumen">${precioKgDerivado.toLocaleString('es-CO')} COP</strong></div>
 
                 <div style="margin-top:1rem;">
                 <div class="precio-final" id="sim-precio-final">$${'0'.toLocaleString('es-CO')}</div>
@@ -3613,10 +3613,18 @@ function cerrarBanner() {
     // Log para analytics
     console.log('📊 Banner promocional cerrado por el usuario');
     
-    // Ocultar después de la animación
+    // Ocultar después de la animación y agregar clase al body
     setTimeout(() => {
         banner.style.display = 'none';
-    }, 500);
+        banner.style.margin = '0';
+        banner.style.padding = '0';
+        banner.style.minHeight = '0';
+        banner.style.maxHeight = '0';
+        banner.style.height = '0';
+        
+        // Agregar clase al body para ajustar el espaciado del contenedor
+        document.body.classList.add('banner-oculto');
+    }, 600);
     
     // Enviar evento personalizado
     dispatchEvent(new CustomEvent('bannerPromocionalCerrado', {
