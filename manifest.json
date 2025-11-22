@@ -11,6 +11,7 @@
   "lang": "es",
   "dir": "ltr",
   "scope": "/",
+  "gcm_sender_id": "103953800507",
   "icons": [
     {
       "src": "./Imagenes/logo/logo 72x72.png",

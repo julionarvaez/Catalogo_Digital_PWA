@@ -1,11 +1,25 @@
 // === SERVICE WORKER PARA ALIMENTO DEL CIELO PWA ===
 // IMPORTANTE: Incrementar esta versión cuando haya cambios importantes
-const CACHE_VERSION = '1.0.8';
+const CACHE_VERSION = '1.0.9';
 const CACHE_NAME = `alimento-del-cielo-v${CACHE_VERSION}`;
 const APP_VERSION = CACHE_VERSION;
 
 // Timestamp de la última actualización (se actualiza automáticamente)
 const LAST_UPDATE = Date.now();
+
+// === IMPORTAR FIREBASE MESSAGING PARA NOTIFICACIONES PUSH ===
+// Configuración de Firebase Cloud Messaging
+const FIREBASE_CONFIG = {
+    apiKey: "TU_API_KEY",
+    authDomain: "TU_PROJECT_ID.firebaseapp.com",
+    projectId: "TU_PROJECT_ID",
+    storageBucket: "TU_PROJECT_ID.appspot.com",
+    messagingSenderId: "TU_SENDER_ID",
+    appId: "TU_APP_ID"
+};
+
+// Bandera para verificar si Firebase está cargado
+let firebaseInitialized = false;
 
 // Archivos esenciales para cachear
 const urlsToCache = [
@@ -110,9 +124,95 @@ self.addEventListener('message', (event) => {
                 });
             }));
         }
+        // Mensaje para inicializar Firebase
+        if (data.type === 'INIT_FIREBASE') {
+            console.log('🔥 Inicializando Firebase en Service Worker');
+            initializeFirebaseInSW();
+        }
     } catch (e) {
         console.error('❌ Error manejando mensaje:', e);
     }
+});
+
+// === INICIALIZAR FIREBASE EN SERVICE WORKER ===
+function initializeFirebaseInSW() {
+    if (firebaseInitialized) {
+        console.log('✅ Firebase ya inicializado en SW');
+        return;
+    }
+
+    try {
+        // Importar scripts de Firebase
+        importScripts('https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js');
+        importScripts('https://www.gstatic.com/firebasejs/9.22.0/firebase-messaging-compat.js');
+
+        // Inicializar Firebase
+        firebase.initializeApp(FIREBASE_CONFIG);
+        const messaging = firebase.messaging();
+
+        // Manejar mensajes en background
+        messaging.onBackgroundMessage((payload) => {
+            console.log('📩 [SW] Mensaje FCM en background:', payload);
+
+            const notificationTitle = payload.notification?.title || 'Alimento del Cielo';
+            const notificationOptions = {
+                body: payload.notification?.body || 'Nueva notificación',
+                icon: payload.notification?.icon || '/Imagenes/logo/Logo.png',
+                image: payload.notification?.image,
+                badge: '/Imagenes/logo/logo 96x96.png',
+                tag: payload.data?.tag || 'default',
+                requireInteraction: false,
+                data: payload.data || {},
+                actions: [
+                    { action: 'ver', title: 'Ver' },
+                    { action: 'cerrar', title: 'Cerrar' }
+                ],
+                vibrate: [200, 100, 200]
+            };
+
+            return self.registration.showNotification(notificationTitle, notificationOptions);
+        });
+
+        firebaseInitialized = true;
+        console.log('✅ Firebase inicializado correctamente en SW');
+    } catch (error) {
+        console.error('❌ Error inicializando Firebase en SW:', error);
+    }
+}
+
+// === MANEJAR CLICS EN NOTIFICACIONES ===
+self.addEventListener('notificationclick', (event) => {
+    console.log('🖱️ Click en notificación:', event);
+    event.notification.close();
+
+    const urlToOpen = event.notification.data?.url || '/';
+
+    event.waitUntil(
+        clients.matchAll({ type: 'window', includeUncontrolled: true })
+            .then((clientList) => {
+                // Buscar ventana abierta
+                for (let client of clientList) {
+                    if (client.url.includes(self.location.origin) && 'focus' in client) {
+                        client.focus();
+                        client.postMessage({
+                            type: 'NOTIFICATION_CLICKED',
+                            data: event.notification.data,
+                            action: event.action
+                        });
+                        return client;
+                    }
+                }
+                // Abrir nueva ventana
+                if (clients.openWindow) {
+                    return clients.openWindow(urlToOpen);
+                }
+            })
+    );
+});
+
+// === MANEJAR CIERRE DE NOTIFICACIONES ===
+self.addEventListener('notificationclose', (event) => {
+    console.log('🔕 Notificación cerrada:', event.notification.tag);
 });
 
 // === INTERCEPTAR REQUESTS (ESTRATEGIA DINÁMICA POR TIPO) ===

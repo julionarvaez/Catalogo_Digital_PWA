@@ -2009,6 +2009,12 @@ async function solicitarPermisoNotificaciones() {
     // Si ya tenemos permiso
     if (Notification.permission === 'granted') {
         console.log('✅ Permisos de notificación ya concedidos');
+        
+        // Obtener token FCM si está disponible
+        if (typeof solicitarPermisoNotificacionesFCM === 'function') {
+            await solicitarPermisoNotificacionesFCM();
+        }
+        
         return 'granted';
     }
 
@@ -2029,8 +2035,16 @@ async function solicitarPermisoNotificaciones() {
             // Guardar en localStorage
             localStorage.setItem('notificaciones_activadas', 'true');
             
-            // Suscribirse a notificaciones push
-            suscribirseAPush();
+            // Obtener token FCM para notificaciones push
+            if (typeof solicitarPermisoNotificacionesFCM === 'function') {
+                const token = await solicitarPermisoNotificacionesFCM();
+                if (token) {
+                    console.log('✅ Token FCM obtenido y guardado');
+                }
+            } else {
+                // Fallback al sistema antiguo si Firebase no está disponible
+                suscribirseAPush();
+            }
             
             // Enviar notificación de prueba después de 3 segundos
             setTimeout(() => {
