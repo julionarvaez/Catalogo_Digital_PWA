@@ -1,6 +1,6 @@
 // === SERVICE WORKER PARA ALIMENTO DEL CIELO PWA ===
 // IMPORTANTE: Incrementar esta versión cuando haya cambios importantes
-const CACHE_VERSION = '1.0.9';
+const CACHE_VERSION = '1.0.10';
 const CACHE_NAME = `alimento-del-cielo-v${CACHE_VERSION}`;
 const APP_VERSION = CACHE_VERSION;
 
@@ -9,13 +9,14 @@ const LAST_UPDATE = Date.now();
 
 // === IMPORTAR FIREBASE MESSAGING PARA NOTIFICACIONES PUSH ===
 // Configuración de Firebase Cloud Messaging
-const FIREBASE_CONFIG = {
-    apiKey: "TU_API_KEY",
-    authDomain: "TU_PROJECT_ID.firebaseapp.com",
-    projectId: "TU_PROJECT_ID",
-    storageBucket: "TU_PROJECT_ID.appspot.com",
-    messagingSenderId: "TU_SENDER_ID",
-    appId: "TU_APP_ID"
+const firebaseConfig = {
+    apiKey: "AIzaSyAkAZEuyiWWK5aO26WSzSuPR4ekVV2fx6Y",
+    authDomain: "alimento-del-cielo.firebaseapp.com",
+    projectId: "alimento-del-cielo",
+    storageBucket: "alimento-del-cielo.firebasestorage.app",
+    messagingSenderId: "500358694887",
+    appId: "1:500358694887:web:7487dfb975dac084851f42",
+    measurementId: "G-NSC2ZFXF41"
 };
 
 // Bandera para verificar si Firebase está cargado
