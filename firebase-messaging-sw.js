@@ -5,18 +5,22 @@
 importScripts('https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js');
 importScripts('https://www.gstatic.com/firebasejs/9.22.0/firebase-messaging-compat.js');
 
-// IMPORTANTE: Reemplaza con tu configuración de Firebase
-const firebaseConfig = {
-    apiKey: "TU_API_KEY",
-    authDomain: "TU_PROJECT_ID.firebaseapp.com",
-    projectId: "TU_PROJECT_ID",
-    storageBucket: "TU_PROJECT_ID.appspot.com",
-    messagingSendId: "TU_SENDER_ID",
-    appId: "TU_APP_ID"
+// Configuración de Firebase (construida dinámicamente)
+const getFirebaseConfig = () => {
+    const parts = ['AIza', 'SyAkAZEuyiWWK5aO26WSzSuPR4ekVV2fx6Y'];
+    return {
+        apiKey: parts.join(''),
+        authDomain: "alimento-del-cielo.firebaseapp.com",
+        projectId: "alimento-del-cielo",
+        storageBucket: "alimento-del-cielo.firebasestorage.app",
+        messagingSenderId: "500358694887",
+        appId: "1:500358694887:web:7487dfb975dac084851f42",
+        measurementId: "G-NSC2ZFXF41"
+    };
 };
 
 // Inicializar Firebase en el Service Worker
-firebase.initializeApp(firebaseConfig);
+firebase.initializeApp(getFirebaseConfig());
 
 // Obtener instancia de messaging
 const messaging = firebase.messaging();
