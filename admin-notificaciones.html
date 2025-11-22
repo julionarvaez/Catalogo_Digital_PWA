@@ -418,7 +418,14 @@
             const secreto = document.getElementById('secreto').value;
 
             try {
-                const response = await fetch('/.netlify/functions/enviar-notificacion-fcm', {
+                // Detectar si estamos en desarrollo local o producción
+                const apiUrl = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+                    ? 'http://localhost:8888/.netlify/functions/enviar-notificacion-fcm'
+                    : '/.netlify/functions/enviar-notificacion-fcm';
+
+                console.log('🚀 Enviando a:', apiUrl);
+
+                const response = await fetch(apiUrl, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -446,6 +453,7 @@
                 }
             } catch (error) {
                 showAlert(`❌ Error de conexión: ${error.message}`, 'error');
+                console.error('Error completo:', error);
             } finally {
                 btn.disabled = false;
                 btn.textContent = '📤 Enviar Notificación a Todos';

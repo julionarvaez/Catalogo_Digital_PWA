@@ -1,0 +1,2 @@
+# Proteger el panel de administración
+/admin-notificaciones.html  /.netlify/functions/auth-admin  200!

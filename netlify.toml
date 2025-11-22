@@ -6,6 +6,16 @@
   functions = "netlify/functions"
   command = "echo 'Build completado - Sitio estático con funciones serverless'"
 
+# ============================================
+# CONFIGURACIÓN NETLIFY DEV (LOCAL)
+# ============================================
+[dev]
+  command = "echo 'Servidor local de desarrollo'"
+  port = 8888
+  publish = "."
+  functions = "netlify/functions"
+  autoLaunch = true
+
 # Redirecciones para las funciones serverless
 [[redirects]]
   from = "/api/*"
