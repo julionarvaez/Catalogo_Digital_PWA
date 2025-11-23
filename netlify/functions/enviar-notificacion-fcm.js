@@ -146,13 +146,11 @@ exports.handler = async (event, context) => {
 
         console.log(`📤 Enviando notificación a ${tokens.length} dispositivo(s)`);
 
-        // Construir mensaje
+        // Construir mensaje - IMPORTANTE: icon e image van en webpush, no en notification
         const message = {
             notification: {
                 title: title,
-                body: body,
-                ...(icon && { icon: icon }),
-                ...(image && { image: image })
+                body: body
             },
             data: {
                 url: url || '/',
@@ -160,6 +158,12 @@ exports.handler = async (event, context) => {
                 ...(data || {})
             },
             webpush: {
+                notification: {
+                    title: title,
+                    body: body,
+                    ...(icon && { icon: icon }),
+                    ...(image && { image: image })
+                },
                 fcmOptions: {
                     link: url || '/'
                 }
