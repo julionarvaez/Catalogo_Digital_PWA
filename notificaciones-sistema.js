@@ -5,6 +5,19 @@
 let notificaciones = [];
 let notificacionesNoLeidas = 0;
 
+// Exportar funciones globales INMEDIATAMENTE (antes de DOMContentLoaded)
+// Esto asegura que firebase-config.js pueda usarlas
+window.agregarNotificacionAlCentro = agregarNotificacionAlCentro;
+window.actualizarContadorNotificaciones = actualizarContadorNotificaciones;
+window.marcarComoLeida = marcarComoLeida;
+window.marcarTodasLeidas = marcarTodasLeidas;
+window.eliminarNotificacion = eliminarNotificacion;
+window.limpiarNotificaciones = limpiarNotificaciones;
+window.abrirNotificacion = abrirNotificacion;
+window.alternarCentroNotificaciones = alternarCentroNotificaciones;
+
+console.log('✅ Funciones de notificaciones exportadas globalmente');
+
 // Cargar notificaciones guardadas al iniciar
 function cargarNotificacionesGuardadas() {
     try {
@@ -268,17 +281,13 @@ function alternarCentroNotificaciones() {
 
 // ========== INICIALIZACIÓN ==========
 // Cargar notificaciones al iniciar
-document.addEventListener('DOMContentLoaded', () => {
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => {
+        cargarNotificacionesGuardadas();
+        console.log('✅ Sistema de notificaciones inicializado');
+    });
+} else {
+    // El DOM ya está listo
     cargarNotificacionesGuardadas();
     console.log('✅ Sistema de notificaciones inicializado');
-});
-
-// Exportar funciones globales
-window.agregarNotificacionAlCentro = agregarNotificacionAlCentro;
-window.actualizarContadorNotificaciones = actualizarContadorNotificaciones;
-window.marcarComoLeida = marcarComoLeida;
-window.marcarTodasLeidas = marcarTodasLeidas;
-window.eliminarNotificacion = eliminarNotificacion;
-window.limpiarNotificaciones = limpiarNotificaciones;
-window.abrirNotificacion = abrirNotificacion;
-window.alternarCentroNotificaciones = alternarCentroNotificaciones;
+}

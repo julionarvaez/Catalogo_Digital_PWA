@@ -194,14 +194,24 @@ function escucharMensajes() {
             data: payload.data
         });
 
-        // Agregar al centro de notificaciones
-        if (typeof agregarNotificacionAlCentro === 'function') {
-            agregarNotificacionAlCentro({
-                titulo: title,
-                mensaje: body,
-                tipo: payload.data?.tipo || 'general'
-            });
-        }
+        // Agregar al centro de notificaciones con reintentos
+        const agregarNotif = () => {
+            if (typeof agregarNotificacionAlCentro === 'function') {
+                agregarNotificacionAlCentro({
+                    titulo: title || 'Notificación',
+                    mensaje: body || 'Tienes un nuevo mensaje',
+                    tipo: payload.data?.tipo || 'general',
+                    icono: '🔔',
+                    url: payload.data?.url || payload.fcmOptions?.link || null,
+                    data: payload.data
+                });
+                console.log('✅ Notificación agregada al centro');
+            } else {
+                console.warn('⚠️ agregarNotificacionAlCentro no disponible aún, reintentando...');
+                setTimeout(agregarNotif, 100);
+            }
+        };
+        agregarNotif();
     });
 }
 
