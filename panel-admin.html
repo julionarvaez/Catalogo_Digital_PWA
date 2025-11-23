@@ -3,11 +3,30 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-    <meta http-equiv="Pragma" content="no-cache">
-    <meta http-equiv="Expires" content="0">
-    <title>Panel de Administración - Notificaciones Push v2.0</title>
+    <title>Panel de Notificaciones Push v2.0 - Alimento del Cielo</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300..800&family=Poppins:wght@500;600;700&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/png" href="./Imagenes/logo/Logo.png">
     <style>
+        :root {
+            --color-primario: #2563eb;
+            --color-secundario: #1e40af;
+            --color-acento: #f59e0b;
+            --color-exito: #10b981;
+            --color-error: #ef4444;
+            --fondo-claro: #f8fafc;
+            --texto-claro: #334155;
+            --texto-secundario: #64748b;
+            --tarjeta-clara: #ffffff;
+            --borde-claro: #e2e8f0;
+            --sombra: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --sombra-lg: 0 20px 60px rgba(37, 99, 235, 0.2);
+            --transicion: all 0.3s ease;
+            --font-ui: 'Inter', system-ui, -apple-system, sans-serif;
+            --font-display: 'Poppins', 'Inter', sans-serif;
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -15,8 +34,10 @@
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: var(--font-ui);
+            background: linear-gradient(135deg, var(--color-primario) 0%, #3b82f6 30%, #8b5cf6 60%, var(--color-acento) 100%);
+            background-size: 400% 400%;
+            animation: gradienteMovimiento 15s ease infinite;
             min-height: 100vh;
             padding: 20px;
             display: flex;
@@ -24,34 +45,72 @@
             justify-content: center;
         }
 
+        @keyframes gradienteMovimiento {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
         .container {
-            background: white;
-            border-radius: 20px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-            max-width: 700px;
+            background: var(--tarjeta-clara);
+            border-radius: 24px;
+            box-shadow: var(--sombra-lg);
+            max-width: 800px;
             width: 100%;
             padding: 40px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 6px;
+            background: linear-gradient(90deg, var(--color-primario) 0%, #8b5cf6 50%, var(--color-acento) 100%);
+        }
+
+        .header-panel {
+            text-align: center;
+            margin-bottom: 35px;
         }
 
         h1 {
-            color: #2d3748;
-            margin-bottom: 10px;
-            font-size: 28px;
+            font-family: var(--font-display);
+            color: var(--color-primario);
+            margin-bottom: 8px;
+            font-size: 32px;
+            font-weight: 700;
+            letter-spacing: -0.02em;
         }
 
         .subtitle {
-            color: #718096;
-            margin-bottom: 30px;
+            color: var(--texto-secundario);
             font-size: 14px;
+            font-weight: 500;
+        }
+
+        .version-tag {
+            display: inline-block;
+            background: linear-gradient(135deg, var(--color-primario), #8b5cf6);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+            margin-left: 10px;
+            letter-spacing: 0.5px;
         }
 
         .form-group {
-            margin-bottom: 20px;
+            margin-bottom: 22px;
         }
 
         label {
             display: block;
-            color: #2d3748;
+            color: var(--texto-claro);
             font-weight: 600;
             margin-bottom: 8px;
             font-size: 14px;
@@ -59,18 +118,20 @@
 
         input, textarea, select {
             width: 100%;
-            padding: 12px 16px;
-            border: 2px solid #e2e8f0;
-            border-radius: 10px;
+            padding: 13px 16px;
+            border: 2px solid var(--borde-claro);
+            border-radius: 12px;
             font-size: 14px;
-            transition: all 0.3s;
-            font-family: inherit;
+            font-family: var(--font-ui);
+            transition: var(--transicion);
+            background: var(--fondo-claro);
         }
 
         input:focus, textarea:focus, select:focus {
             outline: none;
-            border-color: #667eea;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            border-color: var(--color-primario);
+            background: white;
+            box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
         }
 
         textarea {
@@ -85,22 +146,23 @@
         }
 
         .btn {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, var(--color-primario) 0%, var(--color-secundario) 100%);
             color: white;
             border: none;
-            padding: 14px 28px;
-            border-radius: 10px;
+            padding: 15px 28px;
+            border-radius: 12px;
             font-size: 16px;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.3s;
+            transition: var(--transicion);
             width: 100%;
             margin-top: 10px;
+            box-shadow: 0 4px 15px rgba(37, 99, 235, 0.3);
         }
 
         .btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+            box-shadow: 0 8px 25px rgba(37, 99, 235, 0.4);
         }
 
         .btn:active {
@@ -110,14 +172,16 @@
         .btn:disabled {
             opacity: 0.6;
             cursor: not-allowed;
+            transform: none;
         }
 
         .alert {
             padding: 16px 20px;
-            border-radius: 10px;
+            border-radius: 12px;
             margin-bottom: 20px;
             display: none;
-            animation: slideIn 0.3s ease;
+            animation: slideIn 0.4s ease;
+            font-weight: 500;
         }
 
         @keyframes slideIn {
@@ -132,15 +196,15 @@
         }
 
         .alert.success {
-            background: #d4edda;
-            color: #155724;
-            border: 2px solid #c3e6cb;
+            background: #d1fae5;
+            color: #065f46;
+            border: 2px solid #6ee7b7;
         }
 
         .alert.error {
-            background: #f8d7da;
-            color: #721c24;
-            border: 2px solid #f5c6cb;
+            background: #fee2e2;
+            color: #991b1b;
+            border: 2px solid #fca5a5;
         }
 
         .alert.show {
@@ -148,37 +212,38 @@
         }
 
         .preview {
-            background: #f7fafc;
-            border: 2px dashed #cbd5e0;
-            border-radius: 10px;
-            padding: 20px;
+            background: var(--fondo-claro);
+            border: 2px dashed var(--borde-claro);
+            border-radius: 16px;
+            padding: 24px;
             margin-top: 20px;
         }
 
         .preview h3 {
-            color: #2d3748;
-            margin-bottom: 15px;
+            color: var(--texto-claro);
+            margin-bottom: 16px;
             font-size: 16px;
+            font-weight: 600;
         }
 
         .notification-preview {
             background: white;
-            border-radius: 10px;
-            padding: 16px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            border-radius: 14px;
+            padding: 18px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
             display: flex;
-            gap: 12px;
+            gap: 14px;
         }
 
         .notification-icon {
-            width: 48px;
-            height: 48px;
-            border-radius: 8px;
-            background: #667eea;
+            width: 52px;
+            height: 52px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, var(--color-primario), #8b5cf6);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 24px;
+            font-size: 26px;
             flex-shrink: 0;
         }
 
@@ -188,71 +253,134 @@
 
         .notification-title {
             font-weight: 600;
-            color: #2d3748;
-            margin-bottom: 4px;
+            color: var(--texto-claro);
+            margin-bottom: 5px;
+            font-size: 15px;
         }
 
         .notification-body {
-            color: #718096;
+            color: var(--texto-secundario);
             font-size: 14px;
-            line-height: 1.4;
+            line-height: 1.5;
         }
 
         .stats {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 15px;
-            margin-bottom: 30px;
+            gap: 16px;
+            margin-bottom: 32px;
         }
 
         .stat-card {
-            background: linear-gradient(135deg, #667eea20 0%, #764ba220 100%);
-            padding: 20px;
-            border-radius: 12px;
+            background: linear-gradient(135deg, rgba(37, 99, 235, 0.08) 0%, rgba(139, 92, 246, 0.08) 100%);
+            padding: 22px;
+            border-radius: 16px;
             text-align: center;
+            border: 1px solid rgba(37, 99, 235, 0.1);
+            transition: var(--transicion);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 16px rgba(37, 99, 235, 0.15);
         }
 
         .stat-value {
-            font-size: 32px;
+            font-size: 36px;
             font-weight: 700;
-            color: #667eea;
-            margin-bottom: 5px;
+            color: var(--color-primario);
+            margin-bottom: 6px;
+            font-family: var(--font-display);
         }
 
         .stat-label {
-            color: #718096;
+            color: var(--texto-secundario);
             font-size: 12px;
             font-weight: 600;
             text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
         .template-selector {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 10px;
-            margin-bottom: 20px;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 12px;
+            margin-bottom: 22px;
         }
 
         .template-btn {
-            padding: 12px;
-            border: 2px solid #e2e8f0;
-            border-radius: 8px;
+            padding: 14px;
+            border: 2px solid var(--borde-claro);
+            border-radius: 12px;
             background: white;
             cursor: pointer;
-            transition: all 0.3s;
-            font-size: 13px;
+            transition: var(--transicion);
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--texto-claro);
         }
 
         .template-btn:hover {
-            border-color: #667eea;
-            background: #667eea10;
+            border-color: var(--color-primario);
+            background: rgba(37, 99, 235, 0.05);
+            transform: translateY(-2px);
+        }
+
+        .template-btn:active {
+            transform: translateY(0);
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 15px;
+            }
+
+            .container {
+                padding: 28px 20px;
+            }
+
+            h1 {
+                font-size: 26px;
+            }
+
+            .stats {
+                gap: 12px;
+            }
+
+            .stat-card {
+                padding: 18px 12px;
+            }
+
+            .stat-value {
+                font-size: 30px;
+            }
+
+            .row {
+                grid-template-columns: 1fr;
+            }
+
+            .template-selector {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 480px) {
+            .stats {
+                grid-template-columns: 1fr;
+            }
+
+            .template-selector {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>🔔 Panel de Notificaciones Push v2.0</h1>
-        <p class="subtitle">Envía notificaciones a todos los usuarios de tu PWA - Actualizado 23/11/2025</p>
+        <div class="header-panel">
+            <h1>🔔 Panel de Notificaciones Push <span class="version-tag">v2.0</span></h1>
+            <p class="subtitle">Envía notificaciones a todos los usuarios de tu PWA - Actualizado 23/11/2025</p>
+        </div>
 
         <div class="stats" id="stats">
             <div class="stat-card">
