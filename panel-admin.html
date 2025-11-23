@@ -456,13 +456,24 @@
         // Cargar estadísticas al inicio
         async function loadStats() {
             try {
-                // Aquí podrías hacer una llamada para obtener estadísticas
-                // Por ahora, valores de ejemplo
+                const response = await fetch('/.netlify/functions/obtener-estadisticas-fcm');
+                const data = await response.json();
+                
+                if (data.ok) {
+                    document.getElementById('totalTokens').textContent = data.stats.activeTokens;
+                    document.getElementById('lastSent').textContent = data.stats.tokensToday;
+                    document.getElementById('successRate').textContent = data.stats.successRate + '%';
+                } else {
+                    // Si falla, mostrar 0
+                    document.getElementById('totalTokens').textContent = '0';
+                    document.getElementById('lastSent').textContent = '0';
+                    document.getElementById('successRate').textContent = '0%';
+                }
+            } catch (error) {
+                console.error('Error cargando estadísticas:', error);
                 document.getElementById('totalTokens').textContent = '0';
                 document.getElementById('lastSent').textContent = '0';
                 document.getElementById('successRate').textContent = '0%';
-            } catch (error) {
-                console.error('Error cargando estadísticas:', error);
             }
         }
 
