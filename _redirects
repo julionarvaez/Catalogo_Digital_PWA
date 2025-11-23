@@ -1,2 +1,2 @@
-# Proteger el panel de administración
-/admin-notificaciones.html  /.netlify/functions/auth-admin  200!
+# Panel de administración accesible (la seguridad está en el secreto FCM_ADMIN_SECRET)
+# /admin-notificaciones.html es accesible directamente
