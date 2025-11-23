@@ -417,6 +417,8 @@
 
             const secreto = document.getElementById('secreto').value;
 
+            console.log('📤 Enviando datos:', data);
+
             try {
                 const response = await fetch('/.netlify/functions/enviar-notificacion-fcm', {
                     method: 'POST',
@@ -427,7 +429,10 @@
                     body: JSON.stringify(data)
                 });
 
+                console.log('📡 Status de respuesta:', response.status);
+
                 const result = await response.json();
+                console.log('📊 Respuesta completa del servidor:', result);
 
                 if (result.ok) {
                     showAlert(`✅ Notificación enviada exitosamente a ${result.results.successCount} usuario(s)`, 'success');
