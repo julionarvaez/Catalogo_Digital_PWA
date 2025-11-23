@@ -433,9 +433,16 @@
 
                 const result = await response.json();
                 console.log('📊 Respuesta completa del servidor:', result);
+                console.log('🔢 Total tokens:', result.results?.totalTokens);
+                console.log('✅ Success count:', result.results?.successCount);
+                console.log('❌ Failure count:', result.results?.failureCount);
 
                 if (result.ok) {
-                    showAlert(`✅ Notificación enviada exitosamente a ${result.results.successCount} usuario(s)`, 'success');
+                    const successCount = result.results.successCount || 0;
+                    const totalTokens = result.results.totalTokens || 0;
+                    
+                    console.log('🎯 Mostrando alerta con successCount:', successCount);
+                    showAlert(`✅ Notificación enviada exitosamente a ${successCount} usuario(s) de ${totalTokens} total`, 'success');
                     
                     // Actualizar estadísticas
                     document.getElementById('lastSent').textContent = result.results.successCount;
