@@ -121,10 +121,9 @@ async function obtenerTokenFCM() {
             }
         }
 
-        // Obtener token
-        const vapidParts = ['BJWPYTYUys0da2uena9ElENpgl1NDSlAe_bvYA204AXMaFqBTlTVsT0n', 'KpthzTNwRL7erriKqVb-Zs021gpx9hs'];
+        // Obtener token con clave VAPID
         const token = await messaging.getToken({
-            vapidKey: vapidParts.join('') // Clave VAPID de Firebase Console > Cloud Messaging
+            vapidKey: 'BJWPYTYUys0da2uena9ElENpgl1NDSlAe_bvYA204AXMaFqBTlTVsT0nKpthzTNwRL7erriKqVb-Zs021gpx9hs'
         });
 
         if (token) {
