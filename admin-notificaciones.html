@@ -418,14 +418,7 @@
             const secreto = document.getElementById('secreto').value;
 
             try {
-                // Detectar si estamos en desarrollo local o producción
-                const apiUrl = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
-                    ? 'http://localhost:8888/.netlify/functions/enviar-notificacion-fcm'
-                    : '/.netlify/functions/enviar-notificacion-fcm';
-
-                console.log('🚀 Enviando a:', apiUrl);
-
-                const response = await fetch(apiUrl, {
+                const response = await fetch('/.netlify/functions/enviar-notificacion-fcm', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
