@@ -124,11 +124,23 @@ exports.handler = async (event, context) => {
             };
         }
 
+        // Si no hay tokens, devolver éxito con 0 notificaciones enviadas
         if (tokens.length === 0) {
+            console.log('⚠️ No hay tokens disponibles, pero la operación es válida');
             return {
-                statusCode: 400,
+                statusCode: 200,
                 headers,
-                body: JSON.stringify({ ok: false, error: 'No hay tokens disponibles' })
+                body: JSON.stringify({
+                    ok: true,
+                    message: 'No hay usuarios registrados aún',
+                    results: {
+                        totalTokens: 0,
+                        successCount: 0,
+                        failureCount: 0,
+                        errors: []
+                    },
+                    timestamp: new Date().toISOString()
+                })
             };
         }
 
