@@ -251,12 +251,16 @@ exports.handler = async (event, context) => {
         }
         
         // Auto-aprobar reseñas que parecen legítimas
+        // Cambio: Usar OR en lugar de AND para ser más permisivo
+        // Aprobar si: NO es spam Y (rating alto O texto largo)
         const autoApprove = !sanitizedData.flagged && 
-                          sanitizedData.rating >= 3 && 
-                          sanitizedData.texto.length >= 20;
+                          (sanitizedData.rating >= 3 || sanitizedData.texto.length >= 20);
         
         if (autoApprove) {
             sanitizedData.published = true;
+            console.log(`Auto-aprobada: rating=${sanitizedData.rating}, textLength=${sanitizedData.texto.length}`);
+        } else {
+            console.log(`Requiere moderación: rating=${sanitizedData.rating}, textLength=${sanitizedData.texto.length}, flagged=${!!sanitizedData.flagged}`);
         }
         
         // Inicializar Firestore

@@ -1,6 +1,6 @@
 // === SERVICE WORKER PARA ALIMENTO DEL CIELO PWA ===
 // IMPORTANTE: Incrementar esta versión cuando haya cambios importantes
-const CACHE_VERSION = '1.0.16';
+const CACHE_VERSION = '1.0.65'; // ✅ Referidos móvil optimizado: layout vertical, botones full-width, mejor organización
 const CACHE_NAME = `alimento-del-cielo-v${CACHE_VERSION}`;
 const APP_VERSION = CACHE_VERSION;
 

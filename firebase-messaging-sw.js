@@ -52,6 +52,28 @@ messaging.onBackgroundMessage((payload) => {
         vibrate: [200, 100, 200]
     };
 
+    // 🆕 ENVIAR MENSAJE AL MAIN THREAD para sincronizar con el centro de notificaciones
+    self.clients.matchAll({ type: 'window', includeUncontrolled: true })
+        .then((clientList) => {
+            clientList.forEach((client) => {
+                client.postMessage({
+                    type: 'BACKGROUND_NOTIFICATION',
+                    data: {
+                        title: notificationTitle,
+                        body: notificationOptions.body,
+                        titulo: payload.data?.titulo || notificationTitle,
+                        mensaje: payload.data?.mensaje || notificationOptions.body,
+                        tipo: payload.data?.tipo || 'general',
+                        icono: payload.data?.icono || '🔔',
+                        icon: notificationOptions.icon,
+                        url: payload.data?.url || payload.fcmOptions?.link || '/',
+                        data: payload.data,
+                        timestamp: Date.now()
+                    }
+                });
+            });
+        });
+
     return self.registration.showNotification(notificationTitle, notificationOptions);
 });
 

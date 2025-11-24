@@ -147,14 +147,22 @@ exports.handler = async (event, context) => {
         console.log(`📤 Enviando notificación a ${tokens.length} dispositivo(s)`);
 
         // Construir mensaje - IMPORTANTE: icon e image van en webpush, no en notification
+        // 🆕 AGREGADO: Incluir TODOS los campos necesarios para el centro de notificaciones
         const message = {
             notification: {
                 title: title,
                 body: body
             },
             data: {
+                // Campos necesarios para el centro de notificaciones
+                titulo: title,
+                mensaje: body,
+                tipo: data?.tipo || 'general',
+                icono: data?.icono || '🔔',
+                icon: icon || '/Imagenes/logo/Logo.png',
                 url: url || '/',
                 timestamp: new Date().toISOString(),
+                // Datos adicionales
                 ...(data || {})
             },
             webpush: {

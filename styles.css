@@ -1,3 +1,7 @@
+/* === PARCHE BANNER DEFINITIVO - v2.0 - 2025-11-23 === */
+/* Soluciona: recorte de contenido + superposición sobre hero */
+/* NO CACHEAR - FORZAR RECARGA */
+
 /* === VARIABLES CSS PRINCIPALES === */
 :root {
     --color-primario: #2563eb;      /*el color principal*/
@@ -80,18 +84,7 @@ html, body {
     max-width: 1200px;
     margin: 0 auto;
     padding: 0 1rem;
-    padding-top: 5px;
     box-sizing: border-box;
-    transition: padding-top 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-@media (max-width: 768px) {
-    .contenedor {
-        max-width: 100%;
-        width: 100%;
-        padding: 0 1rem;
-        overflow: visible;
-    }
 }
 
 /* === HEADER Y NAVEGACIÓN === */
@@ -100,75 +93,91 @@ html, body {
     height: 60px;
     border-radius: 10%;
     object-fit: cover;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    
 }
 .encabezado {
     background: linear-gradient(135deg, var(--color-primario), var(--color-secundario));
     color: white;
-    padding: 1rem 0;
-    position: fixed; /* Cambia de sticky a fixed */
+    padding: 0.75rem 0;
+    position: fixed;
     top: 0;
     left: 0;
-    width: 100%;     /* Asegura que ocupe todo el ancho */
+    width: 100%;
+    height: 70px;
     z-index: 1000;
-    box-shadow: var(--sombra);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
+    border-bottom: 2px solid rgba(255, 255, 255, 0.2);
+    display: flex;
+    align-items: center;
 }
 
 .contenedor-nav {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 0 1rem;
+    width: 100%;
+    max-width: 100%;
+    margin: 0;
+    padding: 0 1.5rem;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    flex-wrap: wrap;
-    gap: 1rem;
+    height: 100%;
 }
 
 .logo {
-    font-size: 1.8rem;
-    font-weight: bold;
+    font-size: 1.4rem;
+    font-weight: 700;
     display: flex;
     align-items: center;
-    gap: 0.5rem;
+    gap: 0.6rem;
+    line-height: 1;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 .acciones-nav {
     display: flex;
-    gap: 1rem;
+    gap: 0.65rem;
     align-items: center;
 }
 
 .btn-tema, .btn-carrito, .btn-menu, .btn-centro-notificaciones {
-    background: rgba(255, 255, 255, 0.1);
-    border: none;
+    background: rgba(255, 255, 255, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.2);
     color: white;
-    padding: 0.75rem;
-    border-radius: 0.5rem;
+    padding: 0.6rem 0.7rem;
+    border-radius: 0.6rem;
     cursor: pointer;
-    transition: var(--transicion);
-    font-size: 1rem;
+    transition: all 0.3s ease;
+    font-size: 1.1rem;
     position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 42px;
+    min-height: 42px;
 }
 
 .btn-tema:hover, .btn-carrito:hover, .btn-menu:hover, .btn-centro-notificaciones:hover {
-    background: rgba(255, 255, 255, 0.2);
-    transform: scale(1.05);
+    background: rgba(255, 255, 255, 0.25);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
 .contador-carrito, .contador-notif {
     position: absolute;
-    top: -8px;
-    right: -8px;
+    top: -6px;
+    right: -6px;
     background: var(--color-acento);
     color: white;
     border-radius: 50%;
-    width: 20px;
-    height: 20px;
-    font-size: 0.75rem;
+    width: 18px;
+    height: 18px;
+    font-size: 0.65rem;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-weight: bold;
+    font-weight: 700;
+    border: 2px solid var(--color-primario);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
 }
 
 .contador-notif {
@@ -189,21 +198,57 @@ html, body {
 
 /* === CONTENEDOR PRINCIPAL === */
 .contenedor {
-    max-width: 1200px;
-    margin: 0 auto;
-    margin-top: 80px; /* Espacio para el header fijo */
-    padding: 2rem 1rem 2rem 1rem;
+    margin-top: 0;
+    padding: 2rem 1rem;
+    padding-top: 319px;
     transition: padding-top 0.6s ease;
 }
 
 /* Cuando el banner está oculto, reducir padding superior */
 body.banner-oculto .contenedor {
-    padding-top: 100px;
+    padding-top: 75px; /* Header móvil 65px + margen 10px */
 }
 
 body.banner-oculto .seccion-hero {
     margin-top: 0;
     transition: margin-top 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Ajustes responsivos para el contenedor */
+@media (min-width: 361px) and (max-width: 480px) {
+    .contenedor {
+        padding-top: 324px;
+    }
+    body.banner-oculto .contenedor {
+        padding-top: 75px;
+    }
+}
+
+@media (min-width: 481px) and (max-width: 767px) {
+    .contenedor {
+        padding-top: 319px;
+    }
+    body.banner-oculto .contenedor {
+        padding-top: 75px;
+    }
+}
+
+@media (min-width: 768px) and (max-width: 1023px) {
+    .contenedor {
+        padding-top: 244px;
+    }
+    body.banner-oculto .contenedor {
+        padding-top: 80px;
+    }
+}
+
+@media (min-width: 1024px) {
+    .contenedor {
+        padding-top: 165px;
+    }
+    body.banner-oculto .contenedor {
+        padding-top: 80px;
+    }
 }
 
 /* === SECCIÓN HERO === */
@@ -216,10 +261,11 @@ body.banner-oculto .seccion-hero {
     padding: 2rem 1.5rem;
     border-radius: 1rem;
     margin-bottom: 1.5rem;
-    margin-top: 0;
+    margin-top: 0.5rem;
     width: 100%;
     box-sizing: border-box;
     transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
 }
 
 .seccion-hero h1 {
@@ -2210,6 +2256,73 @@ body.modo-oscuro .btn-limpiar-notificaciones:hover {
     transform: translateY(0) scale(0.98);
 }
 
+/* Botón configurar notificaciones - Estilo profesional */
+.btn-configurar-notificaciones {
+    background: linear-gradient(135deg, #3b82f6, #2563eb);
+    color: white;
+    border: 2px solid rgba(59, 130, 246, 0.3);
+    padding: 0.7rem 1.5rem;
+    border-radius: 12px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.25),
+                0 2px 6px rgba(59, 130, 246, 0.15);
+    position: relative;
+    overflow: hidden;
+}
+
+.btn-configurar-notificaciones::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+    transition: left 0.5s ease;
+}
+
+.btn-configurar-notificaciones:hover::before {
+    left: 100%;
+}
+
+.btn-configurar-notificaciones:hover {
+    background: linear-gradient(135deg, #2563eb, #1d4ed8);
+    border-color: #3b82f6;
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4),
+                0 3px 10px rgba(59, 130, 246, 0.25),
+                0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.btn-configurar-notificaciones:active {
+    transform: translateY(-1px) scale(0.98);
+    box-shadow: 0 3px 12px rgba(59, 130, 246, 0.3);
+}
+
+body.modo-oscuro .btn-configurar-notificaciones {
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.2), rgba(37, 99, 235, 0.15));
+    color: #60a5fa;
+    border-color: rgba(59, 130, 246, 0.4);
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2),
+                0 2px 6px rgba(59, 130, 246, 0.15);
+}
+
+body.modo-oscuro .btn-configurar-notificaciones:hover {
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.3), rgba(37, 99, 235, 0.25));
+    color: #93c5fd;
+    border-color: rgba(59, 130, 246, 0.6);
+    box-shadow: 0 6px 20px rgba(59, 130, 246, 0.3),
+                0 3px 10px rgba(59, 130, 246, 0.2),
+                0 0 30px rgba(59, 130, 246, 0.15);
+}
+
 /* Botón activar notificaciones del banner */
 .btn-activar-notificaciones {
     display: flex;
@@ -2583,24 +2696,401 @@ body.modo-oscuro .total-carrito {
 
 /* === PROGRAMA REFERIDOS === */
 .seccion-referidos {
-    background: linear-gradient(135deg, var(--color-exito), #059669);
+    background: linear-gradient(135deg, #10b981 0%, #059669 50%, #047857 100%);
     color: white;
-    border-radius: 1rem;
+    border-radius: 1.25rem;
     padding: 3rem 2rem;
     text-align: center;
     margin: 3rem 0;
+    box-shadow: 0 10px 40px rgba(16, 185, 129, 0.3),
+                0 4px 12px rgba(16, 185, 129, 0.2);
+    position: relative;
+    overflow: hidden;
+}
+
+.seccion-referidos::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -50%;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+    pointer-events: none;
+}
+
+.seccion-referidos h2 {
+    font-size: 1.75rem;
+    font-weight: 800;
+    margin-bottom: 1rem;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    letter-spacing: -0.5px;
+    position: relative;
+}
+
+.seccion-referidos > p {
+    font-size: 1.05rem;
+    opacity: 0.95;
+    margin-bottom: 2rem;
+    font-weight: 500;
+    line-height: 1.6;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+}
+
+.seccion-referidos strong {
+    font-weight: 700;
+    background: rgba(255, 255, 255, 0.2);
+    padding: 0.15rem 0.5rem;
+    border-radius: 6px;
+    display: inline-block;
 }
 
 .codigo-referido {
-    background: rgba(255, 255, 255, 0.2);
-    padding: 1rem 2rem;
-    border-radius: 0.5rem;
+    background: rgba(255, 255, 255, 0.25);
+    padding: 1.25rem 2.5rem;
+    border-radius: 12px;
     font-size: 1.5rem;
-    font-weight: bold;
-    letter-spacing: 2px;
-    margin: 1rem 0;
+    font-weight: 800;
+    letter-spacing: 3px;
+    margin: 1.5rem auto;
+    max-width: fit-content;
+    backdrop-filter: blur(15px);
+    border: 3px dashed rgba(255, 255, 255, 0.6);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15),
+                inset 0 2px 8px rgba(255, 255, 255, 0.2);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    font-family: 'Courier New', monospace;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.codigo-referido:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.2),
+                inset 0 2px 8px rgba(255, 255, 255, 0.25);
+    border-color: rgba(255, 255, 255, 0.8);
+}
+
+/* Estilos para enlace de referido */
+.seccion-referidos a#enlaceReferido {
+    color: rgba(255, 255, 255, 0.95);
+    text-decoration: underline;
+    word-break: break-all;
+    font-size: 0.9rem;
+    font-weight: 600;
+    transition: all 0.2s ease;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.seccion-referidos a#enlaceReferido:hover {
+    color: white;
+    text-decoration-thickness: 2px;
+}
+
+/* Estilos para textos pequeños */
+.seccion-referidos small {
+    font-size: 0.9rem;
+    opacity: 0.9;
+    font-weight: 500;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
+}
+
+.seccion-referidos strong {
+    font-weight: 700;
+    color: white;
+    background: rgba(255, 255, 255, 0.2);
+    padding: 0.2rem 0.6rem;
+    border-radius: 6px;
+    display: inline-block;
+    font-size: 1.05em;
+}
+
+/* Mejoras para contenedores de enlace */
+.seccion-referidos > div {
+    position: relative;
+}
+
+/* Lista de referidos */
+.seccion-referidos ul {
+    list-style: none;
+    padding: 0;
+    margin: 1rem auto 0;
+    max-width: 400px;
+}
+
+.seccion-referidos ul li {
+    background: rgba(255, 255, 255, 0.15);
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    margin: 0.5rem 0;
     backdrop-filter: blur(10px);
-    border: 2px dashed rgba(255, 255, 255, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.seccion-referidos ul li small {
+    font-size: 0.85rem;
+}
+
+/* Botones específicos de la sección de referidos */
+.seccion-referidos .boton {
+    background: rgba(255, 255, 255, 0.25);
+    border: 2px solid rgba(255, 255, 255, 0.4);
+    color: white;
+    font-weight: 600;
+    padding: 0.65rem 1.25rem;
+    border-radius: 10px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.seccion-referidos .boton:hover {
+    background: rgba(255, 255, 255, 0.35);
+    border-color: rgba(255, 255, 255, 0.6);
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+}
+
+.seccion-referidos .boton:active {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.seccion-referidos .boton-primario {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.85));
+    border: 2px solid white;
+    color: #059669;
+    font-weight: 700;
+    padding: 0.75rem 1.5rem;
+    margin: 1rem 0;
+    font-size: 1rem;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2),
+                0 2px 8px rgba(255, 255, 255, 0.3);
+}
+
+.seccion-referidos .boton-primario:hover {
+    background: white;
+    color: #047857;
+    transform: translateY(-4px) scale(1.02);
+    box-shadow: 0 8px 28px rgba(0, 0, 0, 0.25),
+                0 4px 12px rgba(255, 255, 255, 0.4);
+}
+
+.seccion-referidos .boton-primario:active {
+    transform: translateY(-2px) scale(1.01);
+}
+
+/* Botón Azul - Estilo primario del proyecto */
+.seccion-referidos .boton-azul-ref {
+    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+    border: 2px solid rgba(59, 130, 246, 0.5);
+    color: white;
+    font-weight: 700;
+    padding: 0.7rem 1.3rem;
+    box-shadow: 0 4px 14px rgba(59, 130, 246, 0.4),
+                0 2px 6px rgba(59, 130, 246, 0.3);
+}
+
+.seccion-referidos .boton-azul-ref:hover {
+    background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+    border-color: rgba(59, 130, 246, 0.8);
+    transform: translateY(-3px) scale(1.03);
+    box-shadow: 0 6px 20px rgba(59, 130, 246, 0.5),
+                0 3px 10px rgba(59, 130, 246, 0.4);
+}
+
+.seccion-referidos .boton-azul-ref:active {
+    transform: translateY(-1px) scale(1.01);
+    box-shadow: 0 4px 14px rgba(59, 130, 246, 0.4);
+}
+
+/* Botón Naranja - Color de acción secundario */
+.seccion-referidos .boton-naranja-ref {
+    background: linear-gradient(135deg, #f59e0b 0%, #f97316 100%);
+    border: 2px solid rgba(245, 158, 11, 0.5);
+    color: white;
+    font-weight: 700;
+    padding: 0.7rem 1.3rem;
+    box-shadow: 0 4px 14px rgba(245, 158, 11, 0.4),
+                0 2px 6px rgba(245, 158, 11, 0.3);
+}
+
+.seccion-referidos .boton-naranja-ref:hover {
+    background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+    border-color: rgba(245, 158, 11, 0.8);
+    transform: translateY(-3px) scale(1.03);
+    box-shadow: 0 6px 20px rgba(245, 158, 11, 0.5),
+                0 3px 10px rgba(245, 158, 11, 0.4);
+}
+
+.seccion-referidos .boton-naranja-ref:active {
+    transform: translateY(-1px) scale(1.01);
+    box-shadow: 0 4px 14px rgba(245, 158, 11, 0.4);
+}
+
+/* Contenedores organizados para móvil */
+.contenedor-enlace-ref {
+    margin-top: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    align-items: center;
+}
+
+.label-enlace {
+    font-size: 0.9rem;
+    opacity: 0.9;
+    font-weight: 500;
+    display: block;
+    text-align: center;
+}
+
+.botones-enlace-ref {
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+    justify-content: center;
+    width: 100%;
+}
+
+.metricas-referidos {
+    margin-top: 1.5rem;
+    background: rgba(255, 255, 255, 0.15);
+    padding: 1rem;
+    border-radius: 12px;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.contador-ref {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.25rem;
+    margin-bottom: 0.75rem;
+}
+
+.contador-ref small {
+    font-size: 0.85rem;
+    opacity: 0.9;
+}
+
+.contador-ref strong {
+    font-size: 1.5rem;
+    font-weight: 800;
+    background: rgba(255, 255, 255, 0.25);
+    padding: 0.35rem 0.85rem;
+    border-radius: 8px;
+    display: inline-block;
+    min-width: 50px;
+    text-align: center;
+}
+
+.lista-ref-container {
+    margin-top: 0.5rem;
+}
+
+.lista-ref-container ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.lista-ref-container ul li {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 0.6rem 1rem;
+    border-radius: 8px;
+    margin: 0.35rem 0;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    text-align: center;
+}
+
+/* Responsive para sección de referidos */
+@media (max-width: 768px) {
+    .seccion-referidos {
+        padding: 2rem 1.5rem;
+    }
+    
+    .seccion-referidos h2 {
+        font-size: 1.5rem;
+        line-height: 1.3;
+    }
+    
+    .seccion-referidos > p {
+        font-size: 0.95rem;
+    }
+    
+    .codigo-referido {
+        font-size: 1.2rem;
+        letter-spacing: 2px;
+        padding: 1rem 1.5rem;
+    }
+    
+    .botones-enlace-ref {
+        flex-direction: column;
+        gap: 0.65rem;
+    }
+    
+    .seccion-referidos .boton {
+        font-size: 0.85rem;
+        padding: 0.6rem 1rem;
+        width: 100%;
+    }
+    
+    .seccion-referidos .boton-azul-ref,
+    .seccion-referidos .boton-naranja-ref {
+        font-size: 0.9rem;
+        padding: 0.7rem 1.2rem;
+        width: 100%;
+    }
+    
+    .seccion-referidos .boton-primario {
+        width: 100%;
+        max-width: 280px;
+    }
+}
+
+@media (max-width: 480px) {
+    .seccion-referidos {
+        padding: 1.75rem 1.25rem;
+    }
+    
+    .seccion-referidos h2 {
+        font-size: 1.25rem;
+        line-height: 1.3;
+    }
+    
+    .seccion-referidos > p {
+        font-size: 0.9rem;
+    }
+    
+    .codigo-referido {
+        font-size: 1rem;
+        letter-spacing: 1.5px;
+        padding: 0.85rem 1.25rem;
+    }
+    
+    .seccion-referidos .boton-primario {
+        font-size: 0.9rem;
+        padding: 0.7rem 1.3rem;
+        width: 100%;
+        max-width: 100%;
+    }
+    
+    .botones-enlace-ref {
+        gap: 0.6rem;
+    }
+    
+    .seccion-referidos .boton-azul-ref,
+    .seccion-referidos .boton-naranja-ref {
+        font-size: 0.85rem;
+        padding: 0.65rem 1.1rem;
+    }
+    
+    .contador-ref strong {
+        font-size: 1.3rem;
+    }
 }
 
 /* === PIE DE PÁGINA === */
@@ -2703,7 +3193,7 @@ body.modo-oscuro .pie-pagina {
     cursor: pointer;
     box-shadow: 0 8px 20px rgba(37, 99, 235, 0.4);
     z-index: 1400;
-    display: flex;
+    display: none; /* Oculto por defecto - usar solo botón del banner */
     align-items: center;
     gap: 0.5rem;
     font-weight: bold;
@@ -2997,9 +3487,8 @@ body.modo-oscuro .pie-pagina {
 }
 
 @media (max-width: 480px) {
-    .contenedor {
-        padding: 1rem 0.5rem;
-    }
+    /* padding-top ya está definido en las reglas principales del contenedor (líneas 184-237) */
+    /* NO sobrescribir aquí para evitar conflictos */
     
     .seccion-busqueda {
         padding: 1rem;
@@ -3098,19 +3587,45 @@ body.modo-oscuro .cerrar-modal:hover {
 /* === CORRECCIÓN DE ENCABEZADO EN MÓVILES === */
 @media (max-width: 600px) {
     .encabezado {
-        padding: 0.5rem 0.5rem;
-    }
-
-    .contenedor {
-        padding: 1rem !important;
-        padding-top: 70px !important;
-        width: 100% !important;
-        transition: padding-top 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        padding: 0.5rem 0;
+        height: 65px;
     }
     
-    body.banner-oculto .contenedor {
-        padding-top: 90px !important;
+    .contenedor-nav {
+        padding: 0 1rem;
     }
+    
+    .logo {
+        font-size: 1.05rem;
+        gap: 0.5rem;
+    }
+    
+    .logo-img {
+        width: 36px;
+        height: 36px;
+    }
+    
+    .acciones-nav {
+        gap: 0.5rem;
+    }
+    
+    .btn-tema, .btn-carrito, .btn-centro-notificaciones {
+        padding: 0.5rem;
+        min-width: 38px;
+        min-height: 38px;
+        font-size: 1rem;
+    }
+    
+    .contador-carrito, .contador-notif {
+        width: 16px;
+        height: 16px;
+        font-size: 0.6rem;
+        top: -5px;
+        right: -5px;
+    }
+
+    /* padding del contenedor ya está definido en líneas 184-237 */
+    /* NO duplicar aquí */
 
     .seccion-hero {
         padding: 1.25rem 1rem;
@@ -3128,7 +3643,29 @@ body.modo-oscuro .cerrar-modal:hover {
         word-wrap: break-word;
         overflow-wrap: break-word;
     }
+}
 
+/* === HEADER EN TABLETS Y DESKTOP (mayor a 600px) === */
+@media (min-width: 601px) {
+    .encabezado {
+        height: 70px;
+    }
+    
+    .banner-promocional {
+        top: 74px;
+    }
+}
+
+@media (min-width: 601px) and (max-width: 767px) {
+    .contenedor {
+        padding-top: 324px;
+    }
+    body.banner-oculto .contenedor {
+        padding-top: 80px; /* Header 70px + margen 10px */
+    }
+}
+
+@media (max-width: 600px) {
     .seccion-hero p {
         font-size: 0.85rem !important;
         line-height: 1.4;
@@ -4089,18 +4626,23 @@ body.modo-oscuro .resumen-pedido .total {
 
 .banner-promocional {
     position: fixed;
-    top: 80px;
+    top: 74px;
     left: 0;
     right: 0;
     width: 100%;
     margin: 0;
+    margin-bottom: 1rem;
     background: linear-gradient(135deg, var(--color-primario) 0%, #3b82f6 30%, #8b5cf6 60%, #f59e0b 100%);
     background-size: 400% 400%;
     animation: gradienteMovimiento 8s ease infinite;
-    overflow: hidden;
-    z-index: 999;
-    box-shadow: 0 4px 15px rgba(37, 99, 235, 0.2);
+    overflow: visible;
+    z-index: 998;
+    box-shadow: 0 4px 15px rgba(37, 99, 235, 0.2), 0 0 0 1px rgba(255, 255, 255, 0.1);
+    border-top: 1px solid rgba(255, 255, 255, 0.15);
     transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    min-height: fit-content;
+    height: auto;
+    max-height: 280px;
 }
 
 @keyframes gradienteMovimiento {
@@ -4114,7 +4656,7 @@ body.modo-oscuro .resumen-pedido .total {
 }
 
 @keyframes bannerSlideOut {
-    0% { transform: translateY(0); opacity: 1; max-height: 200px; }
+    0% { transform: translateY(0); opacity: 1; max-height: 500px; }
     100% { transform: translateY(-100%); opacity: 0; max-height: 0; }
 }
 
@@ -4127,112 +4669,295 @@ body.modo-oscuro .resumen-pedido .total {
     flex-direction: column;
     align-items: center;
     gap: 0.5rem;
-    padding: 0.6rem 1rem;
+    padding: 0.65rem 0.6rem 0.7rem;
     max-width: 1200px;
     margin: 0 auto;
     position: relative;
-}
-
-.banner-animacion {
-    display: none;
+    width: 100%;
+    box-sizing: border-box;
+    overflow: visible;
 }
 
 .banner-texto {
     color: white;
     text-align: center;
     width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    opacity: 1;
+    visibility: visible;
 }
 
 .promocion-principal {
     display: flex;
     flex-direction: column;
-    gap: 0.15rem;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+    margin: 0;
+    width: 100%;
+    opacity: 1;
+    visibility: visible;
+}
+
+.promocion-item {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.3rem;
+    background: transparent;
+    padding: 0;
+    border-radius: 0;
+    backdrop-filter: none;
+    border: none;
+    width: fit-content;
+    max-width: 100%;
+    transition: all 0.3s ease;
+    box-shadow: none;
+    flex-wrap: nowrap;
+    opacity: 1;
+    visibility: visible;
+}
+
+.promocion-item:hover {
+    background: transparent;
+    transform: none;
+    box-shadow: none;
+}
+
+.icono-promo {
+    font-size: 1.1rem;
+    line-height: 1;
+    flex-shrink: 0;
+}
+
+.texto-promo {
+    font-size: 0.85rem;
+    font-weight: 700;
+    line-height: 1.2;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+    white-space: nowrap;
+    opacity: 1 !important;
+    visibility: visible !important;
+}
+
+.detalle-promo {
+    font-size: 0.75rem;
+    font-weight: 500;
+    opacity: 0.95;
+    line-height: 1.2;
+    white-space: nowrap;
+    visibility: visible !important;
+}
+
+.separador-promo {
+    font-size: 1.2rem;
+    opacity: 0;
+    display: none;
     margin: 0;
 }
 
-.texto-promocion {
-    font-size: 0.95rem;
+.subtexto-promocion {
+    font-size: 0.75rem;
     font-weight: 600;
-    line-height: 1.3;
-    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+    line-height: 1.4;
+    opacity: 0.96;
+    margin-top: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+    flex-wrap: wrap;
+    padding: 0 0.6rem;
+    max-width: 100%;
+    visibility: visible;
+    letter-spacing: 0.3px;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
 }
 
-.subtexto-promocion {
-    font-size: 0.85rem;
-    font-weight: 500;
-    line-height: 1.3;
-    opacity: 0.95;
-    margin-top: 0.15rem;
+.icono-subtexto {
+    font-size: 1.05rem;
+    flex-shrink: 0;
+    filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.2));
 }
 
 .banner-acciones {
     display: flex;
-    gap: 0.5rem;
+    flex-direction: row;
+    gap: 0.4rem;
     width: 100%;
-    max-width: 600px;
+    max-width: 100%;
+    justify-content: center;
+    flex-wrap: wrap;
+    padding: 0 0.5rem;
 }
 
 .btn-instalar-banner {
-    flex: 1;
     background: linear-gradient(135deg, #f59e0b, #f97316);
     color: white;
-    border: none;
-    padding: 0.65rem 1rem;
-    border-radius: 10px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
     font-weight: 700;
-    font-size: 0.9rem;
+    font-size: 0.77rem;
     cursor: pointer;
-    transition: all 0.3s ease;
-    box-shadow: 0 2px 8px rgba(245, 158, 11, 0.3);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 3px 10px rgba(245, 158, 11, 0.4),
+                0 1px 3px rgba(245, 158, 11, 0.3);
+    white-space: nowrap;
+    min-width: fit-content;
+    position: relative;
+    overflow: hidden;
+}
+
+.btn-instalar-banner::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+    transition: left 0.6s ease;
+}
+
+.btn-instalar-banner:hover::before {
+    left: 100%;
 }
 
 .btn-instalar-banner:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(245, 158, 11, 0.4);
+    transform: translateY(-3px) scale(1.05);
+    box-shadow: 0 6px 18px rgba(245, 158, 11, 0.5),
+                0 3px 8px rgba(245, 158, 11, 0.4);
+    border-color: rgba(255, 255, 255, 0.5);
+}
+
+.btn-instalar-banner:active {
+    transform: translateY(-1px) scale(1.02);
+    box-shadow: 0 3px 10px rgba(245, 158, 11, 0.4);
+}
+
+/* Estado: App ya instalada */
+.btn-instalar-banner.instalada {
+    background: linear-gradient(135deg, #22c55e, #16a34a);
+    cursor: default;
+    pointer-events: none;
+}
+
+.btn-instalar-banner.instalada:hover {
+    transform: none;
+    box-shadow: 0 3px 10px rgba(34, 197, 94, 0.4);
+}
+
+/* Estado: Instalando */
+.btn-instalar-banner.instalando {
+    background: linear-gradient(135deg, #3b82f6, #2563eb);
+    cursor: wait;
+    pointer-events: none;
+}
+
+/* Estado: No disponible */
+.btn-instalar-banner.no-disponible {
+    background: linear-gradient(135deg, #6b7280, #4b5563);
+    opacity: 0.7;
+    cursor: not-allowed;
 }
 
 .btn-ver-promociones {
-    flex: 1;
-    background: rgba(255, 255, 255, 0.15);
+    background: rgba(255, 255, 255, 0.25);
     color: white;
-    border: 1.5px solid rgba(255, 255, 255, 0.3);
-    padding: 0.65rem 1rem;
-    border-radius: 10px;
+    border: 1.5px solid rgba(255, 255, 255, 0.4);
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
     font-weight: 600;
-    font-size: 0.9rem;
+    font-size: 0.77rem;
     cursor: pointer;
     transition: all 0.3s ease;
     backdrop-filter: blur(10px);
+    white-space: nowrap;
+    min-width: fit-content;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .btn-ver-promociones:hover {
-    background: rgba(255, 255, 255, 0.25);
+    background: rgba(255, 255, 255, 0.35);
     transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.btn-ver-promociones:active {
+    transform: translateY(0);
+}
+
+.btn-activar-notificaciones {
+    background: rgba(255, 255, 255, 0.25);
+    color: white;
+    border: 1.5px solid rgba(255, 255, 255, 0.4);
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-weight: 600;
+    font-size: 0.77rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.3rem;
+    white-space: nowrap;
+    min-width: fit-content;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.btn-activar-notificaciones:hover {
+    background: rgba(255, 255, 255, 0.35);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.btn-activar-notificaciones:active {
+    transform: translateY(0);
+}
+
+.icono-notif {
+    font-size: 1rem;
+}
+
+.texto-notif {
+    font-size: 0.77rem;
 }
 
 .btn-cerrar-banner {
     position: absolute;
-    top: 0.4rem;
+    top: 0.5rem;
     right: 0.5rem;
-    background: rgba(255, 255, 255, 0.15);
+    background: rgba(255, 255, 255, 0.25);
     color: white;
-    border: none;
+    border: 1px solid rgba(255, 255, 255, 0.3);
     width: 28px;
     height: 28px;
     border-radius: 50%;
     cursor: pointer;
-    font-size: 1rem;
+    font-size: 1.1rem;
     font-weight: bold;
     transition: all 0.3s ease;
     display: flex;
     align-items: center;
     justify-content: center;
     backdrop-filter: blur(5px);
+    z-index: 10;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
 }
 
 .btn-cerrar-banner:hover {
-    background: rgba(255, 255, 255, 0.3);
-    transform: scale(1.1);
+    background: rgba(255, 255, 255, 0.4);
+    transform: scale(1.15);
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+}
+
+.btn-cerrar-banner:active {
+    transform: scale(0.95);
 }
 
 .banner-decoracion {
@@ -4241,67 +4966,463 @@ body.modo-oscuro .resumen-pedido .total {
 
 /* RESPONSIVE */
 
-@media (max-width: 768px) {
+/* Móviles muy pequeños (hasta 360px) */
+@media (max-width: 360px) {
     .banner-promocional {
-        top: 70px;
+        top: 69px;
+        max-height: 260px;
     }
     
     .banner-contenido {
-        padding: 0.5rem 0.75rem;
+        padding: 0.6rem 0.5rem 0.65rem;
         gap: 0.45rem;
     }
     
-    .banner-acciones {
-        flex-direction: column;
-        gap: 0.4rem;
-    }
-    
-    .texto-promocion {
-        font-size: 0.88rem;
-    }
-    
-    .subtexto-promocion {
-        font-size: 0.78rem;
-    }
-}
-
-@media (max-width: 480px) {
-    .banner-contenido {
-        padding: 0.4rem 0.5rem;
+    .banner-texto {
         gap: 0.35rem;
     }
     
     .promocion-principal {
-        gap: 0.1rem;
+        flex-direction: column;
+        gap: 0.35rem;
+        flex-wrap: nowrap;
     }
     
-    .texto-promocion {
-        font-size: 0.82rem;
-        line-height: 1.25;
+    .separador-promo {
+        display: none;
+    }
+    
+    .promocion-item {
+        padding: 0.35rem 0.8rem;
+        gap: 0.28rem;
+        max-width: 100%;
+        width: auto;
+    }
+    
+    .icono-promo {
+        font-size: 0.95rem;
+    }
+    
+    .texto-promo {
+        font-size: 0.76rem;
+    }
+    
+    .detalle-promo {
+        font-size: 0.68rem;
     }
     
     .subtexto-promocion {
-        font-size: 0.72rem;
-        line-height: 1.25;
-        margin-top: 0.1rem;
+        font-size: 0.68rem;
+        padding: 0 0.5rem;
+        gap: 0.28rem;
+        line-height: 1.3;
+    }
+    
+    .icono-subtexto {
+        font-size: 0.9rem;
     }
     
     .banner-acciones {
         gap: 0.35rem;
+        padding: 0 0.5rem;
+        width: 100%;
+        flex-wrap: wrap;
     }
     
     .btn-instalar-banner,
-    .btn-ver-promociones {
-        padding: 0.55rem 0.85rem;
-        font-size: 0.85rem;
+    .btn-ver-promociones,
+    .btn-activar-notificaciones {
+        padding: 0.45rem 0.85rem;
+        font-size: 0.72rem;
+        border-radius: 18px;
+        white-space: nowrap;
     }
     
     .btn-cerrar-banner {
-        top: 0.3rem;
-        right: 0.3rem;
+        width: 24px;
+        height: 24px;
+        font-size: 0.9rem;
+        top: 0.4rem;
+        right: 0.4rem;
+    }
+}
+
+/* Móviles pequeños (361px - 480px) */
+@media (min-width: 361px) and (max-width: 480px) {
+    .banner-promocional {
+        top: 69px;
+        max-height: 270px;
+    }
+    
+    .banner-contenido {
+        padding: 0.65rem 0.6rem 0.7rem;
+        gap: 0.5rem;
+    }
+    
+    .banner-texto {
+        gap: 0.35rem;
+    }
+    
+    .promocion-principal {
+        flex-direction: column;
+        gap: 0.4rem;
+        flex-wrap: nowrap;
+    }
+    
+    .separador-promo {
+        display: none;
+    }
+    
+    .promocion-item {
+        padding: 0.4rem 0.85rem;
+        max-width: 100%;
+        width: auto;
+        gap: 0.3rem;
+    }
+    
+    .icono-promo {
+        font-size: 1.05rem;
+    }
+    
+    .texto-promo {
+        font-size: 0.82rem;
+    }
+    
+    .detalle-promo {
+        font-size: 0.72rem;
+    }
+    
+    .subtexto-promocion {
+        font-size: 0.72rem;
+        padding: 0 0.5rem;
+        line-height: 1.4;
+    }
+    
+    .banner-acciones {
+        gap: 0.45rem;
+        padding: 0 0.5rem;
+        width: 100%;
+        flex-wrap: wrap;
+    }
+    
+    .btn-instalar-banner,
+    .btn-ver-promociones,
+    .btn-activar-notificaciones {
+        padding: 0.5rem 1rem;
+        font-size: 0.77rem;
+        white-space: nowrap;
+    }
+}
+
+/* Tablets pequeñas (481px - 767px) */
+@media (min-width: 481px) and (max-width: 767px) {
+    .banner-promocional {
+        top: 69px;
+        max-height: 250px;
+    }
+    
+    .banner-contenido {
+        padding: 0.7rem 1rem 0.75rem;
+        gap: 0.55rem;
+    }
+    
+    .promocion-principal {
+        gap: 0.4rem;
+    }
+    
+    .promocion-item {
+        padding: 0.4rem 0.9rem;
+    }
+    
+    .icono-promo {
+        font-size: 1.1rem;
+    }
+    
+    .texto-promo {
+        font-size: 0.85rem;
+    }
+    
+    .detalle-promo {
+        font-size: 0.74rem;
+    }
+    
+    .subtexto-promocion {
+        font-size: 0.74rem;
+        margin-top: 0;
+    }
+    
+    .icono-subtexto {
+        font-size: 0.92rem;
+    }
+    
+    .banner-acciones {
+        gap: 0.45rem;
+    }
+    
+    .btn-instalar-banner,
+    .btn-ver-promociones,
+    .btn-activar-notificaciones {
+        padding: 0.5rem 0.95rem;
+        font-size: 0.79rem;
+    }
+}
+
+/* Tablets medianas en horizontal (768px - 1023px) */
+@media (min-width: 768px) and (max-width: 1023px) {
+    .banner-promocional {
+        top: 74px;
+        max-height: 180px;
+    }
+    
+    .banner-contenido {
+        padding: 0.75rem 1.5rem 0.8rem;
+        gap: 0.6rem;
+    }
+    
+    .promocion-principal {
+        flex-direction: row;
+        gap: 0.7rem;
+    }
+    
+    .promocion-item {
+        padding: 0.4rem 0.95rem;
+    }
+    
+    .separador-promo {
+        display: inline;
+    }
+    
+    .icono-promo {
+        font-size: 1.15rem;
+    }
+    
+    .texto-promo {
+        font-size: 0.87rem;
+    }
+    
+    .detalle-promo {
+        font-size: 0.77rem;
+    }
+    
+    .subtexto-promocion {
+        font-size: 0.77rem;
+        margin-top: 0;
+    }
+    
+    .banner-acciones {
+        gap: 0.55rem;
+    }
+    
+    .btn-instalar-banner,
+    .btn-ver-promociones,
+    .btn-activar-notificaciones {
+        padding: 0.55rem 1.05rem;
+        font-size: 0.82rem;
+    }
+}
+
+/* Desktop: Layout horizontal compacto profesional */
+@media (min-width: 1024px) {
+    .banner-promocional {
+        top: 74px;
+        max-height: 80px;
+        min-height: 75px;
+    }
+    
+    .banner-contenido {
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.6rem 2.5rem;
+        gap: 2rem;
+    }
+    
+    .banner-texto {
+        text-align: left;
+        flex: 1;
+        max-width: 65%;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.3rem;
+    }
+    
+    .promocion-principal {
+        flex-direction: row;
+        gap: 2rem;
+        width: 100%;
+        margin: 0;
+        justify-content: flex-start;
+        flex-wrap: nowrap;
+        align-items: center;
+    }
+    
+    .promocion-item {
+        width: auto;
+        padding: 0;
+        border-radius: 0;
+        box-shadow: none;
+        background: transparent;
+        border: none;
+        backdrop-filter: none;
+    }
+    
+    .separador-promo {
+        display: none;
+        font-size: 0;
+        margin: 0;
+        opacity: 0;
+    }
+    
+    .icono-promo {
+        font-size: 1.3rem;
+    }
+    
+    .texto-promo {
+        font-size: 0.95rem;
+        font-weight: 700;
+        letter-spacing: 0.3px;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    }
+    
+    .detalle-promo {
+        font-size: 0.8rem;
+        opacity: 0.95;
+        font-weight: 500;
+    }
+    
+    .subtexto-promocion {
+        display: flex;
+        font-size: 0.82rem;
+        margin-top: 0.25rem;
+        opacity: 0.94;
+        justify-content: flex-start;
+        align-items: center;
+        gap: 0.5rem;
+        font-weight: 600;
+        letter-spacing: 0.4px;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.25);
+    }
+    
+    .icono-subtexto {
+        font-size: 1.1rem;
+        filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.25));
+    }
+    
+    .banner-acciones {
+        gap: 0.65rem;
+        flex-shrink: 0;
+        flex-wrap: nowrap;
+        width: auto;
+        justify-content: flex-end;
+        padding: 0;
+        display: flex;
+        align-items: center;
+    }
+    
+    .btn-instalar-banner,
+    .btn-ver-promociones,
+    .btn-activar-notificaciones {
+        padding: 0.55rem 1rem;
+        font-size: 0.82rem;
+        white-space: nowrap;
+        border-radius: 16px;
+        font-weight: 600;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+        transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        min-width: auto;
+    }
+    
+    .btn-instalar-banner {
+        background: linear-gradient(135deg, #f59e0b, #f97316);
+        border: 2px solid rgba(255, 255, 255, 0.35);
+        box-shadow: 0 3px 8px rgba(245, 158, 11, 0.3);
+    }
+    
+    .btn-instalar-banner:hover,
+    .btn-ver-promociones:hover,
+    .btn-activar-notificaciones:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 12px rgba(0,0,0,0.22);
+    }
+    
+    .btn-instalar-banner:hover {
+        box-shadow: 0 5px 15px rgba(245, 158, 11, 0.4);
+    }
+    
+    .btn-cerrar-banner {
         width: 26px;
         height: 26px;
-        font-size: 0.95rem;
+        font-size: 1.05rem;
+        top: 0.5rem;
+        right: 0.5rem;
+    }
+}
+
+/* Desktop grande: Mantener diseño horizontal compacto */
+@media (min-width: 1400px) {
+    .banner-promocional {
+        max-height: 90px;
+        min-height: 85px;
+    }
+    
+    .banner-contenido {
+        padding: 0.7rem 3.5rem;
+        gap: 2.5rem;
+    }
+    
+    .promocion-principal {
+        gap: 0.9rem;
+    }
+    
+    .promocion-item {
+        padding: 0.45rem 1rem;
+    }
+    
+    .icono-promo {
+        font-size: 1.15rem;
+    }
+    
+    .texto-promo {
+        font-size: 0.92rem;
+    }
+    
+    .detalle-promo {
+        font-size: 0.78rem;
+    }
+    
+    .subtexto-promocion {
+        font-size: 0.75rem;
+    }
+    
+    .btn-instalar-banner,
+    .btn-ver-promociones,
+    .btn-activar-notificaciones {
+        padding: 0.6rem 1.1rem;
+        font-size: 0.85rem;
+    }
+    
+    .banner-acciones {
+        gap: 0.75rem;
+    }
+    
+    .texto-promo {
+        font-size: 0.98rem;
+    }
+    
+    .detalle-promo {
+        font-size: 0.82rem;
+    }
+    
+    .subtexto-promocion {
+        font-size: 0.8rem;
+    }
+    
+    .btn-instalar-banner,
+    .btn-ver-promociones,
+    .btn-activar-notificaciones {
+        padding: 0.65rem 1.2rem;
+        font-size: 0.88rem;
     }
 }
 
@@ -4315,24 +5436,29 @@ body.modo-oscuro .banner-promocional {
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
 }
 
-body.modo-oscuro .btn-ver-promociones {
-    background: rgba(0, 0, 0, 0.2);
+body.modo-oscuro .btn-ver-promociones,
+body.modo-oscuro .btn-activar-notificaciones {
+    background: rgba(0, 0, 0, 0.25);
+    border-color: rgba(255, 255, 255, 0.25);
+}
+
+body.modo-oscuro .promocion-item {
+    background: rgba(255, 255, 255, 0.1);
     border-color: rgba(255, 255, 255, 0.2);
 }
 
-body.modo-oscuro .btn-ver-promociones:hover {
+body.modo-oscuro .btn-ver-promociones:hover,
+body.modo-oscuro .btn-activar-notificaciones:hover {
     background: rgba(0, 0, 0, 0.3);
     border-color: rgba(255, 255, 255, 0.3);
 }
 
 body.modo-oscuro .btn-cerrar-banner {
-    background: rgba(255, 255, 255, 0.1);
-    color: white;
+    background: rgba(255, 255, 255, 0.15);
 }
 
 body.modo-oscuro .btn-cerrar-banner:hover {
-    background: rgba(255, 255, 255, 0.2);
-    transform: scale(1.1);
+    background: rgba(255, 255, 255, 0.25);
 }
 
 /* ===== SECCIÓN BENEFICIOS VISUALES ===== */
@@ -5113,12 +6239,6 @@ body.modo-oscuro .carousel > article p {
 .prompt-instalacion {
     pointer-events: auto;
     z-index: 1400;
-}
-
-.banner-promocional {
-    position: relative;
-    z-index: 999;
-    margin-bottom: 2rem;
 }
 
 /* ===== SISTEMA DE RESEÑAS - ESTILOS PROFESIONALES ===== */

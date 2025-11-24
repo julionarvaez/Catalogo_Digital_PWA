@@ -641,14 +641,46 @@ window.addEventListener('appinstalled', () => {
     deferredPrompt = null; // ya no necesitamos el prompt diferido
     ocultarPromptInstalacion();
     actualizarEstadoBotonInstalacion(false);
-    mostrarNotificacion('🎉 Aplicación instalada correctamente');
+    mostrarNotificacion('🎉 Aplicación instalada correctamente', 'success');
+    
+    // Actualizar botón del banner
+    const btnInstalar = document.querySelector('.btn-instalar-banner');
+    if (btnInstalar) {
+        btnInstalar.innerHTML = '✅ App Instalada';
+        btnInstalar.classList.add('instalada');
+    }
+    
+    // Cerrar banner después de mostrar éxito
+    setTimeout(() => {
+        const cerrarBtn = document.querySelector('.btn-cerrar-banner');
+        if (cerrarBtn) cerrarBtn.click();
+    }, 3000);
 });
+
+// Verificar si ya está instalada al cargar
+function verificarAppInstalada() {
+    if (window.matchMedia('(display-mode: standalone)').matches || 
+        window.navigator.standalone === true) {
+        console.log('✅ App ya instalada - ejecutándose en modo standalone');
+        
+        const btnInstalar = document.querySelector('.btn-instalar-banner');
+        if (btnInstalar) {
+            btnInstalar.innerHTML = '✅ App Instalada';
+            btnInstalar.classList.add('instalada');
+        }
+        
+        // Ocultar botón FAB si existe
+        actualizarEstadoBotonInstalacion(false);
+        return true;
+    }
+    return false;
+}
 
 function instalarPWA() {
     // Si no tenemos el evento diferido, ofrecer instrucciones manuales
     if (!deferredPrompt) {
         console.warn('⚠️ No hay prompt de instalación disponible');
-        mostrarNotificacion('Instala usando el menú del navegador (Añadir a pantalla de inicio)');
+        mostrarNotificacion('💡 Instala desde el menú de tu navegador (⋮ → Instalar app)', 'info');
         return;
     }
     try {
@@ -656,17 +688,46 @@ function instalarPWA() {
         deferredPrompt.prompt();
         deferredPrompt.userChoice.then(choice => {
             console.log('📊 Resultado instalación:', choice.outcome);
+            
+            const btnInstalar = document.querySelector('.btn-instalar-banner');
+            
             if (choice.outcome === 'accepted') {
-                mostrarNotificacion('✅ Instalación aceptada');
+                mostrarNotificacion('🎉 ¡App instalada exitosamente!', 'success');
+                
+                // Actualizar botón del banner
+                if (btnInstalar) {
+                    btnInstalar.innerHTML = '✅ App Instalada';
+                    btnInstalar.classList.remove('instalando');
+                    btnInstalar.classList.add('instalada');
+                }
+                
+                // Cerrar banner después de 3 segundos
+                setTimeout(() => {
+                    cerrarBanner();
+                }, 3000);
             } else {
-                mostrarNotificacion('Instalación cancelada');
+                mostrarNotificacion('Instalación cancelada', 'info');
+                
+                // Restaurar botón
+                if (btnInstalar) {
+                    btnInstalar.innerHTML = '📱 Instalar App';
+                    btnInstalar.classList.remove('instalando');
+                }
             }
+            
             deferredPrompt = null; // limpiar referencia
             ocultarPromptInstalacion();
             actualizarEstadoBotonInstalacion(false);
         });
     } catch (error) {
         console.error('❌ Error mostrando prompt de instalación:', error);
+        mostrarNotificacion('❌ Error al instalar. Intenta desde el menú del navegador', 'error');
+        
+        const btnInstalar = document.querySelector('.btn-instalar-banner');
+        if (btnInstalar) {
+            btnInstalar.innerHTML = '📱 Instalar App';
+            btnInstalar.classList.remove('instalando');
+        }
     }
 }
 
@@ -720,6 +781,7 @@ document.addEventListener('DOMContentLoaded', function() {
     renderizarProductos();
     cargarTema();
     cargarCarritoDesdeLocalStorage();
+    verificarAppInstalada(); // Verificar si ya está instalada
     mostrarPromptInstalacion();
     registrarServiceWorker();
     generarCodigoReferido();
@@ -3019,9 +3081,8 @@ document.addEventListener('DOMContentLoaded', function() {
         const accionesNotif = document.querySelector('.acciones-notificaciones');
         if (accionesNotif) {
             const btnConfig = document.createElement('button');
-            btnConfig.className = 'btn-limpiar-notificaciones';
+            btnConfig.className = 'btn-configurar-notificaciones';
             btnConfig.innerHTML = '⚙️ Configurar';
-            btnConfig.style.background = 'var(--color-primario)';
             btnConfig.onclick = mostrarConfiguracionNotificaciones;
             accionesNotif.appendChild(btnConfig);
         }
@@ -3596,8 +3657,12 @@ function mostrarBannerPromocional() {
     const banner = document.getElementById('bannerPromocional');
     if (!banner) return;
     
-    // Mostrar el banner
+    // Mostrar el banner y limpiar estilos inline que puedan ocultarlo
     banner.style.display = 'block';
+    banner.style.height = 'auto';
+    banner.style.maxHeight = 'none';
+    banner.style.minHeight = 'auto';
+    banner.style.overflow = 'visible';
     
     // Log para analytics
     console.log('📊 Banner promocional mostrado');
@@ -3657,13 +3722,52 @@ function accionInstalarApp() {
     // Log para analytics
     console.log('📊 Click en botón "Instalar App" del banner promocional');
     
-    // Ejecutar la función existente de instalación
+    const btnInstalar = document.querySelector('.btn-instalar-banner');
+    
+    // Verificar si ya está instalada
+    if (window.matchMedia('(display-mode: standalone)').matches) {
+        mostrarNotificacion('✅ La app ya está instalada', 'success');
+        if (btnInstalar) {
+            btnInstalar.innerHTML = '✅ App Instalada';
+            btnInstalar.classList.add('instalada');
+        }
+        return;
+    }
+    
+    // Verificar si hay prompt disponible
+    if (!deferredPrompt) {
+        console.warn('⚠️ Prompt de instalación no disponible');
+        mostrarNotificacion('💡 Instala desde el menú de tu navegador (⋮ → Instalar app)', 'info');
+        if (btnInstalar) {
+            btnInstalar.classList.add('no-disponible');
+        }
+        return;
+    }
+    
+    // Cambiar estado a "instalando"
+    if (btnInstalar) {
+        btnInstalar.innerHTML = '⏳ Instalando...';
+        btnInstalar.classList.add('instalando');
+    }
+    
+    // Ejecutar instalación
     if (typeof instalarPWA === 'function') {
         instalarPWA();
+        
+        // Esperar resultado
+        setTimeout(() => {
+            if (btnInstalar && !btnInstalar.classList.contains('instalada')) {
+                btnInstalar.innerHTML = '📱 Instalar App';
+                btnInstalar.classList.remove('instalando');
+            }
+        }, 3000);
     } else {
-        // Fallback si la función no existe
         console.warn('⚠️ Función instalarPWA() no encontrada');
         mostrarNotificacion('Para instalar la app, usa el menú de tu navegador', 'info');
+        if (btnInstalar) {
+            btnInstalar.innerHTML = '📱 Instalar App';
+            btnInstalar.classList.remove('instalando');
+        }
     }
     
     // Enviar evento personalizado
@@ -3675,10 +3779,7 @@ function accionInstalarApp() {
         }
     }));
     
-    // Cerrar el banner después de la acción
-    setTimeout(() => {
-        cerrarBanner();
-    }, 1000);
+    // NO cerrar el banner inmediatamente - dejar que el usuario vea el resultado
 }
 
 /**
@@ -3771,6 +3872,13 @@ function forzarMostrarBanner() {
     if (banner) {
         banner.classList.remove('cerrando');
         banner.style.display = 'block';
+        banner.style.height = 'auto';
+        banner.style.maxHeight = 'none';
+        banner.style.minHeight = 'auto';
+        banner.style.margin = '';
+        banner.style.padding = '';
+        banner.style.overflow = 'visible';
+        document.body.classList.remove('banner-oculto');
         console.log('🔧 Banner forzado a mostrarse');
     }
 }
@@ -5026,16 +5134,24 @@ class SistemaResenas {
             const response = await this.enviarResenaAlServidor(resenaData);
             
             if (response.ok) {
-                // Éxito - actualizar estado
-                this.updateReviewStatus(resenaData.timestamp, 'published', response.id);
-                this.showSuccess('¡Gracias por tu reseña! Se ha enviado correctamente.');
+                // Determinar estado basado en si fue publicada o va a moderación
+                const status = response.published ? 'published' : 'moderation';
+                this.updateReviewStatus(resenaData.timestamp, status, response.id);
+                
+                // Mensaje personalizado según el estado
+                const mensaje = response.published 
+                    ? '¡Gracias por tu reseña! Se ha publicado correctamente.' 
+                    : '¡Gracias por tu reseña! Se publicará después de la revisión. Puedes verla arriba mientras esperas.';
+                
+                this.showSuccess(mensaje);
                 this.resetForm();
                 
                 // Analytics
                 this.trackEvent('review_submit', {
                     rating: resenaData.rating,
                     has_product: !!resenaData.productoId,
-                    text_length: resenaData.texto.length
+                    text_length: resenaData.texto.length,
+                    auto_published: response.published // Nuevo: rastrear auto-aprobación
                 });
                 
             } else {
@@ -5168,12 +5284,12 @@ class SistemaResenas {
                 const estadoElement = card.querySelector('.resena-estado');
                 if (estadoElement) {
                     const estados = {
-                        'pending': 'Enviando...',
-                        'offline': 'Pendiente (sin conexión)',
-                        'published': 'Publicado',
-                        'moderation': 'En espera de moderación'
+                        'pending': '⏳ Enviando...',
+                        'offline': '📡 Pendiente (sin conexión)',
+                        'published': '✅ Publicado',
+                        'moderation': '⏳ En revisión'
                     };
-                    estadoElement.textContent = estados[status] || 'Publicado';
+                    estadoElement.textContent = estados[status] || '✅ Publicado';
                     estadoElement.className = `resena-estado ${status}`;
                 }
             }

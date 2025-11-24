@@ -49,24 +49,23 @@
         <button class="btn-cerrar-banner" onclick="cerrarBanner()" title="Cerrar banner">✕</button>
         
         <div class="banner-contenido">
-            <div class="banner-animacion">
-                <!-- SVG animado decorativo -->
-                <svg class="icono-animado" viewBox="0 0 100 100" width="40" height="40">
-                    <circle cx="50" cy="50" r="20" fill="#FFA726" opacity="0.3">
-                        <animate attributeName="r" values="15;25;15" dur="2s" repeatCount="indefinite"/>
-                        <animate attributeName="opacity" values="0.3;0.1;0.3" dur="2s" repeatCount="indefinite"/>
-                    </circle>
-                    <circle cx="50" cy="50" r="10" fill="#FF7043"/>
-                </svg>
-            </div>
-            
             <div class="banner-texto">
                 <div class="promocion-principal">
-                    <span class="texto-promocion">🚚 Envío gratis en todo Montelíbano</span>
-                    <span class="texto-promocion">🎁 10% de descuento en tu primer pedido</span>
+                    <div class="promocion-item">
+                        <span class="icono-promo">🚚</span>
+                        <span class="texto-promo">Envío gratis</span>
+                        <span class="detalle-promo">en todo Montelíbano</span>
+                    </div>
+                    <span class="separador-promo">•</span>
+                    <div class="promocion-item">
+                        <span class="icono-promo">🎁</span>
+                        <span class="texto-promo">10% descuento</span>
+                        <span class="detalle-promo">en tu primer pedido</span>
+                    </div>
                 </div>
                 <div class="subtexto-promocion">
-                    📱 Instala nuestra App y disfruta tus productos más rápido
+                    <span class="icono-subtexto">📱</span>
+                    <span>Descarga la App • Pedidos más rápidos • Ofertas exclusivas</span>
                 </div>
             </div>
             
@@ -82,12 +81,6 @@
                     <span class="texto-notif">Ofertas</span>
                 </button>
             </div>
-        </div>
-        
-        <div class="banner-decoracion">
-            <div class="particula particula-1"></div>
-            <div class="particula particula-2"></div>
-            <div class="particula particula-3"></div>
         </div>
     </div>
 
@@ -417,27 +410,29 @@
             <p>Por cada amigo que llegue con tu enlace, <strong>ambos reciben 10% de descuento</strong> en su primera compra.</p>
             
             <!-- Código amigable (visual) -->
-            <div class="codigo-referido" id="codigoReferido">AMIGO-DEL-CIELO-123</div>
+            <div class="codigo-referido" id="codigoReferido">AMIGO-VIP-883</div>
             <button class="boton boton-primario" onclick="compartirCodigoReferido()">📱 Compartir mi código</button>
 
             <!-- Enlace personalizado basado en tu ID (UUID local) -->
-            <div style="margin-top:1rem">
-                <small>Tu enlace personal:</small>
-                <div style="display:flex; gap:.5rem; align-items:center; flex-wrap:wrap;">
-                    <a id="enlaceReferido" href="#" target="_blank" rel="noopener" style="word-break:break-all; text-decoration:underline;">
-                        <!-- Se completa por JS -->
-                    </a>
-                    <button class="boton" onclick="copiarEnlaceReferido()">� Copiar enlace</button>
-                    <button class="boton" onclick="compartirCodigoReferido()">🔗 Compartir enlace</button>
+            <div class="contenedor-enlace-ref">
+                <small class="label-enlace">Tu enlace personal:</small>
+                <div class="botones-enlace-ref">
+                    <button class="boton boton-azul-ref" onclick="copiarEnlaceReferido()">📋 Copiar enlace</button>
+                    <button class="boton boton-naranja-ref" onclick="compartirCodigoReferido()">🔗 Compartir enlace</button>
                 </div>
             </div>
 
             <!-- Métricas locales -->
-            <div style="margin-top:1rem">
-                <small>Referidos detectados (local): <strong id="contadorReferidos">0</strong></small>
-                <ul id="listaReferidos" style="margin:.5rem 0 0 1rem;">
-                    <li><small>(Aún no hay referidos)</small></li>
-                </ul>
+            <div class="metricas-referidos">
+                <div class="contador-ref">
+                    <small>Referidos detectados (local):</small>
+                    <strong id="contadorReferidos">0</strong>
+                </div>
+                <div class="lista-ref-container">
+                    <ul id="listaReferidos">
+                        <li><small>(¡Aún no hay referidos!)</small></li>
+                    </ul>
+                </div>
             </div>
         </section>
 
@@ -839,6 +834,9 @@
     
     <!-- Sistema de Notificaciones -->
     <script src="notificaciones-sistema.js" defer></script>
+    
+    <!-- Sistema de Sincronización de Notificaciones -->
+    <script src="sync-notificaciones.js" defer></script>
     
     <!-- Firebase Cloud Messaging -->
     <script src="firebase-config.js" defer></script>
