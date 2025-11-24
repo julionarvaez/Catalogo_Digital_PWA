@@ -55,7 +55,7 @@
             background: var(--tarjeta-clara);
             border-radius: 24px;
             box-shadow: var(--sombra-lg);
-            max-width: 800px;
+            max-width: 1400px;
             width: 100%;
             padding: 40px;
             position: relative;
@@ -373,31 +373,705 @@
                 grid-template-columns: 1fr;
             }
         }
+
+        /* Sistema de pestañas */
+        .tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 30px;
+            border-bottom: 2px solid var(--borde-claro);
+            overflow-x: auto;
+        }
+
+        .tab {
+            padding: 12px 24px;
+            border: none;
+            background: transparent;
+            color: var(--texto-secundario);
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            border-radius: 12px 12px 0 0;
+            transition: var(--transicion);
+            position: relative;
+            white-space: nowrap;
+        }
+
+        .tab:hover {
+            background: var(--fondo-claro);
+            color: var(--color-primario);
+        }
+
+        .tab.active {
+            background: linear-gradient(135deg, rgba(37, 99, 235, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%);
+            color: var(--color-primario);
+        }
+
+        .tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: var(--color-primario);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Estilos específicos para reseñas */
+        .reviews-list {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            max-height: 600px;
+            overflow-y: auto;
+            padding-right: 10px;
+        }
+
+        .review-card {
+            background: white;
+            border: 2px solid var(--borde-claro);
+            border-radius: 20px;
+            padding: 28px;
+            transition: var(--transicion);
+        }
+
+        .review-card:hover {
+            border-color: var(--color-primario);
+            box-shadow: 0 8px 20px rgba(37, 99, 235, 0.12);
+            transform: translateY(-2px);
+        }
+
+        .review-header {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .review-avatar {
+            width: 52px;
+            height: 52px;
+            border-radius: 14px;
+            background: linear-gradient(135deg, var(--color-primario), #8b5cf6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            font-size: 20px;
+            flex-shrink: 0;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+        }
+
+        .review-info {
+            flex: 1;
+        }
+
+        .review-name {
+            font-weight: 700;
+            color: var(--texto-claro);
+            margin-bottom: 6px;
+            font-size: 16px;
+        }
+
+        .review-date {
+            font-size: 13px;
+            color: var(--texto-secundario);
+            font-weight: 500;
+        }
+
+        .review-rating {
+            font-size: 22px;
+            margin-bottom: 14px;
+            letter-spacing: 2px;
+        }
+
+        .review-text {
+            color: var(--texto-claro);
+            line-height: 1.7;
+            margin-bottom: 16px;
+            font-size: 15px;
+        }
+
+        .review-actions {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .btn-small {
+            padding: 10px 18px;
+            font-size: 13px;
+            border-radius: 12px;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transicion);
+        }
+
+        .btn-small:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .btn-small:active {
+            transform: translateY(0);
+        }
+
+        .btn-approve {
+            background: var(--color-exito);
+            color: white;
+        }
+
+        .btn-approve:hover {
+            background: #059669;
+        }
+
+        .btn-reject {
+            background: var(--color-error);
+            color: white;
+        }
+
+        .btn-reject:hover {
+            background: #dc2626;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+            margin-right: 8px;
+            margin-bottom: 4px;
+        }
+
+        .badge.published {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .badge.pending {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .badge.verified {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--texto-secundario);
+        }
+
+        .empty-icon {
+            font-size: 64px;
+            margin-bottom: 16px;
+            opacity: 0.5;
+        }
+
+        /* Alertas */
+        .alert {
+            padding: 16px 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            font-weight: 500;
+            display: none;
+            animation: slideDown 0.3s ease;
+        }
+
+        .alert.show {
+            display: block;
+        }
+
+        .alert.success {
+            background: #d1fae5;
+            color: #065f46;
+            border-left: 4px solid #10b981;
+        }
+
+        .alert.error {
+            background: #fee2e2;
+            color: #991b1b;
+            border-left: 4px solid #ef4444;
+        }
+
+        .alert.info {
+            background: #dbeafe;
+            color: #1e40af;
+            border-left: 4px solid #3b82f6;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Sub-pestañas de reseñas */
+        .review-tabs {
+            display: flex;
+            gap: 0;
+            padding: 0;
+            background: #f8fafc;
+            border-bottom: 1px solid var(--borde-claro);
+        }
+
+        .review-tab {
+            padding: 18px 32px;
+            background: #f8fafc;
+            border: none;
+            color: #64748b;
+            font-weight: 600;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            transition: var(--transicion);
+            font-size: 15px;
+            position: relative;
+            flex: 1;
+            text-align: center;
+        }
+
+        .review-tab:hover {
+            background: #e2e8f0;
+            color: var(--color-primario);
+        }
+
+        .review-tab.active {
+            background: white;
+            color: var(--color-primario);
+            border-bottom-color: var(--color-primario);
+        }
+
+        .tab-badge {
+            display: inline-block;
+            background: var(--color-primario);
+            color: white;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 700;
+            margin-left: 8px;
+            min-width: 24px;
+            text-align: center;
+        }
+
+        .review-tab.active .tab-badge {
+            background: var(--color-primario);
+            box-shadow: 0 2px 8px rgba(37, 99, 235, 0.3);
+        }
+
+        /* Grid de estadísticas */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 24px;
+            margin-bottom: 28px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+            padding: 32px 20px;
+            border-radius: 20px;
+            text-align: center;
+            border: 2px solid #bfdbfe;
+            transition: var(--transicion);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 24px rgba(37, 99, 235, 0.15);
+            border-color: var(--color-primario);
+        }
+
+        .stat-value {
+            font-size: 52px;
+            font-weight: 700;
+            color: var(--color-primario);
+            margin-bottom: 10px;
+            font-family: var(--font-display);
+            line-height: 1;
+        }
+
+        .stat-label {
+            font-size: 11.5px;
+            font-weight: 700;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+        }
+
+        /* Barra de filtros */
+        .filters-bar {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 28px;
+            align-items: center;
+        }
+
+        .filter-select {
+            padding: 12px 18px;
+            border: 2px solid var(--borde-claro);
+            background: white;
+            border-radius: 14px;
+            font-size: 14.5px;
+            font-family: var(--font-ui);
+            cursor: pointer;
+            transition: var(--transicion);
+            color: var(--texto-claro);
+            font-weight: 500;
+            min-width: 200px;
+        }
+
+        .filter-select:hover {
+            border-color: var(--color-primario);
+            box-shadow: 0 2px 8px rgba(37, 99, 235, 0.1);
+        }
+
+        .filter-select:focus {
+            outline: none;
+            border-color: var(--color-primario);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        .search-box {
+            flex: 1;
+            min-width: 360px;
+            padding: 12px 18px;
+            border: 2px solid var(--borde-claro);
+            border-radius: 14px;
+            font-size: 14.5px;
+            font-family: var(--font-ui);
+            transition: var(--transicion);
+        }
+
+        .search-box:hover {
+            border-color: var(--color-primario);
+            box-shadow: 0 2px 8px rgba(37, 99, 235, 0.1);
+        }
+
+        .search-box:focus {
+            outline: none;
+            border-color: var(--color-primario);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        /* Responsive Design */
+        @media (min-width: 1200px) and (max-width: 1400px) {
+            .container {
+                padding: 36px;
+            }
+
+            .filter-select {
+                min-width: 190px;
+            }
+        }
+
+        @media (max-width: 1024px) {
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .filter-select {
+                min-width: 180px;
+            }
+
+            .search-box {
+                min-width: 280px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .review-tab {
+                padding: 14px 16px;
+                font-size: 13px;
+            }
+
+            .tab-badge {
+                padding: 2px 8px;
+                font-size: 11px;
+                margin-left: 4px;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr 1fr;
+                gap: 12px;
+            }
+
+            .stat-card {
+                padding: 20px 12px;
+            }
+
+            .stat-value {
+                font-size: 36px;
+            }
+
+            .stat-label {
+                font-size: 9px;
+            }
+
+            .filters-bar {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .filter-select,
+            .search-box {
+                width: 100%;
+                min-width: 100%;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .review-tabs {
+                flex-wrap: wrap;
+            }
+
+            .review-tab {
+                flex: 1 1 50%;
+                padding: 12px 8px;
+                font-size: 12px;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .stat-value {
+                font-size: 32px;
+            }
+
+            .review-card {
+                padding: 20px;
+                border-radius: 16px;
+            }
+
+            .review-avatar {
+                width: 44px;
+                height: 44px;
+                font-size: 16px;
+            }
+
+            .review-name {
+                font-size: 15px;
+            }
+
+            .review-date {
+                font-size: 12px;
+            }
+
+            .review-rating {
+                font-size: 18px;
+            }
+
+            .review-text {
+                font-size: 14px;
+            }
+
+            .btn-small {
+                padding: 8px 14px;
+                font-size: 12px;
+                flex: 1 1 calc(50% - 4px);
+            }
+
+            .review-actions {
+                gap: 6px;
+            }
+        }
+
+        @media (max-width: 360px) {
+            .review-tab {
+                font-size: 11px;
+                padding: 10px 6px;
+            }
+
+            .tab-badge {
+                font-size: 10px;
+                padding: 2px 6px;
+            }
+
+            .review-actions {
+                flex-direction: column;
+            }
+
+            .btn-small {
+                width: 100%;
+                flex: 1 1 100%;
+            }
+        }
+
+        /* Lista de reseñas */
+        .reviews-list {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        /* Media Queries Generales */
+        @media (min-width: 1600px) {
+            .container {
+                max-width: 1600px;
+            }
+
+            .stats-grid {
+                gap: 28px;
+            }
+
+            .stat-value {
+                font-size: 56px;
+            }
+
+            .filter-select,
+            .search-box {
+                font-size: 15px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+
+            .container {
+                border-radius: 16px;
+            }
+
+            .header-panel {
+                padding: 24px 20px;
+            }
+
+            .header-panel h1 {
+                font-size: 24px;
+            }
+
+            .version-tag {
+                font-size: 10px;
+                padding: 4px 10px;
+            }
+
+            .subtitle {
+                font-size: 12px;
+            }
+
+            .tabs {
+                padding: 0 20px;
+                gap: 4px;
+            }
+
+            .tab {
+                padding: 12px 16px;
+                font-size: 13px;
+            }
+
+            .stats {
+                grid-template-columns: 1fr;
+                gap: 12px;
+            }
+
+            .form-container {
+                padding: 24px 20px;
+            }
+
+            .form-group label {
+                font-size: 13px;
+            }
+
+            input, textarea, select {
+                font-size: 14px;
+                padding: 10px 14px;
+            }
+
+            .btn {
+                padding: 14px;
+                font-size: 14px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .header-panel h1 {
+                font-size: 20px;
+            }
+
+            .tabs {
+                flex-direction: column;
+                padding: 0;
+            }
+
+            .tab {
+                width: 100%;
+                text-align: center;
+                border-right: none;
+                border-bottom: 2px solid transparent;
+            }
+
+            .tab.active {
+                border-right: none;
+                border-bottom: 2px solid var(--color-primario);
+            }
+
+            .pending-count {
+                position: static;
+                margin-left: 8px;
+            }
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header-panel">
-            <h1>🔔 Panel de Notificaciones Push <span class="version-tag">v2.0</span></h1>
-            <p class="subtitle">Envía notificaciones a todos los usuarios de tu PWA - Actualizado 23/11/2025</p>
+            <h1>🎛️ Panel de Administración <span class="version-tag">v3.0</span></h1>
+            <p class="subtitle">Gestiona notificaciones y reseñas de tu PWA - Actualizado 24/11/2025</p>
         </div>
 
-        <div class="stats" id="stats">
-            <div class="stat-card">
-                <div class="stat-value" id="totalTokens">-</div>
-                <div class="stat-label">Usuarios</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-value" id="lastSent">-</div>
-                <div class="stat-label">Enviados hoy</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-value" id="successRate">-%</div>
-                <div class="stat-label">Tasa éxito</div>
-            </div>
+        <!-- Pestañas -->
+        <div class="tabs">
+            <button class="tab active" onclick="switchTab('notifications')">
+                🔔 Notificaciones Push
+            </button>
+            <button class="tab" onclick="switchTab('reviews')">
+                🌟 Reseñas <span id="pendingCount" class="badge pending" style="margin-left: 8px;">0</span>
+            </button>
         </div>
 
-        <div class="alert" id="alert"></div>
+        <!-- Contenido: Notificaciones -->
+        <div class="tab-content active" id="tab-notifications">
+            <div class="stats" id="stats">
+                <div class="stat-card">
+                    <div class="stat-value" id="totalTokens">-</div>
+                    <div class="stat-label">Usuarios</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="lastSent">-</div>
+                    <div class="stat-label">Enviados hoy</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="successRate">-%</div>
+                    <div class="stat-label">Tasa éxito</div>
+                </div>
+            </div>
+
+            <div class="alert" id="alert"></div>
 
         <form id="notificationForm">
             <div class="form-group">
@@ -457,6 +1131,77 @@
                 📤 Enviar Notificación a Todos
             </button>
         </form>
+    </div>
+
+    <!-- Pestaña: Reseñas -->
+    <div id="tab-reviews" class="tab-content">
+        <!-- Alerta para reseñas -->
+        <div id="reviewAlert" class="alert"></div>
+
+        <!-- Sub-pestañas de filtro -->
+        <div class="review-tabs">
+            <button class="review-tab active" onclick="filterReviews('all')" data-filter="all">
+                Todas <span class="tab-badge" id="countAll">0</span>
+            </button>
+            <button class="review-tab" onclick="filterReviews('published')" data-filter="published">
+                Publicadas <span class="tab-badge" id="countPublished">0</span>
+            </button>
+            <button class="review-tab" onclick="filterReviews('pending')" data-filter="pending">
+                Pendientes <span class="tab-badge" id="countPending">0</span>
+            </button>
+            <button class="review-tab" onclick="filterReviews('flagged')" data-filter="flagged">
+                Reportadas <span class="tab-badge" id="countFlagged">0</span>
+            </button>
+        </div>
+
+        <div style="padding: 32px 56px;">
+            <!-- Estadísticas de reseñas -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-value" id="reviewsTotal">0</div>
+                    <div class="stat-label">TOTAL RESEÑAS</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="reviewsAverage">0.0</div>
+                    <div class="stat-label">RATING PROMEDIO</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="reviewsPublished">0</div>
+                    <div class="stat-label">PUBLICADAS</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="reviewsVerified">0</div>
+                    <div class="stat-label">VERIFICADAS</div>
+                </div>
+            </div>
+
+            <!-- Filtros y búsqueda -->
+            <div class="filters-bar">
+                <select class="filter-select" id="ratingFilter" onchange="applyFilters()">
+                    <option value="all">Todas las estrellas</option>
+                    <option value="5">⭐⭐⭐⭐⭐ (5)</option>
+                    <option value="4">⭐⭐⭐⭐ (4)</option>
+                    <option value="3">⭐⭐⭐ (3)</option>
+                    <option value="2">⭐⭐ (2)</option>
+                    <option value="1">⭐ (1)</option>
+                </select>
+                <select class="filter-select" id="sortFilter" onchange="applyFilters()">
+                    <option value="recent">Más recientes</option>
+                    <option value="oldest">Más antiguas</option>
+                    <option value="highest">Mayor rating</option>
+                    <option value="lowest">Menor rating</option>
+                </select>
+                <input type="text" class="search-box" id="searchBox" placeholder="🔍 Buscar por nombre o texto..." oninput="applyFilters()">
+            </div>
+
+            <!-- Lista de reseñas -->
+            <div id="reviewsList" class="reviews-list">
+                <div class="empty-state">
+                    <div class="empty-icon">🌟</div>
+                    <p>Cambia a la pestaña de reseñas para cargar los datos</p>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script>
@@ -621,6 +1366,379 @@
         }
 
         loadStats();
+
+        // ============================================
+        // FUNCIONALIDAD DE RESEÑAS
+        // ============================================
+
+        // Cambiar entre pestañas
+        window.switchTab = function(tab) {
+            // Actualizar pestañas activas
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            // Actualizar contenido activo
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            document.getElementById(`tab-${tab}`).classList.add('active');
+            
+            // Si cambia a reseñas, cargar datos
+            if (tab === 'reviews') {
+                loadReviews();
+            }
+        };
+
+        // Variables globales para reseñas
+        let allReviews = [];
+        let currentFilter = 'all';
+
+        // Cargar reseñas
+        async function loadReviews() {
+            const container = document.getElementById('reviewsList');
+            container.innerHTML = '<div style="text-align:center; padding:40px;"><div class="spinner" style="margin:0 auto 16px;"></div><p>Cargando reseñas...</p></div>';
+
+            try {
+                const response = await fetch('/.netlify/functions/getReviews?includeAll=true&limit=100');
+                const data = await response.json();
+
+                if (data.ok && data.reviews) {
+                    allReviews = data.reviews;
+                    
+                    // Actualizar contador de pendientes en tab principal
+                    const pending = allReviews.filter(r => !r.published).length;
+                    document.getElementById('pendingCount').textContent = pending;
+                    document.getElementById('pendingCount').style.display = pending > 0 ? 'inline-block' : 'none';
+                    
+                    // Actualizar estadísticas y contadores
+                    updateReviewStats();
+                    updateTabCounts();
+                    
+                    // Renderizar reseñas
+                    applyFilters();
+                } else {
+                    container.innerHTML = '<div class="empty-state"><div class="empty-icon">📭</div><p>No hay reseñas disponibles</p></div>';
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                container.innerHTML = '<div class="empty-state"><div class="empty-icon">❌</div><p>Error cargando reseñas</p></div>';
+                showReviewAlert('Error de conexión', 'error');
+            }
+        }
+
+        // Actualizar contadores de pestañas
+        function updateTabCounts() {
+            const all = allReviews.length;
+            const published = allReviews.filter(r => r.published).length;
+            const pending = allReviews.filter(r => !r.published).length;
+            const flagged = allReviews.filter(r => r.flagged).length;
+
+            document.getElementById('countAll').textContent = all;
+            document.getElementById('countPublished').textContent = published;
+            document.getElementById('countPending').textContent = pending;
+            document.getElementById('countFlagged').textContent = flagged;
+        }
+
+        // Actualizar estadísticas de reseñas
+        function updateReviewStats() {
+            const total = allReviews.length;
+            const published = allReviews.filter(r => r.published).length;
+            const verified = allReviews.filter(r => r.verified).length;
+            const average = total > 0 ? (allReviews.reduce((sum, r) => sum + r.rating, 0) / total).toFixed(1) : '0.0';
+
+            document.getElementById('reviewsTotal').textContent = total;
+            document.getElementById('reviewsAverage').textContent = average;
+            document.getElementById('reviewsPublished').textContent = published;
+            document.getElementById('reviewsVerified').textContent = verified;
+        }
+
+        // Filtrar por pestañas
+        window.filterReviews = function(filter) {
+            currentFilter = filter;
+            
+            // Actualizar pestañas activas
+            document.querySelectorAll('.review-tab').forEach(tab => {
+                tab.classList.toggle('active', tab.dataset.filter === filter);
+            });
+            
+            applyFilters();
+        };
+
+        // Aplicar todos los filtros
+        function applyFilters() {
+            let filtered = [...allReviews];
+
+            // Filtrar por pestaña
+            if (currentFilter === 'published') {
+                filtered = filtered.filter(r => r.published);
+            } else if (currentFilter === 'pending') {
+                filtered = filtered.filter(r => !r.published);
+            } else if (currentFilter === 'flagged') {
+                filtered = filtered.filter(r => r.flagged);
+            }
+
+            // Filtrar por rating
+            const ratingFilter = document.getElementById('ratingFilter').value;
+            if (ratingFilter !== 'all') {
+                filtered = filtered.filter(r => r.rating === parseInt(ratingFilter));
+            }
+
+            // Filtrar por búsqueda
+            const searchTerm = document.getElementById('searchBox').value.toLowerCase();
+            if (searchTerm) {
+                filtered = filtered.filter(r => 
+                    r.nombre.toLowerCase().includes(searchTerm) ||
+                    r.texto.toLowerCase().includes(searchTerm)
+                );
+            }
+
+            // Ordenar
+            const sortFilter = document.getElementById('sortFilter').value;
+            filtered.sort((a, b) => {
+                switch(sortFilter) {
+                    case 'recent':
+                        return new Date(b.createdAt) - new Date(a.createdAt);
+                    case 'oldest':
+                        return new Date(a.createdAt) - new Date(b.createdAt);
+                    case 'highest':
+                        return b.rating - a.rating;
+                    case 'lowest':
+                        return a.rating - b.rating;
+                    default:
+                        return 0;
+                }
+            });
+
+            renderReviews(filtered);
+        }
+
+        // Renderizar lista de reseñas
+        function renderReviews(reviews) {
+            const container = document.getElementById('reviewsList');
+            
+            if (!reviews || reviews.length === 0) {
+                container.innerHTML = '<div class="empty-state"><div class="empty-icon">📭</div><p>No hay reseñas que coincidan con los filtros</p></div>';
+                return;
+            }
+
+            container.innerHTML = reviews.map(review => createReviewCard(review)).join('');
+        }
+
+        // Crear tarjeta de reseña
+        function createReviewCard(review) {
+            const initials = review.nombre.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
+            const stars = '⭐'.repeat(review.rating);
+            const date = new Date(review.createdAt).toLocaleDateString('es-ES', {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+
+            const badges = [];
+            if (review.published) {
+                badges.push('<span class="badge published">✅ Publicada</span>');
+            } else {
+                badges.push('<span class="badge pending">⏳ Pendiente Aprobación</span>');
+            }
+            if (review.verified) {
+                badges.push('<span class="badge verified">✓ Compra Verificada</span>');
+            }
+            if (review.flagged) {
+                badges.push('<span class="badge" style="background:#ef4444;color:white;">🚩 Reportada</span>');
+            }
+
+            return `
+                <div class="review-card">
+                    <div class="review-header">
+                        <div style="display:flex;gap:12px;align-items:center;flex:1;">
+                            <div class="review-avatar">${initials}</div>
+                            <div class="review-info">
+                                <div class="review-name">${review.nombre}</div>
+                                <div class="review-date">📅 ${date}</div>
+                            </div>
+                        </div>
+                        <div class="review-rating">${stars}</div>
+                    </div>
+                    <div class="review-text">${review.texto}</div>
+                    <div style="display:flex;gap:8px;flex-wrap:wrap;margin:16px 0;">${badges.join('')}</div>
+                    ${review.adminResponse ? `
+                        <div style="background:#f0fdf4;padding:16px;border-radius:12px;border-left:4px solid #10b981;margin-bottom:16px;">
+                            <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+                                <strong style="color:#065f46;">📢 Tu Respuesta</strong>
+                                <span style="font-size:11px;color:#047857;">${new Date(review.adminResponse.createdAt).toLocaleDateString('es-ES')}</span>
+                            </div>
+                            <p style="color:#047857;margin:0;line-height:1.5;">${review.adminResponse.texto}</p>
+                        </div>
+                    ` : ''}
+                    <div class="review-actions">
+                        ${!review.published ? `
+                            <button class="btn-small btn-approve" onclick="approveReview('${review.id}')">
+                                ✅ Aprobar y Publicar
+                            </button>
+                        ` : `
+                            <button class="btn-small btn-reject" onclick="unpublishReview('${review.id}')">
+                                ❌ Despublicar
+                            </button>
+                        `}
+                        ${!review.verified ? `
+                            <button class="btn-small" style="background:#3b82f6;color:white;" onclick="verifyReview('${review.id}')">
+                                ✓ Marcar Verificada
+                            </button>
+                        ` : ''}
+                        <button class="btn-small" style="background:#f59e0b;color:white;" onclick="promptResponse('${review.id}')">
+                            💬 ${review.adminResponse ? 'Editar' : 'Responder'}
+                        </button>
+                        <button class="btn-small" style="background:#6b7280;color:white;" onclick="deleteReview('${review.id}')">
+                            🗑️ Eliminar
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Aprobar reseña
+        window.approveReview = async function(reviewId) {
+            if (!confirm('¿Aprobar esta reseña?')) return;
+            
+            try {
+                const response = await fetch('/.netlify/functions/moderar-resena', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ reviewId, action: 'approve' })
+                });
+
+                const data = await response.json();
+                if (data.ok) {
+                    showReviewAlert('✅ Reseña aprobada', 'success');
+                    loadReviews();
+                } else {
+                    showReviewAlert('❌ Error: ' + data.error, 'error');
+                }
+            } catch (error) {
+                showReviewAlert('❌ Error de conexión', 'error');
+            }
+        };
+
+        // Despublicar reseña
+        window.unpublishReview = async function(reviewId) {
+            if (!confirm('¿Despublicar esta reseña?')) return;
+            
+            try {
+                const response = await fetch('/.netlify/functions/moderar-resena', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ reviewId, action: 'unpublish' })
+                });
+
+                const data = await response.json();
+                if (data.ok) {
+                    showReviewAlert('✅ Reseña despublicada', 'success');
+                    loadReviews();
+                } else {
+                    showReviewAlert('❌ Error: ' + data.error, 'error');
+                }
+            } catch (error) {
+                showReviewAlert('❌ Error de conexión', 'error');
+            }
+        };
+
+        // Verificar reseña
+        window.verifyReview = async function(reviewId) {
+            if (!confirm('¿Marcar como compra verificada?')) return;
+            
+            try {
+                const response = await fetch('/.netlify/functions/moderar-resena', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ reviewId, action: 'verify' })
+                });
+
+                const data = await response.json();
+                if (data.ok) {
+                    showReviewAlert('✅ Reseña verificada', 'success');
+                    loadReviews();
+                } else {
+                    showReviewAlert('❌ Error: ' + data.error, 'error');
+                }
+            } catch (error) {
+                showReviewAlert('❌ Error de conexión', 'error');
+            }
+        };
+
+        // Responder a reseña
+        window.promptResponse = async function(reviewId) {
+            const responseText = prompt('Escribe tu respuesta al cliente:');
+            if (!responseText || !responseText.trim()) return;
+            
+            try {
+                const response = await fetch('/.netlify/functions/moderar-resena', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ reviewId, action: 'respond', responseText: responseText.trim() })
+                });
+
+                const data = await response.json();
+                if (data.ok) {
+                    showReviewAlert('✅ Respuesta guardada', 'success');
+                    loadReviews();
+                } else {
+                    showReviewAlert('❌ Error: ' + data.error, 'error');
+                }
+            } catch (error) {
+                showReviewAlert('❌ Error de conexión', 'error');
+            }
+        };
+
+        // Eliminar reseña
+        window.deleteReview = async function(reviewId) {
+            if (!confirm('¿ELIMINAR permanentemente? Esta acción no se puede deshacer.')) return;
+            
+            try {
+                const response = await fetch('/.netlify/functions/moderar-resena', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ reviewId, action: 'delete' })
+                });
+
+                const data = await response.json();
+                if (data.ok) {
+                    showReviewAlert('✅ Reseña eliminada', 'success');
+                    loadReviews();
+                } else {
+                    showReviewAlert('❌ Error: ' + data.error, 'error');
+                }
+            } catch (error) {
+                showReviewAlert('❌ Error de conexión', 'error');
+            }
+        };
+
+        // Mostrar alerta para reseñas
+        function showReviewAlert(message, type) {
+            const alert = document.getElementById('reviewAlert');
+            alert.textContent = message;
+            alert.className = `alert ${type} show`;
+            setTimeout(() => {
+                alert.classList.remove('show');
+            }, 5000);
+        }
+
+        // Agregar spinner CSS para loading
+        const style = document.createElement('style');
+        style.textContent = `
+            .spinner {
+                border: 3px solid #e2e8f0;
+                border-top: 3px solid #2563eb;
+                border-radius: 50%;
+                width: 40px;
+                height: 40px;
+                animation: spin 1s linear infinite;
+            }
+            @keyframes spin {
+                0% { transform: rotate(0deg); }
+                100% { transform: rotate(360deg); }
+            }
+        `;
+        document.head.appendChild(style);
     </script>
 </body>
 </html>
