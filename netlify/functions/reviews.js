@@ -237,31 +237,20 @@ exports.handler = async (event, context) => {
             rating: reviewData.rating,
             productoId: reviewData.productoId || null,
             createdAt: Timestamp.now(),
-            published: false, // Por defecto requiere moderación
+            published: true, // ✅ SIEMPRE PUBLICAR - Sin moderación
             verified: false,
             clientIP: clientIP.split(',')[0].trim(), // Solo primera IP
             userAgent: event.headers['user-agent'] || 'unknown'
         };
         
-        // Detección básica de spam
+        // Detección básica de spam (solo para registro, no bloquea publicación)
         if (detectSpam(sanitizedData.texto, sanitizedData.nombre)) {
-            console.log(`Posible spam detectado de IP: ${clientIP}`);
+            console.log(`⚠️ Posible spam detectado de IP: ${clientIP} (publicada de todas formas)`);
             sanitizedData.flagged = true;
             sanitizedData.flagReason = 'Posible spam detectado';
         }
         
-        // Auto-aprobar reseñas que parecen legítimas
-        // Cambio: Usar OR en lugar de AND para ser más permisivo
-        // Aprobar si: NO es spam Y (rating alto O texto largo)
-        const autoApprove = !sanitizedData.flagged && 
-                          (sanitizedData.rating >= 3 || sanitizedData.texto.length >= 20);
-        
-        if (autoApprove) {
-            sanitizedData.published = true;
-            console.log(`Auto-aprobada: rating=${sanitizedData.rating}, textLength=${sanitizedData.texto.length}`);
-        } else {
-            console.log(`Requiere moderación: rating=${sanitizedData.rating}, textLength=${sanitizedData.texto.length}, flagged=${!!sanitizedData.flagged}`);
-        }
+        console.log(`✅ Reseña auto-publicada: rating=${sanitizedData.rating}, textLength=${sanitizedData.texto.length}`);
         
         // Inicializar Firestore
         const db = initFirebase();

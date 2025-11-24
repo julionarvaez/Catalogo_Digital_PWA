@@ -64,35 +64,48 @@ function formatReview(doc) {
 /**
  * Obtener reseñas desde cache o Firestore
  */
-async function getReviews(useCache = true) {
+async function getReviews(useCache = true, includeAll = false) {
     const now = Date.now();
     
-    // Verificar cache
-    if (useCache && reviewsCache && (now - cacheTimestamp) < CACHE_DURATION) {
+    // Verificar cache (solo si no incluye todas)
+    if (!includeAll && useCache && reviewsCache && (now - cacheTimestamp) < CACHE_DURATION) {
         console.log('Retornando reseñas desde cache');
         return reviewsCache;
     }
     
     try {
-        console.log('Obteniendo reseñas desde Firestore...');
+        console.log(`Obteniendo reseñas desde Firestore (includeAll: ${includeAll})...`);
         
         const db = initFirebase();
         
-        // Query: solo reseñas publicadas, ordenadas por fecha descendente
+        // Query: según parámetro includeAll
         let snapshot;
         try {
-            snapshot = await db.collection('reviews')
-                .where('published', '==', true)
-                .orderBy('createdAt', 'desc')
-                .limit(50) // Máximo 50 reseñas
-                .get();
+            if (includeAll) {
+                // Para panel admin: TODAS las reseñas (publicadas y no publicadas)
+                snapshot = await db.collection('reviews')
+                    .orderBy('createdAt', 'desc')
+                    .limit(200)
+                    .get();
+            } else {
+                // Para frontend público: solo publicadas
+                snapshot = await db.collection('reviews')
+                    .where('published', '==', true)
+                    .orderBy('createdAt', 'desc')
+                    .limit(50)
+                    .get();
+            }
         } catch (queryError) {
             console.warn('⚠️ Fallback: error usando orderBy(createdAt). Intentando sin orden explícito. Razón:', queryError.message);
             // Fallback sin orderBy (si índice no creado o campo faltante)
-            snapshot = await db.collection('reviews')
-                .where('published', '==', true)
-                .limit(50)
-                .get();
+            if (includeAll) {
+                snapshot = await db.collection('reviews').limit(200).get();
+            } else {
+                snapshot = await db.collection('reviews')
+                    .where('published', '==', true)
+                    .limit(50)
+                    .get();
+            }
         }
         
         const reviews = [];
@@ -100,9 +113,11 @@ async function getReviews(useCache = true) {
             reviews.push(formatReview(doc));
         });
         
-        // Actualizar cache
-        reviewsCache = reviews;
-        cacheTimestamp = now;
+        // Actualizar cache (solo si es query pública)
+        if (!includeAll) {
+            reviewsCache = reviews;
+            cacheTimestamp = now;
+        }
         
         console.log(`${reviews.length} reseñas obtenidas desde Firestore`);
         return reviews;
@@ -111,7 +126,7 @@ async function getReviews(useCache = true) {
         console.error('Error obteniendo reseñas:', error);
         
         // En caso de error, retornar cache si existe
-        if (reviewsCache) {
+        if (!includeAll && reviewsCache) {
             console.log('Error en Firestore, retornando cache existente');
             return reviewsCache;
         }
@@ -187,12 +202,13 @@ exports.handler = async (event, context) => {
         const params = event.queryStringParameters || {};
         const includeStats = params.stats === 'true';
         const forceRefresh = params.refresh === 'true';
+        const includeAll = params.includeAll === 'true'; // ← NUEVO: para panel admin
         const limit = Math.min(parseInt(params.limit) || 50, 100); // Max 100
         
-        console.log(`Obteniendo reseñas - includeStats: ${includeStats}, forceRefresh: ${forceRefresh}, limit: ${limit}`);
+        console.log(`Obteniendo reseñas - includeStats: ${includeStats}, forceRefresh: ${forceRefresh}, includeAll: ${includeAll}, limit: ${limit}`);
         
-        // Obtener reseñas
-        const allReviews = await getReviews(!forceRefresh);
+        // Obtener reseñas (con o sin filtro de publicadas)
+        const allReviews = await getReviews(!forceRefresh, includeAll);
         
         // Aplicar límite
         const reviews = allReviews.slice(0, limit);
@@ -203,7 +219,7 @@ exports.handler = async (event, context) => {
             reviews: reviews,
             count: reviews.length,
             totalCount: allReviews.length,
-            cached: reviewsCache && !forceRefresh,
+            cached: reviewsCache && !forceRefresh && !includeAll,
             timestamp: new Date().toISOString()
         };
         
