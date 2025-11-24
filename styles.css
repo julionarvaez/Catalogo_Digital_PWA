@@ -6580,12 +6580,13 @@ body.modo-oscuro .campo-textarea::placeholder {
 /* Rating estrellas interactivas - MEJORADO */
 .rating-selector {
     display: flex;
+    flex-direction: row-reverse; /* Invertir orden visual para que vaya de 1 a 5 */
+    justify-content: center;
     gap: 0.75rem;
     margin-top: 0.5rem;
     padding: 1rem;
     background: rgba(37, 99, 235, 0.03);
     border-radius: 12px;
-    justify-content: center;
     transition: all 0.3s ease;
 }
 
@@ -6625,9 +6626,16 @@ body.modo-oscuro .rating-selector label.estrella {
     filter: drop-shadow(0 4px 8px rgba(251, 191, 36, 0.4));
 }
 
-.rating-input:checked ~ label.estrella {
+/* Marcar estrellas seleccionadas correctamente */
+.rating-input:checked + label.estrella {
     color: #fbbf24;
     animation: reboteEstrella 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    filter: drop-shadow(0 4px 8px rgba(251, 191, 36, 0.5));
+}
+
+/* Marcar todas las estrellas siguientes (que están antes visualmente por flex-direction: row-reverse) */
+.rating-input:checked ~ label.estrella {
+    color: #fbbf24;
     filter: drop-shadow(0 4px 8px rgba(251, 191, 36, 0.5));
 }
 

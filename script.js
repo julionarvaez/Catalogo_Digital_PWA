@@ -5349,14 +5349,43 @@ class SistemaResenas {
     resetForm() {
         if (!this.elementos.form) return;
         
-        this.elementos.form.reset();
+        // 1. Desmarcar TODOS los radio buttons de rating PRIMERO
+        const ratingInputs = this.elementos.ratingSelector.querySelectorAll('input[name="rating"]');
+        ratingInputs.forEach(input => {
+            input.checked = false;
+        });
         
+        // 2. Remover todas las clases 'active' y forzar repaint
+        const estrellas = this.elementos.ratingSelector.querySelectorAll('.estrella');
+        estrellas.forEach(estrella => {
+            estrella.classList.remove('active');
+            // Forzar repaint
+            void estrella.offsetWidth;
+        });
+        
+        // 3. Limpiar todos los campos del formulario
+        this.elementos.nombreInput.value = '';
+        this.elementos.textoTextarea.value = '';
+        if (this.elementos.productoSelect) {
+            this.elementos.productoSelect.selectedIndex = 0;
+        }
+        
+        // 4. Resetear contador de caracteres
         if (this.elementos.contadorCaracteres) {
             this.elementos.contadorCaracteres.textContent = '0';
         }
         
+        // 5. Limpiar todos los errores
         this.clearAllErrors();
-        this.resetStarHighlight();
+        
+        // 6. Reset nativo del formulario
+        this.elementos.form.reset();
+        
+        // 7. Verificar una vez más que las estrellas estén desmarcadas (después de un pequeño delay)
+        setTimeout(() => {
+            const inputs = this.elementos.ratingSelector.querySelectorAll('input[name="rating"]');
+            inputs.forEach(input => input.checked = false);
+        }, 50);
     }
 
     /**
