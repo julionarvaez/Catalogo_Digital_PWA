@@ -1,4 +1,4 @@
-// === BASE DE DATOS DE PRODUCTOS ===
+﻿// === BASE DE DATOS DE PRODUCTOS ===
 const productos = [
     // === POLLO ===
     {
@@ -4522,6 +4522,89 @@ class SistemaResenas {
     }
 
     /**
+     * Convertir timestamp de Firebase a objeto Date de forma segura
+     * Maneja: Firestore Timestamp, objetos Date, strings ISO, números timestamp, null/undefined
+     */
+    convertirFechaSegura(fechaFirebase) {
+        try {
+            // Si es null o undefined, retornar fecha actual
+            if (!fechaFirebase) {
+                return new Date();
+            }
+
+            // Si ya es un objeto Date válido
+            if (fechaFirebase instanceof Date && !isNaN(fechaFirebase.getTime())) {
+                return fechaFirebase;
+            }
+
+            // Si es un Firestore Timestamp (tiene propiedad seconds)
+            if (fechaFirebase.seconds !== undefined) {
+                const timestamp = fechaFirebase.seconds * 1000;
+                const fecha = new Date(timestamp);
+                
+                // Validar que el timestamp genera una fecha válida
+                if (!isNaN(fecha.getTime())) {
+                    return fecha;
+                }
+            }
+
+            // Si es un número (timestamp en milisegundos)
+            if (typeof fechaFirebase === 'number') {
+                const fecha = new Date(fechaFirebase);
+                if (!isNaN(fecha.getTime())) {
+                    return fecha;
+                }
+            }
+
+            // Si es un string (ISO date)
+            if (typeof fechaFirebase === 'string') {
+                const fecha = new Date(fechaFirebase);
+                if (!isNaN(fecha.getTime())) {
+                    return fecha;
+                }
+            }
+
+            // Si nada funcionó, retornar fecha actual
+            console.warn('⚠️ Fecha inválida detectada, usando fecha actual:', fechaFirebase);
+            return new Date();
+
+        } catch (error) {
+            console.error('❌ Error convirtiendo fecha:', error, fechaFirebase);
+            return new Date();
+        }
+    }
+
+    /**
+     * Formatear fecha de forma segura para mostrar al usuario
+     */
+    formatearFecha(fecha, locale = 'es-CO') {
+        try {
+            const fechaValida = this.convertirFechaSegura(fecha);
+            return fechaValida.toLocaleDateString(locale, {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric'
+            });
+        } catch (error) {
+            console.error('❌ Error formateando fecha:', error);
+            return 'Fecha no disponible';
+        }
+    }
+
+    /**
+     * Convertir fecha a ISO String de forma segura
+     */
+    formatearFechaISO(fecha) {
+        try {
+            const fechaValida = this.convertirFechaSegura(fecha);
+            return fechaValida.toISOString();
+        } catch (error) {
+            console.error('❌ Error generando ISO String:', error);
+            return new Date().toISOString();
+        }
+    }
+
+    /**
      * Inicialización del sistema
      */
     async init() {
@@ -4649,7 +4732,7 @@ class SistemaResenas {
             errorRating: document.getElementById('errorRating'),
             errorTexto: document.getElementById('errorTexto'),
             
-            // Schema JSON-LD
+            // Schema JSON-LD (opcional)
             schemaScript: document.getElementById('schemaResenas')
         };
         
@@ -4658,7 +4741,13 @@ class SistemaResenas {
         const faltantes = elementosCriticos.filter(key => !this.elementos[key]);
         
         if (faltantes.length > 0) {
+            console.warn(`⚠️ Elementos críticos no encontrados: ${faltantes.join(', ')}`);
             throw new Error(`Elementos críticos no encontrados: ${faltantes.join(', ')}`);
+        }
+        
+        // Advertir sobre elementos opcionales faltantes
+        if (!this.elementos.schemaScript) {
+            console.log('ℹ️ Elemento opcional schemaScript no encontrado');
         }
     }
 
@@ -4879,13 +4968,8 @@ class SistemaResenas {
             }
         }
         
-        // Fecha formateada
-        const fecha = resena.createdAt ? new Date(resena.createdAt.seconds * 1000 || resena.createdAt) : new Date();
-        const fechaFormateada = fecha.toLocaleDateString('es-CO', {
-            year: 'numeric',
-            month: 'short',
-            day: 'numeric'
-        });
+        // Fecha formateada usando función segura
+        const fechaFormateada = this.formatearFecha(resena.createdAt);
         
         // Estado de la reseña
         let estadoInfo = '';
@@ -4978,39 +5062,45 @@ class SistemaResenas {
      * Actualizar JSON-LD Schema
      */
     updateSchema() {
-        if (!this.elementos.schemaScript) return;
+        // Verificar que el elemento exista antes de actualizar
+        if (!this.elementos.schemaScript) {
+            console.log('ℹ️ Elemento schemaScript no encontrado, omitiendo actualización de schema');
+            return;
+        }
         
-        const total = this.resenas.length;
-        const promedio = total > 0 ? 
-            this.resenas.reduce((sum, r) => sum + r.rating, 0) / total : 0;
-        
-        const schema = {
-            "@context": "https://schema.org",
-            "@type": "Organization",
-            "name": "Alimento del Cielo",
-            "aggregateRating": {
-                "@type": "AggregateRating",
-                "ratingValue": promedio.toFixed(1),
-                "reviewCount": total.toString()
-            },
-            "review": this.resenas.slice(0, 5).map(resena => ({
-                "@type": "Review",
-                "author": {
-                    "@type": "Person",
-                    "name": resena.nombre
+        try {
+            const total = this.resenas.length;
+            const promedio = total > 0 ? 
+                this.resenas.reduce((sum, r) => sum + r.rating, 0) / total : 0;
+            
+            const schema = {
+                "@context": "https://schema.org",
+                "@type": "Organization",
+                "name": "Alimento del Cielo",
+                "aggregateRating": {
+                    "@type": "AggregateRating",
+                    "ratingValue": promedio.toFixed(1),
+                    "reviewCount": total.toString()
                 },
-                "reviewRating": {
-                    "@type": "Rating",
-                    "ratingValue": resena.rating.toString()
-                },
-                "reviewBody": resena.texto,
-                "datePublished": resena.createdAt ? 
-                    new Date(resena.createdAt.seconds * 1000 || resena.createdAt).toISOString() : 
-                    new Date().toISOString()
-            }))
-        };
-        
-        this.elementos.schemaScript.textContent = JSON.stringify(schema, null, 2);
+                "review": this.resenas.slice(0, 5).map(resena => ({
+                    "@type": "Review",
+                    "author": {
+                        "@type": "Person",
+                        "name": resena.nombre
+                    },
+                    "reviewRating": {
+                        "@type": "Rating",
+                        "ratingValue": resena.rating.toString()
+                    },
+                    "reviewBody": resena.texto,
+                    "datePublished": this.formatearFechaISO(resena.createdAt)
+                }))
+            };
+            
+            this.elementos.schemaScript.textContent = JSON.stringify(schema, null, 2);
+        } catch (error) {
+            console.warn('⚠️ Error actualizando schema:', error);
+        }
     }
 
     /**
@@ -5349,43 +5439,31 @@ class SistemaResenas {
     resetForm() {
         if (!this.elementos.form) return;
         
-        // 1. Desmarcar TODOS los radio buttons de rating PRIMERO
+        // Reset del formulario HTML
+        this.elementos.form.reset();
+        
+        // Desmarcar todos los radio buttons de rating manualmente
         const ratingInputs = this.elementos.ratingSelector.querySelectorAll('input[name="rating"]');
         ratingInputs.forEach(input => {
             input.checked = false;
         });
         
-        // 2. Remover todas las clases 'active' y forzar repaint
-        const estrellas = this.elementos.ratingSelector.querySelectorAll('.estrella');
-        estrellas.forEach(estrella => {
-            estrella.classList.remove('active');
-            // Forzar repaint
-            void estrella.offsetWidth;
-        });
-        
-        // 3. Limpiar todos los campos del formulario
-        this.elementos.nombreInput.value = '';
-        this.elementos.textoTextarea.value = '';
-        if (this.elementos.productoSelect) {
-            this.elementos.productoSelect.selectedIndex = 0;
-        }
-        
-        // 4. Resetear contador de caracteres
+        // Resetear contador de caracteres
         if (this.elementos.contadorCaracteres) {
             this.elementos.contadorCaracteres.textContent = '0';
         }
         
-        // 5. Limpiar todos los errores
+        // Limpiar errores
         this.clearAllErrors();
         
-        // 6. Reset nativo del formulario
-        this.elementos.form.reset();
+        // Resetear estrellas visuales
+        this.resetStarHighlight();
         
-        // 7. Verificar una vez más que las estrellas estén desmarcadas (después de un pequeño delay)
-        setTimeout(() => {
-            const inputs = this.elementos.ratingSelector.querySelectorAll('input[name="rating"]');
-            inputs.forEach(input => input.checked = false);
-        }, 50);
+        // Remover clases activas de las estrellas
+        const estrellas = this.elementos.ratingSelector.querySelectorAll('.estrella');
+        estrellas.forEach(estrella => {
+            estrella.classList.remove('active');
+        });
     }
 
     /**
