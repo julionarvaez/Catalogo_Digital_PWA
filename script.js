@@ -3278,11 +3278,30 @@ function iniciarPagoWompi(total) {
 
             const text = await response.text();
             let resultado;
-            try { resultado = JSON.parse(text); } catch { throw new Error(`Respuesta no JSON: ${text}`); }
+            
+            try { 
+                resultado = JSON.parse(text); 
+            } catch { 
+                console.error('Error parseando respuesta:', text);
+                throw new Error(`Error del servidor: ${text.substring(0, 100)}`); 
+            }
 
             if (!response.ok || !resultado.exito) {
-                const errMsg = resultado?.error || resultado?.message || JSON.stringify(resultado);
-                throw new Error(errMsg);
+                // Mostrar error detallado del servidor
+                let mensajeError = resultado?.error || 'Error desconocido';
+                
+                // Si hay detalles, agregarlos
+                if (resultado?.detalles && Array.isArray(resultado.detalles)) {
+                    mensajeError += '\n\nDetalles:\n• ' + resultado.detalles.join('\n• ');
+                }
+                
+                // Si hay ayuda, agregarla
+                if (resultado?.ayuda) {
+                    mensajeError += '\n\n' + resultado.ayuda;
+                }
+                
+                console.error('Error del servidor:', resultado);
+                throw new Error(mensajeError);
             }
 
             // Guardar pedido
@@ -3298,8 +3317,18 @@ function iniciarPagoWompi(total) {
             }
 
         } catch (error) {
-            console.error('Error al procesar pago:', error);
-            mostrarNotificacion(`❌ Error: ${error.message || 'Error creando transacción'}`, 'error');
+            console.error('❌ Error al procesar pago:', error);
+            
+            // Mostrar error de forma más amigable
+            let mensajeUsuario = error.message;
+            
+            // Si el mensaje es muy largo, mostrarlo en consola y dar uno resumido
+            if (mensajeUsuario.length > 300) {
+                console.error('Mensaje de error completo:', mensajeUsuario);
+                mensajeUsuario = 'Error al procesar el pago. Revisa la consola para más detalles o contacta al administrador.';
+            }
+            
+            mostrarNotificacion(`❌ ${mensajeUsuario}`, 'error');
             botonPagar.disabled = false;
             botonPagar.innerHTML = textoOriginal;
         }
