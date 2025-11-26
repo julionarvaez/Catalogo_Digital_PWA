@@ -1,15 +1,12 @@
-// === SERVICE WORKER PARA ALIMENTO DEL CIELO PWA ===
-// IMPORTANTE: Incrementar esta versión cuando haya cambios importantes
-const CACHE_VERSION = '1.0.65'; // ✅ Referidos móvil optimizado: layout vertical, botones full-width, mejor organización
+
+const CACHE_VERSION = '1.0.65'; // 
 const CACHE_NAME = `alimento-del-cielo-v${CACHE_VERSION}`;
 const APP_VERSION = CACHE_VERSION;
 
-// Timestamp de la última actualización (se actualiza automáticamente)
+
 const LAST_UPDATE = Date.now();
 
-// === IMPORTAR FIREBASE MESSAGING PARA NOTIFICACIONES PUSH ===
-// Configuración de Firebase Cloud Messaging
-// NOTA: Esta configuración se carga dinámicamente para evitar falsos positivos de seguridad
+
 const getFirebaseConfig = () => {
     const parts = ['AIza', 'SyAkAZEuyiWWK5aO26WSzSuPR4ekVV2fx6Y'];
     return {
@@ -23,10 +20,10 @@ const getFirebaseConfig = () => {
     };
 };
 
-// Bandera para verificar si Firebase está cargado
+
 let firebaseInitialized = false;
 
-// Archivos esenciales para cachear
+
 const urlsToCache = [
     '/',
     '/index.html',

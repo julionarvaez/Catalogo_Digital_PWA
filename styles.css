@@ -1,8 +1,4 @@
-/* === PARCHE BANNER DEFINITIVO - v2.0 - 2025-11-23 === */
-/* Soluciona: recorte de contenido + superposición sobre hero */
-/* NO CACHEAR - FORZAR RECARGA */
 
-/* === VARIABLES CSS PRINCIPALES === */
 :root {
     --color-primario: #2563eb;      /*el color principal*/
     --color-secundario: #1e40af;    /*Color segundario */
@@ -44,7 +40,6 @@ body {
     color: var(--texto-claro);
     background: var(--fondo-claro);
     transition: var(--transicion);
-    /* Números consistentes por defecto (lining); tabulares se aplican en clases de precio) */
     font-feature-settings: 'lnum' 1;
 }
 
