@@ -8381,3 +8381,281 @@ body.modo-oscuro .btn-limpiar-notificaciones {
     }
 }
 
+/* =========================================
+   SISTEMA DE REFERIDOS - ESTILOS MEJORADOS
+   ========================================= */
+
+/* Banner de descuento por referido */
+.banner-descuento-referido {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 10000;
+    animation: slideInDown 0.5s ease-out;
+    max-width: 500px;
+    width: 90%;
+}
+
+@keyframes slideInDown {
+    from {
+        opacity: 0;
+        transform: translate(-50%, -100px);
+    }
+    to {
+        opacity: 1;
+        transform: translate(-50%, 0);
+    }
+}
+
+@keyframes slideOutUp {
+    from {
+        opacity: 1;
+        transform: translate(-50%, 0);
+    }
+    to {
+        opacity: 0;
+        transform: translate(-50%, -100px);
+    }
+}
+
+.banner-contenido {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    color: white;
+    padding: 1.5rem;
+    border-radius: 12px;
+    box-shadow: 0 10px 40px rgba(16, 185, 129, 0.3),
+                0 5px 15px rgba(0, 0, 0, 0.2);
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    position: relative;
+}
+
+.icono-regalo {
+    font-size: 2.5rem;
+    animation: bounce 1s infinite;
+}
+
+@keyframes bounce {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-10px);
+    }
+}
+
+.texto-banner strong {
+    display: block;
+    font-size: 1.2rem;
+    margin-bottom: 0.25rem;
+}
+
+.texto-banner p {
+    font-size: 0.95rem;
+    margin: 0;
+    opacity: 0.95;
+}
+
+.btn-cerrar-banner-ref {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: rgba(255, 255, 255, 0.2);
+    border: none;
+    color: white;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    font-size: 1.5rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+
+.btn-cerrar-banner-ref:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: rotate(90deg);
+}
+
+/* Descuento en el carrito */
+.descuento-referido-carrito {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem;
+    margin: 0.5rem 0;
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    border-radius: 8px;
+    color: white;
+    font-weight: 600;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4);
+    }
+    50% {
+        box-shadow: 0 0 0 8px rgba(16, 185, 129, 0);
+    }
+}
+
+.descuento-monto {
+    font-size: 1.1rem;
+    font-weight: 700;
+}
+
+/* Métricas de referidos mejoradas */
+.metricas-referidos {
+    margin-top: 2rem;
+    padding: 1.5rem;
+    background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+    border-radius: 12px;
+    border: 2px solid #10b981;
+}
+
+body.modo-oscuro .metricas-referidos {
+    background: linear-gradient(135deg, #064e3b 0%, #065f46 100%);
+    border-color: #059669;
+}
+
+.contador-ref {
+    text-align: center;
+    margin-bottom: 1.5rem;
+}
+
+.contador-ref small {
+    display: block;
+    font-size: 0.9rem;
+    color: #059669;
+    margin-bottom: 0.5rem;
+}
+
+body.modo-oscuro .contador-ref small {
+    color: #10b981;
+}
+
+.contador-ref strong {
+    font-size: 3rem;
+    color: #10b981;
+    font-weight: 800;
+    display: block;
+    line-height: 1;
+}
+
+body.modo-oscuro .contador-ref strong {
+    color: #34d399;
+}
+
+.lista-ref-container ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.lista-ref-container ul li {
+    padding: 1rem;
+    background: white;
+    margin-bottom: 0.5rem;
+    border-radius: 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+body.modo-oscuro .lista-ref-container ul li {
+    background: #1e293b;
+}
+
+.lista-ref-container ul li strong {
+    color: #10b981;
+}
+
+.lista-ref-container ul li span {
+    color: #6b7280;
+    font-size: 0.85rem;
+}
+
+body.modo-oscuro .lista-ref-container ul li small {
+    color: #9ca3af;
+}
+
+/* Descuentos disponibles destacados */
+.descuento-disponible {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
+    color: white !important;
+    padding: 1.5rem !important;
+    position: relative;
+    overflow: hidden;
+}
+
+.descuento-disponible::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+    animation: pulse-glow 3s ease-in-out infinite;
+}
+
+@keyframes pulse-glow {
+    0%, 100% {
+        opacity: 0.5;
+    }
+    50% {
+        opacity: 1;
+    }
+}
+
+.descuento-disponible strong {
+    color: white !important;
+    font-size: 1.1rem;
+    display: block;
+    margin-bottom: 0.5rem;
+}
+
+.descuento-disponible small {
+    color: rgba(255, 255, 255, 0.9) !important;
+    display: block;
+    margin-bottom: 0.5rem;
+}
+
+.badge-activo {
+    background: rgba(255, 255, 255, 0.3);
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    display: inline-block;
+    border: 2px solid rgba(255, 255, 255, 0.5);
+}
+
+/* Responsive para banner */
+@media (max-width: 768px) {
+    .banner-descuento-referido {
+        width: 95%;
+    }
+    
+    .banner-contenido {
+        padding: 1rem;
+    }
+    
+    .icono-regalo {
+        font-size: 2rem;
+    }
+    
+    .texto-banner strong {
+        font-size: 1rem;
+    }
+    
+    .texto-banner p {
+        font-size: 0.85rem;
+    }
+}

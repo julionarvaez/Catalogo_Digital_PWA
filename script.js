@@ -1,622 +1,81 @@
-﻿// === BASE DE DATOS DE PRODUCTOS ===
-const productos = [
-    // === POLLO ===
-    {
-        id: 1,
-        nombre: 'Pollo Semicriollo Entero',
-        categoria: 'pollo',
-        precio: 7500, 
-        descripcion: 'Pollo semicriollo entero, fresco y jugoso. Ideal para cualquier preparación. Precio por kilogramo 15.000 COP.',
-        emoji: '🍗',
-        imagen: './Imagenes/Productos/Pollo/pollo Semicriollo.jpg',
-        etiqueta: 'Bestseller',
-        tipoEtiqueta: 'etiqueta-producto',
-        unidadMedida: 'Peso aproximado',
-        pesoAproximado: '2400 - 3000 g',
-        precioPorKg: 15000,
-    },
-    {
-        id: 2,
-        nombre: 'Bandeja de Menudencia con Vicera 500g',
-        categoria: 'pollo',
-        precio: 4990,
-        descripcion: 'Bandeja con menudencias con Vicera de pollo, ideal para sopas, guisos y más.',
-        emoji: '🔥',
-        imagen: './Imagenes/Productos/Pollo/bandeja-menudencias-vicera.jpg',
-        etiqueta: 'Especial',
-        tipoEtiqueta: 'etiqueta-oferta'
-    },
+﻿
+let productos = []; // Se llena al cargar desde productos.json
 
 
-    // === CARNES ===
-    {
-        id: 20,
-        nombre: 'Carne de Res 1000g',
-        categoria: 'carnes',
-        precio: 14990,
-        descripcion: 'Carne de res fresca y jugosa, ideal para cualquier preparación.',
-        emoji: '🥩',
-        imagen: './Imagenes/Productos/Carnes/carne-de-res.jpg',
-        etiqueta: 'Nuevo',
-        tipoEtiqueta: 'etiqueta-nuevo',
-    },
-    {
-        id: 21,
-        nombre: 'Carne de Cerdo 1000g',
-        categoria: 'carnes',
-        precio: 13990,
-        descripcion: 'Carne de cerdo tierna y jugosa, ideal para cualquier preparación.',
-        emoji: '🍔',
-        imagen: './Imagenes/Productos/Carnes/carne-de-cerdo.jpg',
-        etiqueta: 'Familiar',
-        tipoEtiqueta: 'etiqueta-producto'
-    },
-    {
-        id: 22,
-        nombre: 'Carne Molida de Res 1000g',
-        categoria: 'carnes',
-        precio: 15490,
-        descripcion: 'Carne molida de res, ideal para cualquier preparación.',
-        emoji: '🐷',
-        imagen: './Imagenes/Productos/Carnes/carne-molida-res-1.jpg',
-        etiqueta: 'Delicioso',
-        tipoEtiqueta: 'etiqueta-oferta'
-    },
-    {
-        id: 23,
-        nombre: 'Carne Molida de Cerdo 1000g',
-        categoria: 'carnes',
-        precio: 14490,
-        descripcion: 'Carne molida de cerdo, ideal para cualquier preparación.',
-        emoji: '🐷',
-        imagen: './Imagenes/Productos/Carnes/carne-molida-cerdo.jpg',
-        etiqueta: 'Delicioso',
-        tipoEtiqueta: 'etiqueta-oferta'
-    },
-    {
-        id: 23,
-        nombre: 'Carne Molida de Mixta 1000g',
-        categoria: 'carnes',
-        precio: 12990,
-        descripcion: 'Carne molida mixta res y cerdo, ideal para cualquier preparación.',
-        emoji: '🐷',
-        imagen: './Imagenes/Productos/Carnes/carne-molida-mixta.jpg',
-        etiqueta: 'Delicioso',
-        tipoEtiqueta: 'etiqueta-oferta'
-    },
+// === SISTEMA DE CARGA DINÁMICA DE PRODUCTOS ===
+// Función para cargar productos desde JSON
+async function cargarProductos() {
+    try {
+        console.log('📦 Cargando productos desde productos.json...');
+        const response = await fetch('/productos.json', {
+            cache: 'no-cache',
+            headers: {
+                'Cache-Control': 'no-cache'
+            }
+        });
+        
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        productos = data.productos;
+        
+        console.log(`✅ ${productos.length} productos cargados correctamente`);
+        console.log(`📅 Versión del catálogo: ${data.version}`);
+        console.log(`🕐 Última actualización: ${data.lastUpdate}`);
+        
+        // Guardar versión en localStorage para detectar cambios
+        const versionAnterior = localStorage.getItem('catalogoVersion');
+        if (versionAnterior && versionAnterior !== data.version) {
+            console.log('🆕 Nueva versión del catálogo detectada!');
+            mostrarNotificacion('🆕 Catálogo actualizado con nuevos productos', 'info');
+        }
+        localStorage.setItem('catalogoVersion', data.version);
+        localStorage.setItem('catalogoLastUpdate', data.lastUpdate);
+        
+        return true;
+    } catch (error) {
+        console.error('❌ Error cargando productos:', error);
+        console.warn('⚠️ Intentando cargar desde cache local');
+        
+        // Intentar cargar desde localStorage si existe
+        const productosGuardados = localStorage.getItem('productosCache');
+        if (productosGuardados) {
+            try {
+                const cache = JSON.parse(productosGuardados);
+                productos = cache.productos;
+                console.log('✅ Productos cargados desde cache local');
+                return true;
+            } catch (e) {
+                console.error('Error parseando cache:', e);
+            }
+        }
+        
+        mostrarNotificacion('⚠️ Error cargando productos. Por favor recarga la página.', 'warning');
+        return false;
+    }
+}
 
-
-
-    // === PESCADO ===
-    {
-        id: 40,
-        nombre: 'Filete de Salmón',
-        categoria: 'pescado',
-        precio: 19990,
-        descripcion: 'Salmón fresco, rico en omega-3. Porciones de 200g cada una.',
-        emoji: '🐟',
-        imagen: './Imagenes/Productos/Pescado/Filete de Salmón.jpg',
-        etiqueta: 'Premium',
-        tipoEtiqueta: 'etiqueta-premium'
-    },
-    {
-        id: 41,
-        nombre: 'Camarones Precocido',
-        categoria: 'pescado',
-        precio: 21990,
-        descripcion: 'Camarones precociso, pelados y desvenados.',
-        emoji: '🦐',
-        imagen: './Imagenes/Productos/Pescado/Camarones Precocido.jpg',
-        etiqueta: 'Gourmet',
-        tipoEtiqueta: 'etiqueta-premium'
-    },
-    {
-        id: 42,
-        nombre: 'Cachama Entera x3 unidades',
-        categoria: 'pescado',
-        precio: 14990,
-        descripcion: 'Cachama fresca y limpia, lista para cocinar. Su sabor suave y natural es perfecto para disfrutar en familia.',
-        emoji: '🐟',
-        imagen: './Imagenes/Productos/Pescado/Cachama Entera x3.jpg',
-        etiqueta: 'Premium',
-        tipoEtiqueta: 'etiqueta-premium'
-    },
-    {
-        id: 43,
-        nombre: 'Tilapia Roja Entera x3 unidades',
-        categoria: 'pescado',
-        precio: 15990,
-        descripcion: 'Tilapia roja fresca y limpia, lista para cocinar. Ideal para cualquier preparación y disfrutar en familia.',
-        emoji: '🐟',
-        imagen: './Imagenes/Productos/Pescado/Tilapia Roja Entera x3.jpg',
-        etiqueta: 'Premium',
-        tipoEtiqueta: 'etiqueta-premium'
-    },
-    {
-        id: 44,
-        nombre: 'Mojarra Entera x3 unidades ',
-        categoria: 'pescado',
-        precio: 14990,
-        descripcion: 'Mojarra fresca y limpia, lista para cocinar. Ideal para cualquier preparación y disfrutar en familia.',
-        emoji: '🐟',
-        imagen: './Imagenes/Productos/Pescado/Mojarra Entera x3.jpg',
-        etiqueta: 'Premium',
-        tipoEtiqueta: 'etiqueta-premium'
-    },
-
-    // === VERDURAS ===
-    {
-        id: 60,
-        nombre: 'Mix Gourmet - Verduras Congeladas 500g',
-        categoria: 'verduras',
-        precio: 6490,
-        descripcion: 'Selección gourmet de brócoli, arveja, apio, cebollín y maíz tierno. Congelado al instante para preservar nutrientes, color y textura.',
-        emoji: '🥬',
-        imagen: './Imagenes/Productos/Verduras/Mix Gourmet - Verduras Congeladas 500g.jpg',
-        etiqueta: 'Saludable',
-        tipoEtiqueta: 'etiqueta-producto'
-    },
-        {
-        id: 61,
-        nombre: 'Mix Primavera - Verduras Congeladas 500g',
-        categoria: 'verduras',
-        precio: 6490,
-        descripcion: 'Mezcla colorida de arveja, zanahoria, maíz y pimentón rojo, lista para saltear o acompañar tus comidas. Congelado al instante para mantener su frescura y sabor natural.',
-        emoji: '🥬',
-        imagen: './Imagenes/Productos/Verduras/Mix Primavera - Verduras Congeladas 500g.jpg',
-        etiqueta: 'Saludable',
-        tipoEtiqueta: 'etiqueta-producto'
-    },
-        {
-        id: 62,
-        nombre: 'Salteado Campestre - Verduras Congeladas 500g',
-        categoria: 'verduras',
-        precio: 6490,
-        descripcion: 'Deliciosa combinación de brócoli, zanahoria, pimentón y cebolla, perfecta para comidas saludables. Producto 100% natural sin conservantes.',
-        emoji: '🥬',
-        imagen: './Imagenes/Productos/Verduras/Salteado Campestre - Verduras Congeladas 500g.jpg',
-        etiqueta: 'Saludable',
-        tipoEtiqueta: 'etiqueta-producto'
-    },
-    {
-        id: 63,
-        nombre: 'Papas a la Francesa  1000g',
-        categoria: 'verduras',
-        precio: 12000,
-        descripcion: 'Papas cortadas en bastones, listas para freír o hornear. ideal para acompañar tus comidas favoritas.',
-        emoji: '🥔',
-        imagen: './Imagenes/Productos/Verduras/Papas a la Francesa 1000g.jpg',     
-        etiqueta: 'Tradicional',
-        tipoEtiqueta: 'etiqueta-producto'
-    },
-
-    // === EMPANADAS ===
-    {
-        id: 80,
-        nombre: 'Empanadas Hawaianas x7',
-        categoria: 'empanadas',
-        precio: 8990,
-        descripcion: 'Empanadas rellenas de jamón, piña y queso fundido. Pack x7 Unidades.',
-        emoji: '🥟',
-        imagen: './Imagenes/Productos/Empanadas/Empanadas x7.jpg',
-        etiqueta: 'Exótico',
-        tipoEtiqueta: 'etiqueta-producto'
-    },
-    {
-        id: 81,
-        nombre: 'Empanadas Hawaianas x10',
-        categoria: 'empanadas',
-        precio: 11990,
-        descripcion: 'Empanadas rellenas de jamón, piña y queso fundido. Pack x10 Unidades.',
-        emoji: '🥟',
-        imagen: './Imagenes/Productos/Empanadas/Empanadas x10.jpg',
-        etiqueta: 'Exótico',
-        tipoEtiqueta: 'etiqueta-producto'
-    },
-    {
-        id: 82,
-        nombre: 'Empanadas Hawaianas x15',
-        categoria: 'empanadas',
-        precio: 14990,
-        descripcion: 'Empanadas rellenas de jamón, piña y queso fundido. Pack x15 Unidades.',
-        emoji: '🥟',
-        imagen: './Imagenes/Productos/Empanadas/Empanadas x15.jpg',
-        etiqueta: 'Exótico',
-        tipoEtiqueta: 'etiqueta-producto'
-    },
-    
-    {
-        id: 83,
-        nombre: 'Empanadas de Jamón con Queso x7',
-        categoria: 'empanadas',
-        precio: 8990,
-        descripcion: 'Empanadas rellenas de jamón y queso fundido. Pack x7 Unidades.',
-        emoji: '🥟',
-        imagen: './Imagenes/Productos/Empanadas/Empanadas x7.jpg',
-        etiqueta: 'Delicioso',
-        tipoEtiqueta: 'etiqueta-producto'
-    },
-    {
-        id: 84,
-        nombre: 'Empanadas de Jamón con Queso x10',
-        categoria: 'empanadas',
-        precio: 11990,
-        descripcion: 'Empanadas rellenas de jamón y queso fundido. Pack x10 Unidades.',
-        emoji: '🥟',
-        imagen: './Imagenes/Productos/Empanadas/Empanadas x10.jpg',
-        etiqueta: 'Delicioso',
-        tipoEtiqueta: 'etiqueta-producto'
-    },
-    {
-        id: 85,
-        nombre: 'Empanadas de Jamón con Queso x15',
-        categoria: 'empanadas',
-        precio: 14990,
-        descripcion: 'Empanadas rellenas de jamón y queso fundido. Pack x15 Unidades.',
-        emoji: '🥟',
-        imagen: './Imagenes/Productos/Empanadas/Empanadas x15.jpg',
-        etiqueta: 'Delicioso',
-        tipoEtiqueta: 'etiqueta-producto'
-    },
-    {
-        id: 86,
-        nombre: 'Empanadas de Pollo x7',
-        categoria: 'empanadas',
-        precio: 8990,
-        descripcion: 'Empanadas rellenas de pollo desmechado con un toque de especias. Pack x7 unidades.',
-        emoji: '🥟',
-        imagen: './Imagenes/Productos/Empanadas/Empanadas x7.jpg',
-        etiqueta: 'Clásico',
-        tipoEtiqueta: 'etiqueta-producto'
-    },
-    {
-        id: 87,
-        nombre: 'Empanadas de Pollo x10', 
-        categoria: 'empanadas',
-        precio: 11990,
-        descripcion: 'Empanadas rellenas de pollo desmechado con un toque de especias. Pack x10 unidades.',
-        emoji: '🥟',
-        imagen: './Imagenes/Productos/Empanadas/Empanadas x10.jpg',
-        etiqueta: 'Clásico',
-        tipoEtiqueta: 'etiqueta-producto'
-    },
-    {
-        id: 88,
-        nombre: 'Empanadas de Pollo x15', 
-        categoria: 'empanadas',
-        precio: 14990,
-        descripcion: 'Empanadas rellenas de pollo desmechado con un toque de especias. Pack x15 unidades.',
-        emoji: '🥟',
-        imagen: './Imagenes/Productos/Empanadas/Empanadas x15.jpg',
-        etiqueta: 'Clásico',
-        tipoEtiqueta: 'etiqueta-producto'
-    },
-    {
-        id: 89,
-        nombre: 'Empanadas de Carne x7',
-        categoria: 'empanadas',
-        precio: 8990,
-        descripcion: 'Empanadas rellenas de carne molida sazonada con especias tradicionales. Pack x7 unidades.',
-        emoji: '🥟',
-        imagen: './Imagenes/Productos/Empanadas/Empanadas x7.jpg',
-        etiqueta: 'Clásico',
-        tipoEtiqueta: 'etiqueta-producto'
-    },
-    {
-        id: 90,
-        nombre: 'Empanadas de Carne x10',
-        categoria: 'empanadas',
-        precio: 11990,
-        descripcion: 'Empanadas rellenas de carne molida sazonada con especias tradicionales. Pack x10 unidades.',
-        emoji: '🥟',
-        imagen: './Imagenes/Productos/Empanadas/Empanadas x10.jpg',
-        etiqueta: 'Mixtas',
-        tipoEtiqueta: 'etiqueta-producto'
-    },
-    {
-        id: 91,
-        nombre: 'Empanadas de Carne x15',
-        categoria: 'empanadas',
-        precio: 14990,
-        descripcion: 'Empanadas rellenas de carne molida sazonada con especias tradicionales. Pack x12 unidades.',
-        emoji: '🥟',
-        imagen: './Imagenes/Productos/Empanadas/Empanadas x15.jpg',
-        etiqueta: 'Vegetariano',
-        tipoEtiqueta: 'etiqueta-producto'
-    },
-// === PASABOCAS SIN FRITOS===
-    {
-        id: 105,
-        nombre: 'Combo_01: 50 unidades sin Fritar',
-        categoria: 'pasabocas',
-        precio: 28990,
-        descripcion: 'Incluye 25 deditos y 25 empanadas en tamaño pasaboca sin Fritar. Ideal para reuniones pequeñas.',
-        imagen: './Imagenes/Productos/Pasabocas/Sin Fritar/Combo_01.jpg',
-        emoji: '🥟',
-        etiqueta: 'Económico',
-        tipoEtiqueta: 'etiqueta-producto'
-    },
-    {
-        id: 106,
-        nombre: 'Combo_02: 100 unidades sin Fritar',
-        categoria: 'pasabocas',
-        precio: 55990,
-        descripcion: 'Incluye 50 deditos, 30 empanadas y 20 medallones en tamaño pasaboca sin Fritar. Perfecto para compartir.',
-        imagen: './Imagenes/Productos/Pasabocas/Sin Fritar/Combo_02---.jpg',
-        emoji: '🍢',
-        etiqueta: 'Popular',
-        tipoEtiqueta: 'etiqueta-producto'
-    },
-    {
-        id: 107,
-        nombre: 'Combo_03: 150 unidades sin Fritar',
-        categoria: 'pasabocas',
-        precio: 83990,
-        descripcion: 'Incluye 100 deditos, 30 empanadas y 20 medallones en tamaño pasaboca sin Fritar. Ideal para eventos medianos.',
-        imagen: './Imagenes/Productos/Pasabocas/Sin Fritar/Combo_02---.jpg',
-        emoji: '🍴',
-        etiqueta: 'Recomendado',
-        tipoEtiqueta: 'etiqueta-producto'
-    },
-    {
-        id: 108,
-        nombre: 'Combo_04: 170 unidades sin Fritar',
-        categoria: 'pasabocas',
-        precio: 94990,
-        descripcion: 'Incluye 100 deditos, 50 empanadas y 20 medallones en tamaño pasaboca sin Fritar. Excelente opción para celebraciones.',
-        emoji: '🎉',
-        imagen: './Imagenes/Productos/Pasabocas/Sin Fritar/Combo_02---.jpg',
-        etiqueta: 'Favorito',
-        tipoEtiqueta: 'etiqueta-producto'
-    },
-    {
-        id: 109,
-        nombre: 'Combo_05: 200 unidades sin Fritar',
-        categoria: 'pasabocas',
-        precio: 111990,
-        descripcion: 'Incluye 100 deditos, 50 empanadas y 50 medallones en tamaño pasaboca sin Fritar. Ideal para eventos grandes.',
-        emoji: '🥳',
-        imagen: './Imagenes/Productos/Pasabocas/Sin Fritar/Combo_02---.jpg',
-        etiqueta: 'Premium',
-        tipoEtiqueta: 'etiqueta-producto'
-    },
-    {
-        id: 111,
-        nombre: 'Combo_06: 300 unidades sin Fritar ',
-        categoria: 'pasabocas',
-        precio: 167990,
-        descripcion: 'Incluye 200 deditos, 100 empanadas y 100 medallones en tamaño pasaboca sin Fritar. Ideal para eventos grandes.',
-        emoji: '🥳',
-        imagen: './Imagenes/Productos/Pasabocas/Sin Fritar/Combo_02---.jpg',
-        etiqueta: 'Premium',
-        tipoEtiqueta: 'etiqueta-producto'
-    },
-
-        // === PASABOCAS FRITOS===
-    {
-        id: 100,
-        nombre: 'Combo_01: 50 unidades Fritos',
-        categoria: 'pasabocas',
-        precio: 34990,
-        descripcion: 'Incluye 25 deditos y 25 empanadas en tamaño pasaboca ya Fritos. Ideal para reuniones pequeñas.',
-        emoji: '🥟',
-        imagen: './Imagenes/Productos/Pasabocas/Combo-1.jpg',
-        etiqueta: 'Económico',
-        tipoEtiqueta: 'etiqueta-producto'
-    },
-    {
-        id: 101,
-        nombre: 'Combo_02: 100 unidades Fritos',
-        categoria: 'pasabocas',
-        precio: 64990,
-        descripcion: 'Incluye 50 deditos, 30 empanadas y 20 medallones en tamaño pasaboca ya Fritos. Perfecto para compartir.',
-        emoji: '🍢',
-        imagen: './Imagenes/Productos/Pasabocas/Combos-2---.jpg',
-        etiqueta: 'Popular',
-        tipoEtiqueta: 'etiqueta-producto'
-    },
-    {
-        id: 102,
-        nombre: 'Combo_03: 150 unidades Fritos',
-        categoria: 'pasabocas',
-        precio: 97990,
-        descripcion: 'Incluye 100 deditos, 30 empanadas y 20 medallones en tamaño pasaboca ya Fritos. Ideal para eventos medianos.',
-        imagen: './Imagenes/Productos/Pasabocas/Combos-2---.jpg',
-        emoji: '🍴',
-        etiqueta: 'Recomendado',
-        tipoEtiqueta: 'etiqueta-producto'
-    },
-    {
-        id: 103,
-        nombre: 'Combo_04: 170 unidades Fritos',
-        categoria: 'pasabocas',
-        precio: 111990,
-        descripcion: 'Incluye 100 deditos, 50 empanadas y 20 medallones en tamaño pasaboca ya Fritos. Excelente opción para celebraciones.',
-        emoji: '🎉',
-        imagen: './Imagenes/Productos/Pasabocas/Combos-2---.jpg',
-        etiqueta: 'Favorito',
-        tipoEtiqueta: 'etiqueta-producto'
-    },
-    {
-        id: 104,
-        nombre: 'Combo_05: 200 unidades Fritos',
-        categoria: 'pasabocas',
-        precio: 128990,
-        descripcion: 'Incluye 100 deditos, 50 empanadas y 50 medallones en tamaño pasaboca ya Fritos. Ideal para eventos grandes.',
-        emoji: '🥳',
-        imagen: './Imagenes/Productos/Pasabocas/Combos-2---.jpg',
-        etiqueta: 'Premium',
-        tipoEtiqueta: 'etiqueta-producto'
-    },
-    {
-        id: 110,
-        nombre: 'Combo_06: 300 unidades Fritos',
-        categoria: 'pasabocas',
-        precio: 194990,
-        descripcion: 'Incluye 200 deditos, 100 empanadas y 100 medallones en tamaño pasaboca ya Fritos. Ideal para eventos grandes.',
-        emoji: '🥳',
-        imagen: './Imagenes/Productos/Pasabocas/Combos-2---.jpg',
-        etiqueta: 'Premium',
-        tipoEtiqueta: 'etiqueta-producto'
-    },
-    
-    // === DEDITOS ===
-    {
-        id: 120,
-        nombre: 'Deditos de Queso x10',
-        categoria: 'deditos',
-        precio: 8990,
-        descripcion: 'Crujientes deditos rellenos de queso. Pack x10 unidades.',
-        emoji: '🧀',
-        imagen: './Imagenes/Productos/Deditos/Deditos x10.jpg',
-        etiqueta: 'Clásico',
-        tipoEtiqueta: 'etiqueta-producto'
-    },
-    {
-        id: 121,
-        nombre: 'Deditos de Queso x13',
-        categoria: 'deditos',
-        precio: 12990,
-        descripcion: 'Crujientes deditos rellenos de queso. Pack x13 unidades.',
-        emoji: '🧀',
-        imagen: './Imagenes/Productos/Deditos/Deditos x13.jpg',
-        etiqueta: 'Clásico',
-        tipoEtiqueta: 'etiqueta-producto'
-    },
-    {
-        id: 122,
-        nombre: 'Deditos de Queso x18',
-        categoria: 'deditos',
-        precio: 16990,
-        descripcion: 'Crujientes deditos rellenos de queso. Pack x18 unidades.',
-        emoji: '🧀',
-        imagen: './Imagenes/Productos/Deditos/Deditos x18.jpg',
-        etiqueta: 'Clásico',
-        tipoEtiqueta: 'etiqueta-producto'
-    },
-    {
-        id: 123,
-        nombre: 'Deditos Mixtos x10',
-        categoria: 'deditos',
-        precio: 8990,
-        descripcion: 'Mezcla de deditos de queso y bocadillo. 5 queso y 5 bocadillo. Pack x10 unidades.',
-        emoji: '🧀',
-        imagen: './Imagenes/Productos/Deditos/Deditos x10.jpg',
-        etiqueta: 'Mixto',
-        tipoEtiqueta: 'etiqueta-producto'
-    },
-    {
-        id: 124,
-        nombre: 'Deditos Mixtos x13',
-        categoria: 'deditos',
-        precio: 11990,
-        descripcion: 'Mezcla de deditos de queso y bocadillo. 6 o 7 queso y 6 o 7 bocadillo. Pack x13 unidades.',
-        emoji: '🧀',
-        imagen: './Imagenes/Productos/Deditos/Deditos x13.jpg',
-        etiqueta: 'Mixto',
-        tipoEtiqueta: 'etiqueta-producto'
-    },
-    {
-        id: 125,
-        nombre: 'Deditos Mixtos x18',
-        categoria: 'deditos',
-        precio: 16990,
-        descripcion: 'Mezcla de deditos de queso y bocadillo. 9 queso y 9 bocadillo. Pack x18 unidades.',
-        emoji: '🧀',
-        imagen: './Imagenes/Productos/Deditos/Deditos x18.jpg',
-        etiqueta: 'Mixto',
-        tipoEtiqueta: 'etiqueta-producto'
-    },
-    {
-        id: 126,
-        nombre: 'Deditos de Combinados x10',
-        categoria: 'deditos',
-        precio: 8990,
-        descripcion: 'Mezcla de queso y bocadillo en cada dedito. Pack x10 unidades.',
-        imagen: './Imagenes/Productos/Deditos/Deditos x10.jpg',
-        etiqueta: 'Combinado',
-        tipoEtiqueta: 'etiqueta-producto'
-    },
-    {
-        id: 127,
-        nombre: 'Deditos de Combinados x13',
-        categoria: 'deditos',
-        precio: 11990,
-        descripcion: 'Mezcla de queso y bocadillo en cada dedito. Pack x13 unidades.',
-        emoji: '🧀',
-        imagen: './Imagenes/Productos/Deditos/Deditos x13.jpg',
-        etiqueta: 'Combinado',
-        tipoEtiqueta: 'etiqueta-producto'
-    },
-    {
-        id: 128,
-        nombre: 'Deditos de Combinados x18',
-        categoria: 'deditos',
-        precio: 16990,
-        descripcion: 'Mezcla de queso y bocadillo en cada dedito. Pack x18 unidades.',
-        imagen: './Imagenes/Productos/Deditos/Deditos x18.jpg',
-        etiqueta: 'Combinado',
-        tipoEtiqueta: 'etiqueta-producto'
-    },
-    {
-        id: 129,
-        nombre: 'Deditos de Bocadillo x10',
-        categoria: 'deditos',
-        precio: 8990,
-        descripcion: 'Deditos rellenos de bocadillo. Pack x10 unidades.',
-        emoji: '🍬',
-        imagen: './Imagenes/Productos/Deditos/Deditos x10.jpg',
-        etiqueta: 'Dulce',
-        tipoEtiqueta: 'etiqueta-producto'
-    },
-    {
-        id: 130,
-        nombre: 'Deditos de Bocadillo x13',
-        categoria: 'deditos',
-        precio: 11990,
-        descripcion: 'Deditos rellenos de bocadillo. Pack x13 unidades.',
-        emoji: '🍬',
-        imagen: './Imagenes/Productos/Deditos/Deditos x13.jpg',
-        etiqueta: 'Dulce',
-        tipoEtiqueta: 'etiqueta-producto'
-    },
-    {
-        id: 131,
-        nombre: 'Deditos de Bocadillo x18',
-        categoria: 'deditos',
-        precio: 16990,
-        descripcion: 'Deditos rellenos de bocadillo. Pack x18 unidades.',
-        emoji: '🍬',
-        imagen: './Imagenes/Productos/Deditos/Deditos x18.jpg',
-        etiqueta: 'Dulce',
-        tipoEtiqueta: 'etiqueta-producto'
-    },
-
-    // === MEDALLONES ===
-    {
-        id: 140,
-        nombre: 'Medallones x20',
-        categoria: 'medallones',
-        precio: 11990,
-        descripcion: 'Medallones tradicionales. Pack x20 unidades.',
-        emoji: '🍖',
-        imagen: './Imagenes/Productos/Medallones/Medallones x20.jpg',
-        etiqueta: 'Clásico',
-        tipoEtiqueta: 'etiqueta-producto'
-    },
-    {
-        id: 141,
-        nombre: 'Medallones x30',
-        categoria: 'medallones',
-        precio: 16990,
-        descripcion: 'Medallones tradicionales. Pack x20 unidades.',
-        emoji: '🍖',
-        imagen: './Imagenes/Productos/Medallones/Medallones x30.jpg',
-        etiqueta: 'Clásico',
-        tipoEtiqueta: 'etiqueta-producto'
-    },
-
-];
+// Escuchar mensajes del Service Worker sobre actualizaciones
+if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.addEventListener('message', (event) => {
+        if (event.data && event.data.type === 'DATA_UPDATED') {
+            console.log('🔄 Datos actualizados detectados:', event.data.url);
+            
+            // Si se actualizó productos.json, recargar
+            if (event.data.url.includes('productos.json')) {
+                cargarProductos().then(() => {
+                    // Refrescar vista de productos si está visible
+                    if (document.getElementById('productos')) {
+                        mostrarProductos(filtroActual);
+                        console.log('🔄 Vista de productos actualizada');
+                    }
+                });
+            }
+        }
+    });
+}
 
 
 // === VARIABLES GLOBALES ===
@@ -764,7 +223,7 @@ function actualizarEstadoBotonInstalacion(disponible) {
 }
 
 // === INICIALIZACIÓN DE LA APP ===
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', async function() {
     console.log('🚀 Iniciando Alimento del Cielo PWA...');
 
     // Filtro para silenciar errores conocidos de extensiones (Grammarly / Iterable)
@@ -778,6 +237,10 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         originalConsoleError.apply(console, args);
     };
+    
+    // ⭐ CARGAR PRODUCTOS DINÁMICAMENTE PRIMERO
+    await cargarProductos();
+    
     renderizarProductos();
     cargarTema();
     cargarCarritoDesdeLocalStorage();
@@ -1012,7 +475,28 @@ function actualizarCarrito() {
 
 
     // total
-    const total = carritoCompras.reduce((suma, item) => suma + item.precio * item.cantidad, 0);
+    const subtotal = carritoCompras.reduce((suma, item) => suma + item.precio * item.cantidad, 0);
+    const descuentoReferido = calcularDescuentoReferidoSync(subtotal);
+    const tipoDescuento = obtenerTipoDescuento();
+    const total = subtotal - descuentoReferido;
+    
+    // Mostrar descuento si aplica
+    let htmlDescuento = '';
+    if (descuentoReferido > 0 && tipoDescuento) {
+        htmlDescuento = `
+            <div class="descuento-referido-carrito">
+                <span>🎁 ${tipoDescuento.mensaje}:</span>
+                <span class="descuento-monto">-$${descuentoReferido.toLocaleString("es-CO")}</span>
+            </div>
+        `;
+    }
+    
+    // Insertar descuento antes del total si existe contenedor
+    const descuentoContainer = document.getElementById('descuentoReferidoContainer');
+    if (descuentoContainer) {
+        descuentoContainer.innerHTML = htmlDescuento;
+    }
+    
     montoTotal.textContent = total.toLocaleString("es-CO");
 }
 
@@ -1536,19 +1020,27 @@ ${item.emoji} *${item.nombre}*
 `;
     });
 
-    const total = carritoCompras.reduce((suma, item) => suma + (item.precio * item.cantidad), 0);
+    const subtotal = carritoCompras.reduce((suma, item) => suma + (item.precio * item.cantidad), 0);
+    const descuentoReferido = calcularDescuentoReferido(subtotal);
+    const tipoDescuento = obtenerTipoDescuento();
+    const total = subtotal - descuentoReferido;
+    
     mensaje += `
-💰 *TOTAL: $${total.toLocaleString('es-CO')}*
+-------------------
+💵 *SUBTOTAL:* $${subtotal.toLocaleString('es-CO')}`;
+
+    // Adjuntar info de descuento
+    if (descuentoReferido > 0 && tipoDescuento) {
+        mensaje += `
+🎁 *DESCUENTO (${tipoDescuento.mensaje}):* -$${descuentoReferido.toLocaleString('es-CO')}`;
+    }
+    
+    mensaje += `
+💰 *TOTAL A PAGAR:* $${total.toLocaleString('es-CO')}
 
 📍 ¿Podrían confirmar disponibilidad y coordinar la entrega?
 
 ¡Gracias! 😊`;
-
-    // Adjuntar info de referido si existe
-    const ref = localStorage.getItem('referenteActivo');
-    if (ref) {
-        mensaje += `\n\n🤝 Código de referido aplicado: ${ref}`;
-    }
 
     // Guardar pedido en historial
     guardarPedidoEnHistorial();
@@ -1584,6 +1076,10 @@ function procesarPago() {
 }
 
 // === PROGRAMA DE REFERIDOS ===
+
+/**
+ * Genera un código de referido único para el usuario
+ */
 function generarCodigoReferido() {
     const prefijos = ['AMIGO', 'FAMILIA', 'CIELO', 'SABOR'];
     const sufijos = ['PREMIUM', 'VIP', 'ESPECIAL', 'GOLD'];
@@ -1597,19 +1093,26 @@ function generarCodigoReferido() {
     if (!codigo) {
         codigo = `${prefijo}-${sufijo}-${numero}`;
         localStorage.setItem('miCodigoReferido', codigo);
+        console.log('✅ Código de referido generado:', codigo);
     }
     const el = document.getElementById('codigoReferido');
     if (el) el.textContent = codigo;
+    
+    return codigo;
 }
 
+/**
+ * Comparte el código de referido del usuario
+ */
 function compartirCodigoReferido() {
-    const codigo = (document.getElementById('codigoReferido')?.textContent || localStorage.getItem('miCodigoReferido') || '').trim();
+    let codigo = (document.getElementById('codigoReferido')?.textContent || localStorage.getItem('miCodigoReferido') || '').trim();
+    
     if (!codigo) {
-        generarCodigoReferido();
+        codigo = generarCodigoReferido();
     }
-    const finalCodigo = (document.getElementById('codigoReferido')?.textContent || localStorage.getItem('miCodigoReferido') || '').trim();
-    const enlaceLanding = `${location.origin}${location.pathname}?ref=${encodeURIComponent(finalCodigo)}`;
-    const mensaje = `🎉 ¡Te invito a conocer Alimento del Cielo! \n\nUsa mi código de referido: *${finalCodigo}* \ny obtén 10% de descuento en tu primera compra.\n\n🍽️ Los mejores alimentos congelados de Bogotá\n⚡ Perfectos para airfryer\n🚚 Entrega rápida y segura\n\nEntra aquí: ${enlaceLanding}\n\n¡No te pierdas esta oportunidad! 😋`;
+    
+    const enlaceLanding = `${location.origin}${location.pathname}?ref=${encodeURIComponent(codigo)}`;
+    const mensaje = `🎉 ¡Te invito a conocer Alimento del Cielo! \n\nUsa mi código de referido: *${codigo}* \ny obtén 10% de descuento en tu primera compra.\n\n🍽️ Los mejores alimentos congelados de Bogotá\n⚡ Perfectos para airfryer\n🚚 Entrega rápida y segura\n\nEntra aquí: ${enlaceLanding}\n\n¡No te pierdas esta oportunidad! 😋`;
 
     if (navigator.share) {
         navigator.share({
@@ -1618,66 +1121,498 @@ function compartirCodigoReferido() {
             url: enlaceLanding
         }).then(() => {
             mostrarNotificacion('📱 ¡Código compartido exitosamente!');
+            registrarCompartidoReferido(codigo);
+        }).catch(err => {
+            console.log('Compartir cancelado:', err);
         });
     } else {
         navigator.clipboard.writeText(mensaje).then(() => {
             mostrarNotificacion('📋 ¡Código copiado! Compártelo con tus amigos');
+            registrarCompartidoReferido(codigo);
+        }).catch(err => {
+            mostrarNotificacion('❌ Error al copiar', 'error');
         });
     }
 }
 
+/**
+ * Copia el enlace de referido al portapapeles
+ */
+function copiarEnlaceReferido() {
+    let codigo = localStorage.getItem('miCodigoReferido');
+    if (!codigo) {
+        codigo = generarCodigoReferido();
+    }
+    
+    const enlaceLanding = `${location.origin}${location.pathname}?ref=${encodeURIComponent(codigo)}`;
+    
+    navigator.clipboard.writeText(enlaceLanding).then(() => {
+        mostrarNotificacion('📋 ¡Enlace copiado al portapapeles!');
+        registrarCompartidoReferido(codigo);
+    }).catch(err => {
+        mostrarNotificacion('❌ Error al copiar enlace', 'error');
+    });
+}
+
+/**
+ * Registra que se compartió el código de referido
+ */
+function registrarCompartidoReferido(codigo) {
+    try {
+        const compartidos = JSON.parse(localStorage.getItem('referidosCompartidos') || '[]');
+        compartidos.push({
+            codigo: codigo,
+            timestamp: Date.now()
+        });
+        localStorage.setItem('referidosCompartidos', JSON.stringify(compartidos));
+    } catch (e) {
+        console.error('Error registrando compartido:', e);
+    }
+}
+
 // === CAPTURAR ?ref= DE LA URL Y GUARDARLO ===
+
+/**
+ * Captura el código de referido desde la URL
+ */
 function capturarCodigoReferenteDesdeURL() {
     try {
         const params = new URLSearchParams(window.location.search);
         const ref = params.get('ref');
+        
         if (ref && /^[A-Z0-9\-]{5,30}$/.test(ref)) {
             const miCodigo = localStorage.getItem('miCodigoReferido');
-            if (miCodigo && miCodigo === ref) return; // evitar auto-referido
+            
+            // Evitar auto-referido
+            if (miCodigo && miCodigo === ref) {
+                console.warn('⚠️ No puedes usar tu propio código de referido');
+                mostrarNotificacion('⚠️ No puedes usar tu propio código', 'warning');
+                return;
+            }
+            
+            // Verificar si ya tiene un referente activo
+            const referenteExistente = localStorage.getItem('referenteActivo');
+            if (referenteExistente && referenteExistente !== ref) {
+                console.log('ℹ️ Ya tienes un código de referido activo:', referenteExistente);
+                return;
+            }
+            
+            // Guardar referente
             localStorage.setItem('referenteActivo', ref);
             localStorage.setItem('referenteTimestamp', String(Date.now()));
-            mostrarNotificacion('🤝 Código de referido aplicado');
-            console.log('Referente capturado:', ref);
+            localStorage.setItem('descuentoReferidoAplicado', 'false');
+            
+            // Mostrar notificación de bienvenida
+            mostrarNotificacion('🎉 ¡Código de referido aplicado! 10% de descuento en tu primera compra');
+            mostrarBannerDescuentoReferido(ref);
+            
+            console.log('✅ Referente capturado:', ref);
+            
+            // Registrar el referido para el que compartió
+            registrarReferidoCapturado(ref);
+            
+            // Limpiar URL sin recargar
+            const url = new URL(window.location);
+            url.searchParams.delete('ref');
+            window.history.replaceState({}, '', url);
         }
     } catch (e) {
-        console.warn('No se pudo procesar ref de URL:', e.message);
+        console.error('❌ Error procesando ref de URL:', e.message);
+    }
+}
+
+/**
+ * Registra que alguien usó tu código de referido
+ */
+function registrarReferidoCapturado(codigo) {
+    try {
+        const miCodigo = localStorage.getItem('miCodigoReferido');
+        if (!miCodigo || miCodigo !== codigo) {
+            // Este registro es para el que USÓ el código
+            const misReferentes = JSON.parse(localStorage.getItem('misReferentesUsados') || '[]');
+            misReferentes.push({
+                codigo: codigo,
+                timestamp: Date.now(),
+                usado: false
+            });
+            localStorage.setItem('misReferentesUsados', JSON.stringify(misReferentes));
+        }
+    } catch (e) {
+        console.error('Error registrando referido capturado:', e);
+    }
+}
+
+/**
+ * Muestra un banner con el descuento de referido
+ */
+function mostrarBannerDescuentoReferido(codigo) {
+    const banner = document.createElement('div');
+    banner.className = 'banner-descuento-referido';
+    banner.innerHTML = `
+        <div class="banner-contenido">
+            <span class="icono-regalo">🎁</span>
+            <div class="texto-banner">
+                <strong>¡Descuento Aplicado!</strong>
+                <p>Tienes 10% OFF en tu primera compra con el código <strong>${codigo}</strong></p>
+            </div>
+            <button class="btn-cerrar-banner-ref" onclick="cerrarBannerReferido()">×</button>
+        </div>
+    `;
+    
+    document.body.appendChild(banner);
+    
+    // Auto-cerrar después de 10 segundos
+    setTimeout(() => {
+        cerrarBannerReferido();
+    }, 10000);
+}
+
+/**
+ * Cierra el banner de descuento
+ */
+function cerrarBannerReferido() {
+    const banner = document.querySelector('.banner-descuento-referido');
+    if (banner) {
+        banner.style.animation = 'slideOutUp 0.3s ease-out';
+        setTimeout(() => banner.remove(), 300);
     }
 }
 
 // === HISTORIAL DE PEDIDOS (LOCAL) ===
+
+/**
+ * Guarda el pedido en el historial local
+ */
 function guardarPedidoEnHistorial() {
     try {
-        const total = carritoCompras.reduce((suma, item) => suma + item.precio * item.cantidad, 0);
+        const subtotal = carritoCompras.reduce((suma, item) => suma + item.precio * item.cantidad, 0);
+        const descuentoReferido = calcularDescuentoReferidoSync(subtotal);
+        const tipoDescuento = obtenerTipoDescuento();
+        const total = subtotal - descuentoReferido;
+        
+        const referente = localStorage.getItem('referenteActivo');
+        
         const pedido = {
             id: 'PED-' + Date.now(),
             items: carritoCompras.map(i => ({ id: i.id, nombre: i.nombre, cantidad: i.cantidad, precio: i.precio })),
+            subtotal,
+            descuentoReferido,
             total,
-            referente: localStorage.getItem('referenteActivo') || null,
+            referente: referente || null,
             timestamp: new Date().toISOString()
         };
+        
         const arr = JSON.parse(localStorage.getItem('historialPedidosAlimento') || '[]');
         arr.push(pedido);
         localStorage.setItem('historialPedidosAlimento', JSON.stringify(arr));
 
-        // métrica local por referente
-        if (pedido.referente) {
+        // CASO 1: Usuario que RECIBIÓ un código de referido
+        if (referente && tipoDescuento?.tipo === 'referido') {
+            // Incrementar contador del que compartió
             const m = JSON.parse(localStorage.getItem('referidosConteo') || '{}');
-            m[pedido.referente] = (m[pedido.referente] || 0) + 1;
+            m[referente] = (m[referente] || 0) + 1;
             localStorage.setItem('referidosConteo', JSON.stringify(m));
+            
+            // Marcar descuento como usado
+            localStorage.setItem('descuentoReferidoAplicado', 'true');
+            
+            // Notificar al que compartió (simulado - en producción sería servidor)
+            notificarReferidoExitoso(referente);
+            
+            console.log('✅ Pedido con código referido guardado:', referente);
+        }
+        
+        // CASO 2: Usuario que COMPARTIÓ su código y está usando su recompensa
+        if (tipoDescuento?.tipo === 'recompensa') {
+            // Marcar un descuento de recompensa como usado
+            const misReferidosExitosos = JSON.parse(localStorage.getItem('misReferidosExitosos') || '[]');
+            const pendiente = misReferidosExitosos.find(r => !r.descuentoUsado);
+            if (pendiente) {
+                pendiente.descuentoUsado = true;
+                pendiente.fechaUso = new Date().toISOString();
+                localStorage.setItem('misReferidosExitosos', JSON.stringify(misReferidosExitosos));
+                console.log('✅ Descuento de recompensa usado');
+            }
+        }
+        
+        actualizarMetricasReferidos();
+    } catch (e) {
+        console.error('❌ Error guardando historial de pedido:', e);
+    }
+}
+
+/**
+ * Notifica que alguien usó tu código exitosamente
+ * Ahora usa Netlify Functions para sincronizar entre usuarios
+ */
+async function notificarReferidoExitoso(codigoUsado) {
+    try {
+        const miCodigo = localStorage.getItem('miCodigoReferido');
+        
+        // Registrar en servidor (Netlify Function)
+        const response = await fetch('/.netlify/functions/registrar-referido', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                codigoReferente: codigoUsado,
+                pedidoId: 'PED-' + Date.now(),
+                total: carritoCompras.reduce((suma, item) => suma + item.precio * item.cantidad, 0)
+            })
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+            console.log('✅ Referido registrado en servidor:', data);
+            
+            // Si es MI código, actualizar métricas locales
+            if (miCodigo === codigoUsado) {
+                const misReferidosExitosos = JSON.parse(localStorage.getItem('misReferidosExitosos') || '[]');
+                misReferidosExitosos.push({
+                    timestamp: Date.now(),
+                    descuentoUsado: false,
+                    fechaUso: null
+                });
+                localStorage.setItem('misReferidosExitosos', JSON.stringify(misReferidosExitosos));
+                
+                // Mostrar notificación de recompensa
+                mostrarNotificacion('🎉 ¡Ganaste 10% de descuento! Alguien usó tu código');
+            }
+        } else {
+            console.warn('⚠️ Error registrando referido en servidor');
+            // Continuar con registro local
+            registrarReferidoLocal(codigoUsado);
         }
     } catch (e) {
-        console.error('Error guardando historial de pedido:', e);
+        console.error('Error notificando referido exitoso:', e);
+        // Fallback: registro local
+        registrarReferidoLocal(codigoUsado);
+    }
+}
+
+/**
+ * Registro local como fallback
+ */
+function registrarReferidoLocal(codigoUsado) {
+    const miCodigo = localStorage.getItem('miCodigoReferido');
+    if (miCodigo === codigoUsado) {
+        const misReferidosExitosos = JSON.parse(localStorage.getItem('misReferidosExitosos') || '[]');
+        misReferidosExitosos.push({
+            timestamp: Date.now(),
+            descuentoUsado: false,
+            fechaUso: null
+        });
+        localStorage.setItem('misReferidosExitosos', JSON.stringify(misReferidosExitosos));
+    }
+}
+
+/**
+ * Calcula el descuento por referido
+ * - 10% para quien USA el código (primera compra)
+ * - 10% para quien COMPARTIÓ el código (en su próxima compra)
+ * Consulta el servidor para verificar descuentos disponibles
+ */
+async function calcularDescuentoReferido(subtotal) {
+    // Descuento para quien RECIBIÓ el código (primera compra)
+    const referente = localStorage.getItem('referenteActivo');
+    const descuentoYaAplicado = localStorage.getItem('descuentoReferidoAplicado') === 'true';
+    
+    if (referente && !descuentoYaAplicado) {
+        return Math.round(subtotal * 0.10); // 10% de descuento
+    }
+    
+    // Descuento para quien COMPARTIÓ el código (recompensa)
+    const miCodigo = localStorage.getItem('miCodigoReferido');
+    if (!miCodigo) return 0;
+    
+    try {
+        // Consultar servidor para verificar descuentos disponibles
+        const response = await fetch(`/.netlify/functions/registrar-referido?codigo=${encodeURIComponent(miCodigo)}`);
+        
+        if (response.ok) {
+            const data = await response.json();
+            const descuentosDisponibles = data.descuentosDisponibles || 0;
+            
+            if (descuentosDisponibles > 0) {
+                return Math.round(subtotal * 0.10); // 10% de descuento por haber referido
+            }
+        } else {
+            // Fallback: usar datos locales
+            const misReferidosExitosos = JSON.parse(localStorage.getItem('misReferidosExitosos') || '[]');
+            const descuentosDisponibles = misReferidosExitosos.filter(r => !r.descuentoUsado).length;
+            
+            if (descuentosDisponibles > 0) {
+                return Math.round(subtotal * 0.10);
+            }
+        }
+    } catch (e) {
+        console.error('Error consultando descuentos:', e);
+        // Fallback local
+        const misReferidosExitosos = JSON.parse(localStorage.getItem('misReferidosExitosos') || '[]');
+        const descuentosDisponibles = misReferidosExitosos.filter(r => !r.descuentoUsado).length;
+        
+        if (descuentosDisponibles > 0) {
+            return Math.round(subtotal * 0.10);
+        }
+    }
+    
+    return 0;
+}
+
+// Función síncrona para compatibilidad (se ejecutará async internamente)
+function calcularDescuentoReferidoSync(subtotal) {
+    const referente = localStorage.getItem('referenteActivo');
+    const descuentoYaAplicado = localStorage.getItem('descuentoReferidoAplicado') === 'true';
+    
+    if (referente && !descuentoYaAplicado) {
+        return Math.round(subtotal * 0.10);
+    }
+    
+    const misReferidosExitosos = JSON.parse(localStorage.getItem('misReferidosExitosos') || '[]');
+    const descuentosDisponibles = misReferidosExitosos.filter(r => !r.descuentoUsado).length;
+    
+    if (descuentosDisponibles > 0) {
+        return Math.round(subtotal * 0.10);
+    }
+    
+    return 0;
+}
+
+/**
+ * Obtiene el tipo de descuento aplicado
+ */
+function obtenerTipoDescuento() {
+    const referente = localStorage.getItem('referenteActivo');
+    const descuentoYaAplicado = localStorage.getItem('descuentoReferidoAplicado') === 'true';
+    
+    // Descuento por haber usado un código
+    if (referente && !descuentoYaAplicado) {
+        return {
+            tipo: 'referido',
+            codigo: referente,
+            mensaje: `Código ${referente}`
+        };
+    }
+    
+    // Descuento por haber compartido tu código
+    const miCodigo = localStorage.getItem('miCodigoReferido');
+    const misReferidosExitosos = JSON.parse(localStorage.getItem('misReferidosExitosos') || '[]');
+    const descuentosDisponibles = misReferidosExitosos.filter(r => !r.descuentoUsado);
+    
+    if (descuentosDisponibles.length > 0 && miCodigo) {
+        return {
+            tipo: 'recompensa',
+            codigo: miCodigo,
+            mensaje: `Recompensa por referir (${descuentosDisponibles.length} disponible${descuentosDisponibles.length > 1 ? 's' : ''})`
+        };
+    }
+    
+    return null;
+}
+
+/**
+ * Actualiza las métricas de referidos en la UI
+ * Ahora consulta el servidor para obtener datos reales
+ */
+async function actualizarMetricasReferidos() {
+    try {
+        const miCodigo = localStorage.getItem('miCodigoReferido');
+        if (!miCodigo) return;
+        
+        // Consultar servidor
+        const response = await fetch(`/.netlify/functions/registrar-referido?codigo=${encodeURIComponent(miCodigo)}`);
+        
+        let totalReferidos = 0;
+        let descuentosDisponibles = 0;
+        let referidos = [];
+        
+        if (response.ok) {
+            const data = await response.json();
+            totalReferidos = data.totalReferidos || 0;
+            descuentosDisponibles = data.descuentosDisponibles || 0;
+            referidos = data.referidos || [];
+            
+            console.log('✅ Métricas obtenidas del servidor:', data);
+        } else {
+            // Fallback: usar datos locales
+            const conteoReferidos = JSON.parse(localStorage.getItem('referidosConteo') || '{}');
+            totalReferidos = conteoReferidos[miCodigo] || 0;
+            
+            const misReferidosExitosos = JSON.parse(localStorage.getItem('misReferidosExitosos') || '[]');
+            descuentosDisponibles = misReferidosExitosos.filter(r => !r.descuentoUsado).length;
+            
+            console.log('⚠️ Usando métricas locales (servidor no disponible)');
+        }
+        
+        // Actualizar contador
+        const contadorEl = document.getElementById('contadorReferidos');
+        if (contadorEl) {
+            contadorEl.textContent = totalReferidos;
+        }
+        
+        // Actualizar lista de referidos
+        const listaEl = document.getElementById('listaReferidos');
+        if (listaEl) {
+            if (totalReferidos === 0) {
+                listaEl.innerHTML = '<li><small>(¡Aún no hay referidos!)</small></li>';
+            } else {
+                let html = '';
+                
+                // Mostrar descuentos disponibles
+                if (descuentosDisponibles > 0) {
+                    html += `
+                        <li class="descuento-disponible">
+                            <strong>🎁 ${descuentosDisponibles} Descuento${descuentosDisponibles > 1 ? 's' : ''} Disponible${descuentosDisponibles > 1 ? 's' : ''}</strong>
+                            <small>¡Úsalo${descuentosDisponibles > 1 ? 's' : ''} en tu próxima compra!</small>
+                            <span class="badge-activo">ACTIVO</span>
+                        </li>
+                    `;
+                }
+                
+                // Mostrar referidos desde servidor o local
+                if (referidos.length > 0) {
+                    html += referidos.map((r, i) => `
+                        <li>
+                            <strong>Referido #${i + 1}</strong>
+                            <small>${new Date(r.timestamp).toLocaleDateString('es-CO')}</small>
+                            <span>$${(r.total || 0).toLocaleString('es-CO')}</span>
+                        </li>
+                    `).join('');
+                } else {
+                    // Fallback: mostrar desde historial local
+                    const pedidos = JSON.parse(localStorage.getItem('historialPedidosAlimento') || '[]');
+                    const misReferidos = pedidos.filter(p => p.referente === miCodigo);
+                    
+                    html += misReferidos.map((p, i) => `
+                        <li>
+                            <strong>Referido #${i + 1}</strong>
+                            <small>${new Date(p.timestamp).toLocaleDateString('es-CO')}</small>
+                            <span>$${p.total.toLocaleString('es-CO')}</span>
+                        </li>
+                    `).join('');
+                }
+                
+                listaEl.innerHTML = html;
+            }
+        }
+    } catch (e) {
+        console.error('Error actualizando métricas:', e);
     }
 }
 
 // Inicializar captura de ref al cargar
 document.addEventListener('DOMContentLoaded', () => {
+    // Generar código de referido si no existe
+    generarCodigoReferido();
+    
+    // Capturar código de referido de la URL
     capturarCodigoReferenteDesdeURL();
-    const mi = localStorage.getItem('miCodigoReferido');
-    if (mi) {
-        const el = document.getElementById('codigoReferido');
-        if (el) el.textContent = mi;
-    }
+    
+    // Actualizar métricas de referidos
+    setTimeout(() => {
+        actualizarMetricasReferidos();
+    }, 500);
 });
 
 // === TEMA CLARO/OSCURO ===

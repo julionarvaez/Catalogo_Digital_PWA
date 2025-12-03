@@ -10,11 +10,9 @@
 # CONFIGURACIÓN NETLIFY DEV (LOCAL)
 # ============================================
 [dev]
-  command = "echo 'Servidor local de desarrollo'"
   port = 8888
   publish = "."
   functions = "netlify/functions"
-  autoLaunch = true
 
 # Redirecciones para las funciones serverless
 [[redirects]]
@@ -23,29 +21,11 @@
   status = 200
 
 # ============================================
-# VARIABLES DE ENTORNO - PRODUCCIÓN
+# VARIABLES DE ENTORNO
 # ============================================
-# ⚠️ IMPORTANTE: Configura estas variables en Netlify Dashboard
+# Configura las variables en Netlify Dashboard:
 # Site settings > Environment variables
-# NO las dejes hardcodeadas aquí por seguridad
 # ============================================
-
-[context.production.environment]
-  # Wompi - Llaves de PRODUCCIÓN
-  # WOMPI_PUBLIC_KEY = "pub_prod_TU_LLAVE_PUBLICA_REAL"
-  # WOMPI_PRIVATE_KEY = "prv_prod_TU_LLAVE_PRIVADA_REAL"
-  
-  # Firebase (opcional - solo para reseñas)
-  # FIREBASE_PROJECT_ID = "tu-proyecto-firebase"
-  # FIREBASE_SERVICE_ACCOUNT_B64 = "base64_de_tu_service_account"
-
-# ============================================
-# VARIABLES DE ENTORNO - DEPLOY PREVIEWS
-# ============================================
-[context.deploy-preview.environment]
-  # Wompi - Llaves de PRUEBA
-  # WOMPI_PUBLIC_KEY = "pub_test_QhUoFSL5mYyzHcfweWwfHT4JNI3jHujU"
-  # WOMPI_PRIVATE_KEY = "prv_test_TU_LLAVE_PRIVADA_DE_PRUEBA"
 
 # ============================================
 # VARIABLES DE ENTORNO - BRANCH DEPLOYS

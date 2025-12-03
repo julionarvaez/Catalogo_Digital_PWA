@@ -6,7 +6,11 @@
   "scripts": {
     "dev": "netlify dev",
     "build": "echo 'No build needed for static site'",
-    "deploy": "netlify deploy --prod"
+    "deploy": "netlify deploy --prod",
+    "update:productos": "node actualizar-version-productos.js patch",
+    "update:productos:minor": "node actualizar-version-productos.js minor",
+    "update:productos:major": "node actualizar-version-productos.js major",
+    "version:bump": "npm version patch && node actualizar-version-productos.js patch"
   },
   "keywords": [
     "pwa",

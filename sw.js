@@ -1,5 +1,5 @@
 
-const CACHE_VERSION = '1.0.65'; // 
+const CACHE_VERSION = '1.0.66'; // ⭐ Incrementado para sistema de productos dinámicos
 const CACHE_NAME = `alimento-del-cielo-v${CACHE_VERSION}`;
 const APP_VERSION = CACHE_VERSION;
 
@@ -29,6 +29,7 @@ const urlsToCache = [
     '/index.html',
     '/styles.css',
     '/script.js',
+    '/productos.json', // ⭐ Datos dinámicos del catálogo
     '/manifest.json',
     '/Imagenes/logo/Logo.png',
     // Imágenes de productos
@@ -563,8 +564,47 @@ async function networkFirst(request) {
     }
 }
 
+// === ESTRATEGIA: STALE-WHILE-REVALIDATE ===
+// Sirve desde cache inmediatamente, pero actualiza en background
+// PERFECTO para datos que cambian frecuentemente (productos, precios)
+async function staleWhileRevalidate(request) {
+    const cache = await caches.open(CACHE_NAME);
+    const cachedResponse = await cache.match(request);
+    
+    // Fetch en background para actualizar cache
+    const fetchPromise = fetch(request).then(async (networkResponse) => {
+        if (networkResponse.ok && debeCachear(request.url)) {
+            // Actualizar cache con nueva respuesta
+            await cache.put(request, networkResponse.clone());
+            
+            // Notificar a clientes sobre actualización de datos
+            const clients = await self.clients.matchAll();
+            clients.forEach(client => {
+                client.postMessage({
+                    type: 'DATA_UPDATED',
+                    url: request.url,
+                    timestamp: Date.now()
+                });
+            });
+        }
+        return networkResponse;
+    }).catch(error => {
+        console.log('🔄 Actualización en background falló:', error.message);
+        return cachedResponse; // Retornar cache si falla la red
+    });
+    
+    // Retornar cache inmediatamente si existe, sino esperar network
+    return cachedResponse || fetchPromise;
+}
+
 function aplicarEstrategiaCache(request) {
     const url = new URL(request.url);
+    
+    // ⭐ Para productos.json: Stale-While-Revalidate (actualización automática)
+    if (url.pathname.includes('/productos.json')) {
+        console.log('📦 Usando Stale-While-Revalidate para productos');
+        return staleWhileRevalidate(request);
+    }
     
     // Para archivos estáticos: Cache First
     if (request.destination === 'style' || 
