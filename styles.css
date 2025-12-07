@@ -6743,7 +6743,7 @@ body.modo-oscuro .campo-label {
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     background: #f8fafc;
     font-family: inherit;
-    color: var(--color-texto-principal);
+    color: #0f172a;
 }
 
 body.modo-oscuro .campo-input,

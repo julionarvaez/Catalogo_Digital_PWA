@@ -259,6 +259,19 @@ document.addEventListener('DOMContentLoaded', async function() {
     }, 2000); // Esperar 2 segundos después de cargar la página
 });
 
+// Función para registrar Service Worker
+function registrarServiceWorker() {
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('/sw.js')
+            .then(registration => {
+                console.log('✅ Service Worker registrado:', registration.scope);
+            })
+            .catch(error => {
+                console.log('❌ Error al registrar Service Worker:', error);
+            });
+    }
+}
+
 // === RENDERIZADO DE PRODUCTOS ===
 function renderizarProductos() {
     const grilla = document.getElementById('grillaProductos');
@@ -6611,7 +6624,7 @@ async function enviarResenaProducto(event) {
         };
         
         // Usar el sistema de reseñas existente
-        if (typeof reviewsManager !== 'undefined') {
+        if (typeof reviewsManager !== 'undefined' && reviewsManager) {
             await reviewsManager.submitReview(nuevaResena);
             
             mostrarNotificacion('✅ ¡Gracias por tu opinión!', 'exito');
@@ -6631,6 +6644,8 @@ async function enviarResenaProducto(event) {
             }, 500);
             
         } else {
+            console.error('Sistema de reseñas no disponible');
+            mostrarNotificacion('⚠️ Sistema de reseñas no disponible. Intenta recargar la página.', 'error');
             throw new Error('Sistema de reseñas no disponible');
         }
         
