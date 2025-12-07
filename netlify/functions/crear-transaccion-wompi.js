@@ -80,13 +80,25 @@ exports.handler = async (event) => {
     const erroresConfig = validarConfiguracion();
     if (erroresConfig.length > 0) {
         console.error('❌ Errores de configuración:', erroresConfig);
+        console.error('📋 Variables de entorno requeridas:');
+        console.error('   - WOMPI_PUBLIC_KEY (pub_test_... o pub_prod_...)');
+        console.error('   - WOMPI_PRIVATE_KEY (prv_test_... o prv_prod_...)');
+        console.error('   - WOMPI_INTEGRITY_SECRET (test_integrity_... o prod_integrity_...)');
+        console.error('🔧 Configúralas en: Netlify Dashboard > Site Settings > Environment Variables');
+        
         return {
             statusCode: 500,
             headers,
             body: JSON.stringify({
                 error: 'Servidor no configurado correctamente',
                 detalles: erroresConfig,
-                ayuda: 'Configure las variables de entorno en Netlify: Site Settings > Environment Variables'
+                ayuda: 'Configure las variables de entorno en Netlify: Site Settings > Environment Variables',
+                variables_requeridas: [
+                    'WOMPI_PUBLIC_KEY (pub_test_... o pub_prod_...)',
+                    'WOMPI_PRIVATE_KEY (prv_test_... o prv_prod_...)',
+                    'WOMPI_INTEGRITY_SECRET (test_integrity_... o prod_integrity_...)'
+                ],
+                guia: 'Ver archivo CONFIGURACION-NETLIFY-WOMPI.md para instrucciones detalladas'
             })
         };
     }

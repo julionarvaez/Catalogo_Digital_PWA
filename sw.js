@@ -1,5 +1,5 @@
 
-const CACHE_VERSION = '1.0.66'; // ⭐ Incrementado para sistema de productos dinámicos
+const CACHE_VERSION = '1.0.70'; // ⭐ Incrementado para sistema de productos dinámicos
 const CACHE_NAME = `alimento-del-cielo-v${CACHE_VERSION}`;
 const APP_VERSION = CACHE_VERSION;
 
@@ -437,6 +437,12 @@ self.addEventListener('message', function(event) {
         self.skipWaiting();
     }
     
+    if (type === 'DATA_UPDATED') {
+        // Mensaje de actualización de datos - ya manejado, solo registrar
+        console.log('✅ Datos actualizados:', payload);
+        return;
+    }
+    
     if (type === 'CACHE_URLS') {
         event.waitUntil(
             caches.open(CACHE_NAME).then(cache => {
@@ -571,19 +577,33 @@ async function staleWhileRevalidate(request) {
     const cache = await caches.open(CACHE_NAME);
     const cachedResponse = await cache.match(request);
     
+    // Verificar si ya se actualizó recientemente (evitar actualizaciones continuas)
+    const lastUpdateKey = `lastUpdate_${request.url}`;
+    const lastUpdate = await caches.match(lastUpdateKey).then(r => r ? r.text() : null);
+    const now = Date.now();
+    const UPDATE_INTERVAL = 5 * 60 * 1000; // 5 minutos
+    
+    if (lastUpdate && (now - parseInt(lastUpdate)) < UPDATE_INTERVAL) {
+        // Actualización reciente, solo retornar cache
+        return cachedResponse || fetch(request);
+    }
+    
     // Fetch en background para actualizar cache
     const fetchPromise = fetch(request).then(async (networkResponse) => {
         if (networkResponse.ok && debeCachear(request.url)) {
             // Actualizar cache con nueva respuesta
             await cache.put(request, networkResponse.clone());
             
-            // Notificar a clientes sobre actualización de datos
+            // Guardar timestamp de actualización
+            await cache.put(lastUpdateKey, new Response(now.toString()));
+            
+            // Notificar a clientes sobre actualización de datos (solo si hay cambios)
             const clients = await self.clients.matchAll();
             clients.forEach(client => {
                 client.postMessage({
                     type: 'DATA_UPDATED',
                     url: request.url,
-                    timestamp: Date.now()
+                    timestamp: now
                 });
             });
         }

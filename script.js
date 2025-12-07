@@ -1075,6 +1075,172 @@ function procesarPago() {
     console.log('💳 Procesando pago para:', carritoCompras);
 }
 
+// === PAGO POR NEQUI ===
+
+/**
+ * Procesa el pago por Nequi
+ */
+async function pagarPorNequi() {
+    if (carritoCompras.length === 0) {
+        mostrarNotificacion('⚠️ Tu carrito está vacío', 'error');
+        return;
+    }
+
+    try {
+        // Calcular totales
+        const subtotal = carritoCompras.reduce((suma, item) => suma + item.precio * item.cantidad, 0);
+        const descuentoReferido = calcularDescuentoReferidoSync(subtotal);
+        const total = subtotal - descuentoReferido;
+        
+        // Generar referencia única
+        const referencia = `PED-${Date.now()}`;
+        
+        // Preparar datos
+        const datosTransaccion = {
+            total: total,
+            referencia: referencia,
+            items: carritoCompras.map(item => ({
+                nombre: item.nombre,
+                cantidad: item.cantidad,
+                precio: item.precio
+            })),
+            clienteInfo: {
+                descuentoAplicado: descuentoReferido > 0,
+                montoDescuento: descuentoReferido
+            }
+        };
+
+        // Mostrar loading
+        mostrarNotificacion('💰 Generando instrucciones de pago Nequi...', 'info');
+
+        // Llamar a Netlify Function
+        const response = await fetch('/.netlify/functions/crear-transaccion-nequi', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(datosTransaccion)
+        });
+
+        if (!response.ok) {
+            throw new Error('Error creando transacción Nequi');
+        }
+
+        const data = await response.json();
+        
+        if (data.success && data.transaccion) {
+            // Guardar transacción en localStorage
+            const transacciones = JSON.parse(localStorage.getItem('transaccionesNequi') || '[]');
+            transacciones.push(data.transaccion);
+            localStorage.setItem('transaccionesNequi', JSON.stringify(transacciones));
+
+            // Mostrar modal con instrucciones
+            mostrarModalInstruccionesNequi(data.transaccion);
+            
+            // Guardar pedido en historial
+            guardarPedidoEnHistorial();
+            
+            console.log('✅ Transacción Nequi creada:', data.transaccion);
+        } else {
+            throw new Error('Respuesta inválida del servidor');
+        }
+
+    } catch (error) {
+        console.error('❌ Error procesando pago Nequi:', error);
+        mostrarNotificacion('❌ Error al procesar pago. Intenta de nuevo.', 'error');
+    }
+}
+
+/**
+ * Muestra modal con instrucciones de pago Nequi
+ */
+function mostrarModalInstruccionesNequi(transaccion) {
+    const modal = document.createElement('div');
+    modal.className = 'modal-overlay';
+    modal.id = 'modalNequi';
+    
+    modal.innerHTML = `
+        <div class="modal-contenido modal-nequi">
+            <button class="btn-cerrar-modal" onclick="cerrarModalNequi()">×</button>
+            
+            <div class="header-modal-nequi">
+                <div class="icono-nequi-grande">💰</div>
+                <h2>Pago por Nequi</h2>
+                <p class="monto-destacado">$${transaccion.total.toLocaleString('es-CO')}</p>
+            </div>
+            
+            <div class="instrucciones-nequi">
+                <h3>📋 Instrucciones:</h3>
+                <ol>
+                    ${transaccion.instrucciones.map(inst => `<li>${inst}</li>`).join('')}
+                </ol>
+            </div>
+            
+            <div class="info-importante">
+                <p><strong>⏰ Esta referencia expira en 15 minutos</strong></p>
+                <p class="codigo-referencia">Referencia: <strong>${transaccion.referencia}</strong></p>
+            </div>
+            
+            <div class="acciones-modal-nequi">
+                <button class="boton boton-whatsapp" onclick="abrirWhatsAppNequi('${transaccion.whatsappLink}')">
+                    💬 Enviar comprobante por WhatsApp
+                </button>
+                <button class="boton boton-secundario" onclick="copiarReferencia('${transaccion.referencia}')">
+                    📋 Copiar referencia
+                </button>
+                <button class="boton boton-outline" onclick="cerrarModalNequi()">
+                    Cerrar
+                </button>
+            </div>
+        </div>
+    `;
+    
+    document.body.appendChild(modal);
+    
+    // Animar entrada
+    setTimeout(() => modal.classList.add('active'), 10);
+}
+
+/**
+ * Cierra el modal de Nequi
+ */
+function cerrarModalNequi() {
+    const modal = document.getElementById('modalNequi');
+    if (modal) {
+        modal.classList.remove('active');
+        setTimeout(() => modal.remove(), 300);
+    }
+}
+
+/**
+ * Abre WhatsApp con el enlace preconfigurado
+ */
+function abrirWhatsAppNequi(link) {
+    window.open(link, '_blank');
+    cerrarModalNequi();
+    
+    // Limpiar carrito después de enviar
+    setTimeout(() => {
+        if (confirm('¿Deseas vaciar el carrito?')) {
+            carritoCompras = [];
+            actualizarCarrito();
+            cerrarCarrito();
+            mostrarNotificacion('✅ ¡Gracias por tu pedido! Te contactaremos pronto.', 'success');
+        }
+    }, 1000);
+}
+
+/**
+ * Copia la referencia al portapapeles
+ */
+function copiarReferencia(referencia) {
+    navigator.clipboard.writeText(referencia).then(() => {
+        mostrarNotificacion('📋 Referencia copiada: ' + referencia, 'success');
+    }).catch(() => {
+        mostrarNotificacion('❌ Error al copiar', 'error');
+    });
+}
+
 // === PROGRAMA DE REFERIDOS ===
 
 /**
@@ -1246,25 +1412,32 @@ function registrarReferidoCapturado(codigo) {
  * Muestra un banner con el descuento de referido
  */
 function mostrarBannerDescuentoReferido(codigo) {
+    // Eliminar banner anterior si existe
+    const bannerAnterior = document.querySelector('.banner-descuento-referido');
+    if (bannerAnterior) {
+        bannerAnterior.remove();
+    }
+
     const banner = document.createElement('div');
     banner.className = 'banner-descuento-referido';
     banner.innerHTML = `
-        <div class="banner-contenido">
+        <div class="banner-referido-contenido">
             <span class="icono-regalo">🎁</span>
             <div class="texto-banner">
-                <strong>¡Descuento Aplicado!</strong>
-                <p>Tienes 10% OFF en tu primera compra con el código <strong>${codigo}</strong></p>
+                <strong>¡Descuento Disponible!</strong>
+                <p>10% OFF en tu próxima compra</p>
             </div>
-            <button class="btn-cerrar-banner-ref" onclick="cerrarBannerReferido()">×</button>
+            <span class="badge-activo">ACTIVO</span>
+            <button class="btn-cerrar-banner-ref" onclick="cerrarBannerReferido()" aria-label="Cerrar banner">×</button>
         </div>
     `;
     
     document.body.appendChild(banner);
     
-    // Auto-cerrar después de 10 segundos
+    // Auto-cerrar después de 12 segundos
     setTimeout(() => {
         cerrarBannerReferido();
-    }, 10000);
+    }, 12000);
 }
 
 /**
@@ -3042,13 +3215,29 @@ console.log('  - obtenerEstadisticasNotificaciones()');
 
 // === CONFIGURACIÓN WOMPI ===
 const WOMPI_CONFIG = {
-    // ⚠️ CAMBIAR POR TU LLAVE PÚBLICA
-    publicKey: 'pub_prod_oBaaR0X7Wr4IAHkaFEWbZU1orcnq9vNf', // Ejemplo de llave de prueba
+    // ⚠️ IMPORTANTE: Verifica que esta llave pública esté configurada correctamente
+    // Debe comenzar con pub_test_ (pruebas) o pub_prod_ (producción)
+    publicKey: 'pub_prod_oBaaR0X7Wr4IAHkaFEWbZU1orcnq9vNf',
     apiUrl: 'https://production.wompi.co/v1',
     // URL de tu backend serverless (Netlify Functions)
-    backendUrl: '/.netlify/functions', // O tu URL de producción
+    backendUrl: '/.netlify/functions',
     moneda: 'COP'
 };
+
+// Validar configuración de Wompi al cargar
+function validarConfiguracionWompi() {
+    if (!WOMPI_CONFIG.publicKey || WOMPI_CONFIG.publicKey === 'TU_LLAVE_PUBLICA_AQUI') {
+        console.error('❌ ERROR CRÍTICO: WOMPI_CONFIG.publicKey no está configurada');
+        console.error('📝 Edita script.js línea ~3210 y agrega tu llave pública de Wompi');
+        return false;
+    }
+    if (!WOMPI_CONFIG.publicKey.startsWith('pub_')) {
+        console.error('❌ ERROR: La llave pública de Wompi debe comenzar con "pub_"');
+        return false;
+    }
+    console.log('✅ Configuración de Wompi validada correctamente');
+    return true;
+}
 
 // === PROCESAR PAGO CON WOMPI ===
 async function procesarPago() {
@@ -3178,6 +3367,13 @@ function cerrarModalPago() {
 
 // === INICIAR PROCESO DE PAGO CON WOMPI ===
 function iniciarPagoWompi(total) {
+    // Validar configuración antes de procesar
+    if (!validarConfiguracionWompi()) {
+        mostrarNotificacion('❌ Error de configuración. Contacta al administrador.', 'error');
+        console.error('La aplicación no está configurada correctamente para procesar pagos');
+        return;
+    }
+
     const email = document.getElementById('emailPago').value.trim();
     const nombre = document.getElementById('nombrePago').value.trim();
     const telefono = document.getElementById('telefonoPago').value.trim();
@@ -4501,9 +4697,10 @@ class SistemaResenas {
                 return fechaFirebase;
             }
 
-            // Si es un Firestore Timestamp (tiene propiedad seconds)
-            if (fechaFirebase.seconds !== undefined) {
-                const timestamp = fechaFirebase.seconds * 1000;
+            // Si es un Firestore Timestamp (tiene propiedad seconds o _seconds)
+            if (fechaFirebase.seconds !== undefined || fechaFirebase._seconds !== undefined) {
+                const seconds = fechaFirebase.seconds || fechaFirebase._seconds;
+                const timestamp = seconds * 1000;
                 const fecha = new Date(timestamp);
                 
                 // Validar que el timestamp genera una fecha válida
@@ -4928,42 +5125,82 @@ class SistemaResenas {
         if (resena.productoId && typeof productos !== 'undefined') {
             const producto = productos.find(p => p.id == resena.productoId);
             if (producto) {
-                productoInfo = `<div class="resena-producto">${producto.emoji} ${producto.nombre}</div>`;
+                productoInfo = `
+                    <div class="resena-producto-tag">
+                        <span class="producto-emoji">${producto.emoji}</span>
+                        <span class="producto-nombre">${producto.nombre}</span>
+                    </div>`;
             }
         }
         
         // Fecha formateada usando función segura
         const fechaFormateada = this.formatearFecha(resena.createdAt);
         
-        // Estado de la reseña
-        let estadoInfo = '';
-        if (resena.status) {
-            const estados = {
-                'pending': 'Enviando...',
-                'offline': 'Pendiente (sin conexión)', 
-                'published': 'Publicado',
-                'moderation': 'En espera de moderación'
-            };
-            estadoInfo = `<div class="resena-estado ${resena.status}">${estados[resena.status] || 'Publicado'}</div>`;
-        }
+        // Calcular hace cuánto tiempo
+        const tiempoAtras = this.calcularTiempoAtras(resena.createdAt);
         
         card.innerHTML = `
+            <div class="resena-decoracion-top"></div>
+            
             <div class="resena-header">
-                <div class="resena-avatar">${iniciales}</div>
+                <div class="resena-avatar-wrapper">
+                    <div class="resena-avatar">${iniciales}</div>
+                    <div class="avatar-badge-verificado">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+                        </svg>
+                    </div>
+                </div>
                 <div class="resena-info">
-                    <div class="resena-nombre">${this.sanitizeHTML(resena.nombre)}</div>
-                    <div class="resena-fecha">${fechaFormateada}</div>
-                    ${productoInfo}
+                    <h4 class="resena-nombre">${this.sanitizeHTML(resena.nombre)}</h4>
+                    <div class="resena-metadata">
+                        <span class="resena-tiempo">${tiempoAtras}</span>
+                        <span class="metadata-separator">•</span>
+                        <span class="resena-fecha-corta">${fechaFormateada}</span>
+                    </div>
                 </div>
             </div>
-            <div class="resena-rating">
-                ${this.generateStars(resena.rating)}
+            
+            <div class="resena-rating-wrapper">
+                <div class="resena-rating">
+                    ${this.generateStars(resena.rating)}
+                </div>
+                <div class="rating-numero-badge">${resena.rating}.0</div>
             </div>
-            <div class="resena-texto">${this.sanitizeHTML(resena.texto)}</div>
-            ${estadoInfo}
+            
+            <div class="resena-texto-wrapper">
+                <p class="resena-texto">"${this.sanitizeHTML(resena.texto)}"</p>
+            </div>
+            
+            ${productoInfo}
+            
+            <div class="resena-acciones">
+                <button class="accion-util" title="Útil">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"/>
+                    </svg>
+                    <span>Útil</span>
+                </button>
+            </div>
         `;
         
         return card;
+    }
+    
+    /**
+     * Calcular tiempo transcurrido
+     */
+    calcularTiempoAtras(fecha) {
+        const ahora = new Date();
+        const fechaResena = fecha?.toDate ? fecha.toDate() : new Date(fecha);
+        const diff = Math.floor((ahora - fechaResena) / 1000);
+        
+        if (diff < 60) return 'Hace un momento';
+        if (diff < 3600) return `Hace ${Math.floor(diff / 60)} min`;
+        if (diff < 86400) return `Hace ${Math.floor(diff / 3600)}h`;
+        if (diff < 604800) return `Hace ${Math.floor(diff / 86400)} días`;
+        if (diff < 2592000) return `Hace ${Math.floor(diff / 604800)} semanas`;
+        return `Hace ${Math.floor(diff / 2592000)} meses`;
     }
 
     /**
@@ -5101,9 +5338,15 @@ class SistemaResenas {
         
         this.currentIndex = index;
         
-        // Actualizar posición del carrusel
-        const offset = -index * 100;
-        this.elementos.track.style.transform = `translateX(${offset}%)`;
+        // Hacer scroll a la tarjeta específica
+        const cards = this.elementos.track.querySelectorAll('.resena-card');
+        if (cards[index]) {
+            cards[index].scrollIntoView({
+                behavior: 'smooth',
+                block: 'nearest',
+                inline: 'center'
+            });
+        }
         
         // Actualizar indicadores
         const dots = this.elementos.indicadores?.querySelectorAll('.carousel-dot');
@@ -5995,6 +6238,9 @@ function abrirModalProducto(idProducto) {
     
     // Agregar listener para cerrar con ESC
     document.addEventListener('keydown', cerrarModalConEsc);
+    
+    // Cargar reseñas del producto
+    cargarResenasProducto(idProducto);
 }
 
 // Cerrar modal
@@ -6110,4 +6356,289 @@ function verProductosSimilares() {
             mostrarNotificacion(`Mostrando productos de: ${categoria.charAt(0).toUpperCase() + categoria.slice(1)}`, 'info');
         }
     }, 300);
+}
+
+// ===== SISTEMA DE RESEÑAS EN MODAL DE PRODUCTO =====
+
+let ratingModalSeleccionado = 0;
+
+/**
+ * Cargar reseñas específicas de un producto
+ */
+async function cargarResenasProducto(productoId) {
+    const listContainer = document.getElementById('modalResenasList');
+    const statsContainer = document.getElementById('modalResenasStats');
+    
+    if (!listContainer || !statsContainer) return;
+    
+    try {
+        // Obtener reseñas del producto desde el sistema existente
+        const resenasProducto = await obtenerResenasProducto(productoId);
+        
+        // Actualizar estadísticas
+        actualizarStatsModalResenas(resenasProducto);
+        
+        // Renderizar lista de reseñas
+        renderizarResenasModal(resenasProducto, listContainer);
+        
+    } catch (error) {
+        console.error('Error cargando reseñas del producto:', error);
+        mostrarPlaceholderResenasModal(listContainer);
+    }
+}
+
+/**
+ * Obtener reseñas filtradas por producto
+ */
+async function obtenerResenasProducto(productoId) {
+    // Usar el sistema de reseñas existente
+    if (typeof reviewsManager !== 'undefined' && reviewsManager.resenas) {
+        return reviewsManager.resenas.filter(r => r.productoId == productoId);
+    }
+    return [];
+}
+
+/**
+ * Actualizar estadísticas en el modal
+ */
+function actualizarStatsModalResenas(resenas) {
+    const statRating = document.getElementById('modalStatRating');
+    const statEstrellas = document.getElementById('modalStatEstrellas');
+    const statTotal = document.getElementById('modalStatTotal');
+    
+    if (!resenas || resenas.length === 0) {
+        statRating.textContent = '0.0';
+        statEstrellas.innerHTML = '';
+        statTotal.textContent = '0 reseñas';
+        return;
+    }
+    
+    const promedio = resenas.reduce((sum, r) => sum + r.rating, 0) / resenas.length;
+    const promedioRedondeado = Math.round(promedio);
+    
+    statRating.textContent = promedio.toFixed(1);
+    statEstrellas.innerHTML = generarEstrellasHTML(promedioRedondeado);
+    statTotal.textContent = `${resenas.length} ${resenas.length === 1 ? 'reseña' : 'reseñas'}`;
+}
+
+/**
+ * Generar HTML de estrellas
+ */
+function generarEstrellasHTML(rating) {
+    let html = '';
+    for (let i = 1; i <= 5; i++) {
+        html += `<span style="color: ${i <= rating ? '#fbbf24' : '#d1d5db'}">★</span>`;
+    }
+    return html;
+}
+
+/**
+ * Renderizar reseñas en el modal
+ */
+function renderizarResenasModal(resenas, container) {
+    if (!resenas || resenas.length === 0) {
+        mostrarPlaceholderResenasModal(container);
+        return;
+    }
+    
+    container.innerHTML = resenas.map(resena => {
+        const iniciales = resena.nombre.split(' ')
+            .map(word => word[0])
+            .join('')
+            .substring(0, 2)
+            .toUpperCase();
+        
+        const fechaFormateada = formatearFechaResena(resena.createdAt);
+        
+        return `
+            <div class="resena-card-mini">
+                <div class="resena-card-mini-header">
+                    <div class="resena-mini-autor">
+                        <div class="resena-mini-avatar">${iniciales}</div>
+                        <div class="resena-mini-info">
+                            <h5>${sanitizeHTML(resena.nombre)}</h5>
+                            <p class="resena-mini-fecha">${fechaFormateada}</p>
+                        </div>
+                    </div>
+                    <div class="resena-mini-rating">
+                        ${generarEstrellasHTML(resena.rating)}
+                    </div>
+                </div>
+                <p class="resena-mini-texto">"${sanitizeHTML(resena.texto)}"</p>
+            </div>
+        `;
+    }).join('');
+}
+
+/**
+ * Mostrar placeholder cuando no hay reseñas
+ */
+function mostrarPlaceholderResenasModal(container) {
+    container.innerHTML = `
+        <div class="resenas-placeholder-mini">
+            <span class="placeholder-icono-mini">💭</span>
+            <p>Aún no hay opiniones para este producto.<br>¡Sé el primero en compartir tu experiencia!</p>
+        </div>
+    `;
+}
+
+/**
+ * Formatear fecha para reseña
+ */
+function formatearFechaResena(fecha) {
+    if (!fecha) return 'Reciente';
+    
+    const fechaObj = fecha?.toDate ? fecha.toDate() : new Date(fecha);
+    const ahora = new Date();
+    const diff = Math.floor((ahora - fechaObj) / 1000);
+    
+    if (diff < 60) return 'Hace un momento';
+    if (diff < 3600) return `Hace ${Math.floor(diff / 60)} min`;
+    if (diff < 86400) return `Hace ${Math.floor(diff / 3600)}h`;
+    if (diff < 604800) return `Hace ${Math.floor(diff / 86400)} días`;
+    
+    const opciones = { day: 'numeric', month: 'short', year: 'numeric' };
+    return fechaObj.toLocaleDateString('es-ES', opciones);
+}
+
+/**
+ * Sanitizar HTML para prevenir XSS
+ */
+function sanitizeHTML(str) {
+    const div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
+}
+
+/**
+ * Cambiar entre tabs de reseñas
+ */
+function cambiarTabResenas(tab) {
+    const tabs = document.querySelectorAll('.resenas-tab');
+    const contents = document.querySelectorAll('.modal-resenas-tab-content');
+    
+    tabs.forEach(t => t.classList.remove('active'));
+    contents.forEach(c => c.classList.remove('active'));
+    
+    document.querySelector(`[data-tab="${tab}"]`).classList.add('active');
+    document.getElementById(tab === 'lista' ? 'tabListaResenas' : 'tabFormularioResena').classList.add('active');
+}
+
+/**
+ * Seleccionar rating en el modal
+ */
+function seleccionarRatingModal(rating) {
+    ratingModalSeleccionado = rating;
+    document.getElementById('modalResenaRating').value = rating;
+    
+    const stars = document.querySelectorAll('.star-btn');
+    stars.forEach((star) => {
+        const starRating = parseInt(star.getAttribute('data-rating'));
+        if (starRating <= rating) {
+            star.classList.add('active');
+        } else {
+            star.classList.remove('active');
+        }
+    });
+}
+
+/**
+ * Contador de caracteres en textarea
+ */
+document.addEventListener('DOMContentLoaded', () => {
+    const textarea = document.getElementById('modalResenaTexto');
+    const counter = document.getElementById('modalCharCounter');
+    
+    if (textarea && counter) {
+        textarea.addEventListener('input', () => {
+            const length = textarea.value.length;
+            counter.textContent = `${length}/300`;
+            
+            if (length > 280) {
+                counter.style.color = '#ef4444';
+            } else {
+                counter.style.color = '#94a3b8';
+            }
+        });
+    }
+});
+
+/**
+ * Enviar reseña desde el modal
+ */
+async function enviarResenaProducto(event) {
+    event.preventDefault();
+    
+    if (!productoModalActual) {
+        mostrarNotificacion('⚠️ Error: No se pudo identificar el producto', 'error');
+        return;
+    }
+    
+    const nombre = document.getElementById('modalResenaNombre').value.trim();
+    const rating = parseInt(document.getElementById('modalResenaRating').value);
+    const texto = document.getElementById('modalResenaTexto').value.trim();
+    
+    // Validaciones
+    if (!nombre || nombre.length < 2) {
+        mostrarNotificacion('⚠️ Por favor ingresa tu nombre', 'error');
+        return;
+    }
+    
+    if (!rating || rating < 1 || rating > 5) {
+        mostrarNotificacion('⚠️ Por favor selecciona una calificación', 'error');
+        return;
+    }
+    
+    if (!texto || texto.length < 10) {
+        mostrarNotificacion('⚠️ La opinión debe tener al menos 10 caracteres', 'error');
+        return;
+    }
+    
+    const btnEnviar = event.target.querySelector('button[type="submit"]');
+    const textoOriginal = btnEnviar.innerHTML;
+    btnEnviar.disabled = true;
+    btnEnviar.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg> Enviando...';
+    
+    try {
+        // Crear objeto de reseña
+        const nuevaResena = {
+            nombre: nombre,
+            rating: rating,
+            texto: texto,
+            productoId: productoModalActual.id,
+            createdAt: new Date(),
+            status: 'pending'
+        };
+        
+        // Usar el sistema de reseñas existente
+        if (typeof reviewsManager !== 'undefined') {
+            await reviewsManager.submitReview(nuevaResena);
+            
+            mostrarNotificacion('✅ ¡Gracias por tu opinión!', 'exito');
+            
+            // Limpiar formulario
+            document.getElementById('modalResenaForm').reset();
+            ratingModalSeleccionado = 0;
+            document.querySelectorAll('.star-btn').forEach(s => s.classList.remove('active'));
+            document.getElementById('modalCharCounter').textContent = '0/300';
+            
+            // Cambiar a la tab de lista
+            cambiarTabResenas('lista');
+            
+            // Recargar reseñas
+            setTimeout(() => {
+                cargarResenasProducto(productoModalActual.id);
+            }, 500);
+            
+        } else {
+            throw new Error('Sistema de reseñas no disponible');
+        }
+        
+    } catch (error) {
+        console.error('Error al enviar reseña:', error);
+        mostrarNotificacion('❌ Error al enviar la opinión. Intenta de nuevo', 'error');
+    } finally {
+        btnEnviar.disabled = false;
+        btnEnviar.innerHTML = textoOriginal;
+    }
 }
