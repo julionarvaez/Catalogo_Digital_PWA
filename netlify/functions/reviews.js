@@ -153,7 +153,7 @@ exports.handler = async (event, context) => {
     const headers = {
         'Access-Control-Allow-Origin': '*',
         'Access-Control-Allow-Headers': 'Content-Type',
-        'Access-Control-Allow-Methods': 'POST, OPTIONS',
+        'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
         'Content-Type': 'application/json'
     };
     
@@ -166,14 +166,65 @@ exports.handler = async (event, context) => {
         };
     }
     
-    // Solo permitir POST
+    // Manejar GET - Obtener reseñas
+    if (event.httpMethod === 'GET') {
+        try {
+            const db = initFirebase();
+            
+            // Query simple sin índice compuesto - filtrar en memoria
+            const reviewsSnapshot = await db.collection('reviews')
+                .orderBy('createdAt', 'desc')
+                .limit(200)
+                .get();
+            
+            const reviews = [];
+            reviewsSnapshot.forEach(doc => {
+                const data = doc.data();
+                // Filtrar solo publicadas
+                if (data.published === true) {
+                    reviews.push({
+                        id: doc.id,
+                        nombre: data.nombre,
+                        rating: data.rating,
+                        texto: data.texto,
+                        productoId: data.productoId,
+                        createdAt: data.createdAt?.toDate?.() || new Date(),
+                        verified: data.verified || false
+                    });
+                }
+            });
+            
+            return {
+                statusCode: 200,
+                headers,
+                body: JSON.stringify({
+                    ok: true,
+                    reviews: reviews.slice(0, 100), // Limitar a 100
+                    total: reviews.length
+                })
+            };
+        } catch (error) {
+            console.error('Error obteniendo reseñas:', error);
+            return {
+                statusCode: 500,
+                headers,
+                body: JSON.stringify({
+                    ok: false,
+                    error: 'Error al obtener reseñas',
+                    reviews: []
+                })
+            };
+        }
+    }
+    
+    // Solo permitir POST para crear reseñas
     if (event.httpMethod !== 'POST') {
         return {
             statusCode: 405,
             headers,
             body: JSON.stringify({
                 ok: false,
-                error: 'Método no permitido. Use POST.'
+                error: 'Método no permitido. Use GET o POST.'
             })
         };
     }

@@ -1675,7 +1675,7 @@ body.modo-oscuro .badge-metodo {
 }
 
 /* Modal Nequi */
-.modal-overlay {
+.modal-overlay-nequi {
     position: fixed;
     top: 0;
     left: 0;
@@ -1685,14 +1685,16 @@ body.modo-oscuro .badge-metodo {
     display: flex;
     align-items: center;
     justify-content: center;
-    z-index: 10000;
+    z-index: 99999;
     opacity: 0;
     transition: opacity 0.3s ease;
     padding: 1rem;
+    pointer-events: none;
 }
 
-.modal-overlay.active {
+.modal-overlay-nequi.active {
     opacity: 1;
+    pointer-events: all;
 }
 
 .modal-nequi {
@@ -1708,7 +1710,7 @@ body.modo-oscuro .badge-metodo {
     transition: transform 0.3s ease;
 }
 
-.modal-overlay.active .modal-nequi {
+.modal-overlay-nequi.active .modal-nequi {
     transform: scale(1);
 }
 
@@ -7961,7 +7963,7 @@ body.modo-oscuro .carousel-dot:hover {
     left: 0;
     width: 100%;
     height: 100%;
-    z-index: 10000;
+    z-index: 5000;
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
     padding: 1rem;
@@ -8740,13 +8742,14 @@ body.modo-oscuro .form-label-mini {
     font-family: inherit;
     transition: all 0.3s ease;
     background: white;
+    color: #0f172a;
 }
 
 body.modo-oscuro .form-input-mini,
 body.modo-oscuro .form-textarea-mini {
     background: rgba(30, 41, 59, 0.5);
     border-color: rgba(100, 116, 139, 0.3);
-    color: white;
+    color: #e2e8f0;
 }
 
 .form-input-mini:focus,

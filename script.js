@@ -227,14 +227,27 @@ document.addEventListener('DOMContentLoaded', async function() {
     console.log('🚀 Iniciando Alimento del Cielo PWA...');
 
     // Filtro para silenciar errores conocidos de extensiones (Grammarly / Iterable)
+    // Suprimir errores de extensiones del navegador (Grammarly, etc.)
     const originalConsoleError = console.error;
     console.error = function(...args) {
-        const joined = args.map(a => (typeof a === 'string' ? a : (a && a.message) || '')).join(' ');
-        if (/grm ERROR \[iterable\]/i.test(joined) || /Iterable.+not supported/i.test(joined)) {
-            // Silenciar sólo este tipo específico
-            console.warn('🔇 Error externo silenciado (Grammarly/Iterable):', joined);
+        const errorStr = args.map(a => {
+            if (typeof a === 'string') return a;
+            if (a && a.message) return a.message;
+            if (a && a.stack) return a.stack;
+            return String(a);
+        }).join(' ');
+        
+        // Filtrar errores de extensiones del navegador
+        if (
+            /grm ERROR/i.test(errorStr) ||
+            /\[iterable\]/i.test(errorStr) ||
+            /Not supported: in app messages from Iterable/i.test(errorStr) ||
+            /Iterable/i.test(errorStr)
+        ) {
+            // Silenciar completamente estos errores
             return;
         }
+        
         originalConsoleError.apply(console, args);
     };
     
@@ -252,6 +265,10 @@ document.addEventListener('DOMContentLoaded', async function() {
     configurarEventos();
     inicializarBotonWhatsApp();
     inicializarContadorNotificaciones(); // Inicializar contador de notificaciones
+    
+    // Inicializar sistema de reseñas
+    window.reviewsManager = new ReviewsManager();
+    await reviewsManager.init();
     
     // Inicializar sistema de notificaciones
     setTimeout(() => {
@@ -1169,8 +1186,15 @@ async function pagarPorNequi() {
  */
 function mostrarModalInstruccionesNequi(transaccion) {
     const modal = document.createElement('div');
-    modal.className = 'modal-overlay';
+    modal.className = 'modal-overlay-nequi';
     modal.id = 'modalNequi';
+    
+    // Cerrar al hacer click en el overlay (fondo)
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) {
+            cerrarModalNequi();
+        }
+    });
     
     modal.innerHTML = `
         <div class="modal-contenido modal-nequi">
@@ -1210,8 +1234,11 @@ function mostrarModalInstruccionesNequi(transaccion) {
     
     document.body.appendChild(modal);
     
-    // Animar entrada
-    setTimeout(() => modal.classList.add('active'), 10);
+    // Animar entrada y asegurar que esté por encima de todo
+    setTimeout(() => {
+        modal.classList.add('active');
+        modal.style.zIndex = '99999';
+    }, 10);
 }
 
 /**
@@ -6575,6 +6602,76 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 });
+
+/**
+ * Clase para manejar el sistema de reseñas
+ */
+class ReviewsManager {
+    constructor() {
+        this.resenas = [];
+        this.apiUrl = '/.netlify/functions/reviews';
+    }
+    
+    async init() {
+        try {
+            await this.loadReviews();
+            console.log('✅ Sistema de reseñas inicializado correctamente');
+        } catch (error) {
+            console.warn('⚠️ No se pudieron cargar reseñas:', error);
+        }
+    }
+    
+    async loadReviews() {
+        try {
+            const response = await fetch(this.apiUrl);
+            if (response.ok) {
+                const data = await response.json();
+                this.resenas = data.reviews || [];
+            }
+        } catch (error) {
+            console.warn('No se pudieron cargar reseñas desde el servidor');
+            this.resenas = [];
+        }
+    }
+    
+    async submitReview(reviewData) {
+        try {
+            const response = await fetch(this.apiUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(reviewData)
+            });
+            
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error || 'Error al enviar reseña');
+            }
+            
+            const result = await response.json();
+            
+            // Crear objeto de reseña con la estructura correcta
+            const newReview = {
+                id: result.id,
+                nombre: reviewData.nombre,
+                rating: reviewData.rating,
+                texto: reviewData.texto,
+                productoId: reviewData.productoId,
+                createdAt: reviewData.createdAt || new Date(),
+                published: result.published || true
+            };
+            
+            // Agregar al cache local
+            this.resenas.push(newReview);
+            
+            return result;
+        } catch (error) {
+            console.error('Error al enviar reseña:', error);
+            throw error;
+        }
+    }
+}
 
 /**
  * Enviar reseña desde el modal
