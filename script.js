@@ -261,8 +261,8 @@ document.addEventListener('DOMContentLoaded', async function() {
     mostrarPromptInstalacion();
     registrarServiceWorker();
     generarCodigoReferido();
-    configurarBusqueda();
-    configurarEventos();
+    // configurarBusqueda(); // Función no existe - comentada
+    // configurarEventos(); // Función no existe - comentada
     inicializarBotonWhatsApp();
     inicializarContadorNotificaciones(); // Inicializar contador de notificaciones
     
@@ -1122,63 +1122,91 @@ async function pagarPorNequi() {
         const descuentoReferido = calcularDescuentoReferidoSync(subtotal);
         const total = subtotal - descuentoReferido;
         
-        // Generar referencia única
-        const referencia = `PED-${Date.now()}`;
+        // Crear mensaje descriptivo del pedido
+        let mensajePedido = 'Pedido: ';
+        if (carritoCompras.length === 1) {
+            mensajePedido += `${carritoCompras[0].nombre} x${carritoCompras[0].cantidad}`;
+        } else if (carritoCompras.length === 2) {
+            mensajePedido += `${carritoCompras[0].nombre}, ${carritoCompras[1].nombre}`;
+        } else {
+            mensajePedido += `${carritoCompras[0].nombre} y ${carritoCompras.length - 1} productos más`;
+        }
         
-        // Preparar datos
-        const datosTransaccion = {
+        // Preparar datos de la transacción
+        const transaccion = {
             total: total,
-            referencia: referencia,
+            numeroNequi: '3104915876',
+            nombreNegocio: 'Alimento del Cielo',
             items: carritoCompras.map(item => ({
                 nombre: item.nombre,
                 cantidad: item.cantidad,
                 precio: item.precio
             })),
-            clienteInfo: {
-                descuentoAplicado: descuentoReferido > 0,
-                montoDescuento: descuentoReferido
-            }
+            mensajePedido: mensajePedido,
+            mensajeCompleto: generarMensajeCompletoPedido(total, descuentoReferido),
+            whatsappLink: generarLinkWhatsAppConPedido(total, mensajePedido)
         };
 
-        // Mostrar loading
-        mostrarNotificacion('💰 Generando instrucciones de pago Nequi...', 'info');
-
-        // Llamar a Netlify Function
-        const response = await fetch('/.netlify/functions/crear-transaccion-nequi', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(datosTransaccion)
-        });
-
-        if (!response.ok) {
-            throw new Error('Error creando transacción Nequi');
-        }
-
-        const data = await response.json();
+        // Mostrar modal con instrucciones
+        mostrarModalInstruccionesNequi(transaccion);
         
-        if (data.success && data.transaccion) {
-            // Guardar transacción en localStorage
-            const transacciones = JSON.parse(localStorage.getItem('transaccionesNequi') || '[]');
-            transacciones.push(data.transaccion);
-            localStorage.setItem('transaccionesNequi', JSON.stringify(transacciones));
-
-            // Mostrar modal con instrucciones
-            mostrarModalInstruccionesNequi(data.transaccion);
-            
-            // Guardar pedido en historial
-            guardarPedidoEnHistorial();
-            
-            console.log('✅ Transacción Nequi creada:', data.transaccion);
-        } else {
-            throw new Error('Respuesta inválida del servidor');
-        }
+        // Guardar pedido en historial
+        guardarPedidoEnHistorial();
+        
+        console.log('✅ Modal Nequi mostrado');
 
     } catch (error) {
         console.error('❌ Error procesando pago Nequi:', error);
         mostrarNotificacion('❌ Error al procesar pago. Intenta de nuevo.', 'error');
     }
+}
+
+/**
+ * Genera mensaje completo del pedido
+ */
+function generarMensajeCompletoPedido(total, descuento) {
+    const fecha = new Date().toLocaleDateString('es-CO', { 
+        day: '2-digit', 
+        month: '2-digit', 
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+    });
+    
+    let mensaje = '🛒 PEDIDO ALIMENTO DEL CIELO\n';
+    mensaje += `📅 ${fecha}\n`;
+    mensaje += '━━━━━━━━━━━━━━━━━━━━\n\n';
+    
+    mensaje += '📦 PRODUCTOS:\n';
+    carritoCompras.forEach((item, index) => {
+        mensaje += `\n${index + 1}. ${item.nombre}\n`;
+        mensaje += `   • Cantidad: ${item.cantidad} unidad${item.cantidad > 1 ? 'es' : ''}\n`;
+        mensaje += `   • Precio unitario: $${item.precio.toLocaleString('es-CO')}\n`;
+        mensaje += `   • Subtotal: $${(item.precio * item.cantidad).toLocaleString('es-CO')}\n`;
+    });
+    
+    const subtotal = carritoCompras.reduce((suma, item) => suma + item.precio * item.cantidad, 0);
+    
+    mensaje += '\n━━━━━━━━━━━━━━━━━━━━\n';
+    mensaje += '💰 RESUMEN DE PAGO:\n\n';
+    mensaje += `Subtotal: $${subtotal.toLocaleString('es-CO')}\n`;
+    
+    if (descuento > 0) {
+        mensaje += `Descuento aplicado: -$${descuento.toLocaleString('es-CO')}\n`;
+    }
+    
+    mensaje += `\n✅ TOTAL A PAGAR: $${total.toLocaleString('es-CO')}\n`;
+    mensaje += '━━━━━━━━━━━━━━━━━━━━';
+    
+    return mensaje;
+}
+
+/**
+ * Genera link de WhatsApp con el pedido
+ */
+function generarLinkWhatsAppConPedido(total, mensajePedido) {
+    const mensaje = `¡Hola! 👋\n\nAcabo de realizar un pago por Nequi:\n\n💰 Monto pagado: $${total.toLocaleString('es-CO')}\n\n${mensajePedido}\n\n📸 A continuación envío el comprobante de pago.\n\n¡Gracias!`;
+    return `https://wa.me/573135212887?text=${encodeURIComponent(mensaje)}`;
 }
 
 /**
@@ -1201,29 +1229,81 @@ function mostrarModalInstruccionesNequi(transaccion) {
             <button class="btn-cerrar-modal" onclick="cerrarModalNequi()">×</button>
             
             <div class="header-modal-nequi">
-                <div class="icono-nequi-grande">💰</div>
-                <h2>Pago por Nequi</h2>
-                <p class="monto-destacado">$${transaccion.total.toLocaleString('es-CO')}</p>
+                <div class="logo-nequi">NEQUI</div>
+                <h2>Instrucciones de Pago</h2>
+                <div class="monto-destacado">$${transaccion.total.toLocaleString('es-CO')}</div>
             </div>
             
-            <div class="instrucciones-nequi">
-                <h3>📋 Instrucciones:</h3>
-                <ol>
-                    ${transaccion.instrucciones.map(inst => `<li>${inst}</li>`).join('')}
-                </ol>
-            </div>
-            
-            <div class="info-importante">
-                <p><strong>⏰ Esta referencia expira en 15 minutos</strong></p>
-                <p class="codigo-referencia">Referencia: <strong>${transaccion.referencia}</strong></p>
+            <div class="contenido-compacto">
+                
+                <!-- Instrucciones claras -->
+                <div class="instrucciones-importantes">
+                    <div class="instruccion-header">
+                        <strong>Cómo pagar correctamente:</strong>
+                    </div>
+                    <ol class="lista-pasos-pago">
+                        <li>Abre tu app <strong>Nequi</strong> y ve a <strong>Enviar Plata</strong></li>
+                        <li>Copia el <strong>número</strong> y el <strong>monto</strong> exacto de abajo</li>
+                        <li>Copia la <strong>descripción del pedido</strong></li>
+                        <li>Pégala en el campo de concepto o descripción de Nequi</li>
+                        <li>Completa el pago y toma captura del comprobante</li>
+                        <li>Envía el comprobante por WhatsApp</li>
+                    </ol>
+                </div>
+                
+                <!-- Datos para copiar -->
+                <div class="seccion-datos">
+                    <div class="dato-row">
+                        <div class="dato-info">
+                            <span class="dato-label">Número Nequi</span>
+                            <strong class="dato-valor">${transaccion.numeroNequi}</strong>
+                        </div>
+                        <button class="btn-copiar-dato" onclick="copiarNumeroNequi('${transaccion.numeroNequi}'); event.stopPropagation();">Copiar</button>
+                    </div>
+                    
+                    <div class="dato-row">
+                        <div class="dato-info">
+                            <span class="dato-label">Monto exacto</span>
+                            <strong class="dato-valor">$${transaccion.total.toLocaleString('es-CO')}</strong>
+                        </div>
+                        <button class="btn-copiar-dato" onclick="copiarMonto('${transaccion.total}'); event.stopPropagation();">Copiar</button>
+                    </div>
+                </div>
+                
+                <!-- Detalle del pedido -->
+                <div class="seccion-pedido">
+                    <div class="pedido-header">
+                        <div class="pedido-titulo-wrapper">
+                            <span class="pedido-icono">📋</span>
+                            <span class="pedido-titulo">Descripción del Pedido</span>
+                        </div>
+                        <button class="btn-copiar-pedido" onclick="copiarPedidoCompleto(\`${transaccion.mensajeCompleto.replace(/`/g, '\\`').replace(/\n/g, '\\n')}\`)">
+                            Copiar
+                        </button>
+                    </div>
+                    <div class="pedido-preview">
+                        ${carritoCompras.slice(0, 3).map(item => 
+                            `<div class="item-preview">• ${item.nombre} (${item.cantidad})</div>`
+                        ).join('')}
+                        ${carritoCompras.length > 3 ? `<div class="item-preview">• +${carritoCompras.length - 3} más...</div>` : ''}
+                    </div>
+                    <div class="opciones-envio">
+                        <div class="opcion-item">
+                            <span class="opcion-numero">1</span>
+                            <span class="opcion-texto"><strong>Opción 1:</strong> Pégala en la descripción del pago de Nequi</span>
+                        </div>
+                        <div class="opcion-separador">O</div>
+                        <div class="opcion-item">
+                            <span class="opcion-numero">2</span>
+                            <span class="opcion-texto"><strong>Opción 2:</strong> Envíala por WhatsApp junto al comprobante</span>
+                        </div>
+                    </div>
+                </div>
             </div>
             
             <div class="acciones-modal-nequi">
                 <button class="boton boton-whatsapp" onclick="abrirWhatsAppNequi('${transaccion.whatsappLink}')">
-                    💬 Enviar comprobante por WhatsApp
-                </button>
-                <button class="boton boton-secundario" onclick="copiarReferencia('${transaccion.referencia}')">
-                    📋 Copiar referencia
+                    Enviar comprobante por WhatsApp
                 </button>
                 <button class="boton boton-outline" onclick="cerrarModalNequi()">
                     Cerrar
@@ -1271,13 +1351,46 @@ function abrirWhatsAppNequi(link) {
 }
 
 /**
- * Copia la referencia al portapapeles
+ * Copia el número de Nequi al portapapeles
  */
-function copiarReferencia(referencia) {
-    navigator.clipboard.writeText(referencia).then(() => {
-        mostrarNotificacion('📋 Referencia copiada: ' + referencia, 'success');
+function copiarNumeroNequi(numero) {
+    navigator.clipboard.writeText(numero).then(() => {
+        mostrarNotificacion('Número Nequi copiado: ' + numero, 'exito');
     }).catch(() => {
-        mostrarNotificacion('❌ Error al copiar', 'error');
+        mostrarNotificacion('Error al copiar', 'error');
+    });
+}
+
+/**
+ * Copia el monto al portapapeles
+ */
+function copiarMonto(monto) {
+    navigator.clipboard.writeText(monto.toString()).then(() => {
+        mostrarNotificacion('Monto copiado: $' + monto.toLocaleString('es-CO'), 'exito');
+    }).catch(() => {
+        mostrarNotificacion('Error al copiar', 'error');
+    });
+}
+
+/**
+ * Copia el mensaje del pedido al portapapeles
+ */
+function copiarMensajePedido(mensaje) {
+    navigator.clipboard.writeText(mensaje).then(() => {
+        mostrarNotificacion('Mensaje copiado. Pégalo en la descripción del pago de Nequi', 'exito');
+    }).catch(() => {
+        mostrarNotificacion('Error al copiar', 'error');
+    });
+}
+
+/**
+ * Copia el pedido completo al portapapeles
+ */
+function copiarPedidoCompleto(mensajeCompleto) {
+    navigator.clipboard.writeText(mensajeCompleto).then(() => {
+        mostrarNotificacion('Pedido copiado. Pégalo en la descripción del pago de Nequi', 'exito');
+    }).catch(() => {
+        mostrarNotificacion('Error al copiar', 'error');
     });
 }
 

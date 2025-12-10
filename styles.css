@@ -1699,19 +1699,41 @@ body.modo-oscuro .badge-metodo {
 
 .modal-nequi {
     background: white;
-    border-radius: 16px;
-    max-width: 500px;
+    border-radius: 14px;
+    max-width: 480px;
     width: 100%;
     max-height: 90vh;
     overflow-y: auto;
+    overflow-x: hidden;
     position: relative;
     box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
     transform: scale(0.9);
     transition: transform 0.3s ease;
+    display: flex;
+    flex-direction: column;
 }
 
 .modal-overlay-nequi.active .modal-nequi {
     transform: scale(1);
+}
+
+/* Scroll personalizado para el modal */
+.modal-nequi::-webkit-scrollbar {
+    width: 8px;
+}
+
+.modal-nequi::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+}
+
+.modal-nequi::-webkit-scrollbar-thumb {
+    background: #FF006E;
+    border-radius: 10px;
+}
+
+.modal-nequi::-webkit-scrollbar-thumb:hover {
+    background: #D4004F;
 }
 
 .btn-cerrar-modal {
@@ -1740,86 +1762,814 @@ body.modo-oscuro .badge-metodo {
 .header-modal-nequi {
     background: linear-gradient(135deg, #FF006E 0%, #D4004F 100%);
     color: white;
-    padding: 2rem;
+    padding: 0.75rem;
     text-align: center;
-    border-radius: 16px 16px 0 0;
+    border-radius: 14px 14px 0 0;
+    flex-shrink: 0;
 }
 
-.icono-nequi-grande {
-    font-size: 4rem;
-    margin-bottom: 0.5rem;
-    animation: bounce 2s infinite;
+.logo-nequi {
+    font-size: 1rem;
+    font-weight: 900;
+    letter-spacing: 1.5px;
+    margin-bottom: 0.1rem;
+    opacity: 0.95;
 }
 
 .header-modal-nequi h2 {
-    margin: 0 0 0.5rem 0;
-    font-size: 1.5rem;
+    margin: 0 0 0.35rem 0;
+    font-size: 0.85rem;
+    font-weight: 500;
+    opacity: 0.95;
 }
 
 .monto-destacado {
-    font-size: 2rem;
+    font-size: 1.75rem;
     font-weight: 800;
     margin: 0;
+    background: rgba(255, 255, 255, 0.15);
+    padding: 0.3rem 1rem;
+    border-radius: 8px;
+    display: inline-block;
+    backdrop-filter: blur(10px);
 }
 
-.instrucciones-nequi {
-    padding: 1.5rem;
+.contenido-compacto {
+    padding: 0.75rem;
+    overflow-y: auto;
+    flex: 1;
 }
 
-.instrucciones-nequi h3 {
-    color: var(--color-primario);
+body.modo-oscuro .modal-nequi {
+    background: var(--fondo-oscuro);
+}
+
+/* Instrucciones importantes */
+.instrucciones-importantes {
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.08), rgba(96, 165, 250, 0.12));
+    border: 2px solid rgba(59, 130, 246, 0.25);
+    border-radius: 8px;
+    padding: 0.65rem;
+    margin-bottom: 0.75rem;
+}
+
+.instruccion-header {
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    margin-bottom: 0.5rem;
+    color: #1e40af;
+    font-size: 0.8rem;
+}
+
+.icon-info {
+    font-size: 1rem;
+}
+
+.lista-pasos-pago {
+    margin: 0;
+    padding-left: 1.1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.lista-pasos-pago li {
+    color: #334155;
+    font-size: 0.75rem;
+    line-height: 1.4;
+}
+
+.lista-pasos-pago strong {
+    color: #1e40af;
+    font-weight: 600;
+}
+
+body.modo-oscuro .instrucciones-importantes {
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.12), rgba(96, 165, 250, 0.16));
+    border-color: rgba(96, 165, 250, 0.3);
+}
+
+body.modo-oscuro .instruccion-header {
+    color: #93c5fd;
+}
+
+body.modo-oscuro .lista-pasos-pago li {
+    color: #cbd5e1;
+}
+
+body.modo-oscuro .lista-pasos-pago strong {
+    color: #93c5fd;
+}
+
+/* Sección de datos copiables */
+.seccion-datos {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-bottom: 0.75rem;
+}
+
+.dato-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #f8fafc;
+    padding: 0.6rem 0.85rem;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: 2px solid transparent;
+}
+
+.dato-row:hover {
+    background: #f1f5f9;
+    border-color: #2563eb;
+    transform: translateX(2px);
+}
+
+.dato-row:active {
+    transform: scale(0.98);
+}
+
+.dato-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+    flex: 1;
+    min-width: 0;
+}
+
+.dato-label {
+    font-size: 0.65rem;
+    color: #64748b;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    line-height: 1;
+}
+
+.dato-valor {
+    font-size: 1rem;
+    color: #0f172a;
+    font-weight: 700;
+    font-family: 'Courier New', monospace;
+    line-height: 1.2;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.btn-copiar-dato {
+    background: #2563eb;
+    color: white;
+    border: none;
+    padding: 0.4rem 0.75rem;
+    border-radius: 6px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.btn-copiar-dato:hover {
+    background: #1e40af;
+    transform: scale(1.05);
+}
+
+body.modo-oscuro .dato-row {
+    background: rgba(30, 41, 59, 0.5);
+}
+
+body.modo-oscuro .dato-row:hover {
+    background: rgba(30, 41, 59, 0.7);
+    border-color: #3b82f6;
+}
+
+body.modo-oscuro .dato-valor {
+    color: #e2e8f0;
+}
+
+/* Pasos del proceso de pago */
+/* Sección del pedido */
+.seccion-pedido {
+    background: linear-gradient(135deg, rgba(37, 99, 235, 0.05), rgba(59, 130, 246, 0.08));
+    border: 2px solid rgba(37, 99, 235, 0.2);
+    border-radius: 8px;
+    padding: 0.65rem;
+    margin-bottom: 0.75rem;
+}
+
+.pedido-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.3rem;
+    margin-bottom: 0.5rem;
+}
+
+.pedido-titulo-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+}
+
+.pedido-icono {
+    font-size: 1rem;
+}
+
+.pedido-titulo {
+    font-weight: 700;
+    color: #1e40af;
+    font-size: 0.8rem;
+}
+
+.pedido-preview {
+    background: white;
+    padding: 0.6rem;
+    border-radius: 6px;
+    margin-bottom: 0.5rem;
+    border: 1px solid #e2e8f0;
+    max-height: 80px;
+    overflow-y: auto;
+}
+
+.item-preview {
+    color: #475569;
+    font-size: 0.75rem;
+    padding: 0.15rem 0;
+    line-height: 1.3;
+}
+
+.btn-copiar-pedido {
+    background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
+    color: white;
+    border: none;
+    padding: 0.4rem 0.75rem;
+    border-radius: 6px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.btn-copiar-pedido:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(37, 99, 235, 0.3);
+}
+
+.btn-copiar-pedido:active {
+    transform: translateY(0);
+}
+
+.ayuda-texto {
+    text-align: center;
+    color: #64748b;
+    font-size: 0.7rem;
+    margin: 0.4rem 0 0 0;
+    font-style: italic;
+}
+
+/* Opciones de envío */
+.opciones-envio {
+    margin-top: 0.6rem;
+    padding-top: 0.6rem;
+    border-top: 2px dashed rgba(37, 99, 235, 0.2);
+}
+
+.opcion-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem;
+    background: rgba(255, 255, 255, 0.7);
+    border-radius: 6px;
+    margin-bottom: 0.35rem;
+}
+
+.opcion-numero {
+    min-width: 22px;
+    height: 22px;
+    background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 0.7rem;
+    flex-shrink: 0;
+}
+
+.opcion-texto {
+    color: #475569;
+    font-size: 0.75rem;
+    line-height: 1.3;
+}
+
+.opcion-texto strong {
+    color: #1e40af;
+}
+
+.opcion-separador {
+    text-align: center;
+    color: #94a3b8;
+    font-weight: 700;
+    font-size: 0.75rem;
+    margin: 0.35rem 0;
+    letter-spacing: 0.8px;
+}
+
+body.modo-oscuro .opcion-item {
+    background: rgba(30, 41, 59, 0.4);
+}
+
+body.modo-oscuro .opcion-texto {
+    color: #cbd5e1;
+}
+
+body.modo-oscuro .opcion-texto strong {
+    color: #93c5fd;
+}
+
+body.modo-oscuro .opcion-separador {
+    color: #64748b;
+}
+
+body.modo-oscuro .seccion-pedido {
+    background: linear-gradient(135deg, rgba(37, 99, 235, 0.1), rgba(59, 130, 246, 0.12));
+    border-color: rgba(59, 130, 246, 0.3);
+}
+
+body.modo-oscuro .pedido-titulo {
+    color: #93c5fd;
+}
+
+body.modo-oscuro .pedido-preview {
+    background: rgba(30, 41, 59, 0.6);
+    border-color: rgba(100, 116, 139, 0.3);
+}
+
+body.modo-oscuro .item-preview {
+    color: #cbd5e1;
+}
+
+/* Pasos rápidos */
+.pasos-rapidos {
+    background: rgba(249, 250, 251, 0.5);
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    padding: 1rem;
     margin-bottom: 1rem;
 }
 
-.instrucciones-nequi ol {
-    list-style: decimal;
-    padding-left: 1.5rem;
-    line-height: 1.8;
+.paso-item {
+    color: #475569;
+    font-size: 0.875rem;
+    padding: 0.5rem 0;
+    line-height: 1.4;
+    font-weight: 500;
 }
 
-.instrucciones-nequi li {
-    margin-bottom: 0.5rem;
-    color: var(--color-texto);
+.paso-item:not(:last-child) {
+    border-bottom: 1px solid #f1f5f9;
 }
 
-.info-importante {
+body.modo-oscuro .pasos-rapidos {
+    background: rgba(30, 41, 59, 0.3);
+    border-color: rgba(100, 116, 139, 0.3);
+}
+
+body.modo-oscuro .paso-item {
+    color: #cbd5e1;
+    border-bottom-color: rgba(100, 116, 139, 0.2);
+}
+
+.paso-nequi p {
+    margin: 0;
+    padding-top: 4px;
+    color: var(--texto-claro);
+    line-height: 1.5;
+}
+
+.paso-destacado {
     background: rgba(255, 0, 110, 0.05);
     border: 2px solid rgba(255, 0, 110, 0.2);
     border-radius: 12px;
     padding: 1rem;
+}
+
+.paso-destacado:hover {
+    background: rgba(255, 0, 110, 0.1);
+    border-color: rgba(255, 0, 110, 0.3);
+}
+
+.paso-destacado-especial {
+    background: linear-gradient(135deg, rgba(37, 99, 235, 0.05), rgba(59, 130, 246, 0.08));
+    border: 2px solid rgba(37, 99, 235, 0.3);
+    border-radius: 12px;
+    padding: 1rem;
+}
+
+.paso-destacado-especial:hover {
+    background: linear-gradient(135deg, rgba(37, 99, 235, 0.08), rgba(59, 130, 246, 0.12));
+    border-color: rgba(37, 99, 235, 0.5);
+}
+
+.mensaje-pedido-box {
+    background: white;
+    border: 2px dashed #2563eb;
+    border-radius: 12px;
+    padding: 1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.mensaje-pedido-box:hover {
+    background: #f8fafc;
+    border-color: #1e40af;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+}
+
+.mensaje-pedido-preview {
+    margin-bottom: 0.75rem;
+    padding: 0.75rem;
+    background: linear-gradient(135deg, rgba(37, 99, 235, 0.05), rgba(59, 130, 246, 0.08));
+    border-radius: 8px;
+    border-left: 4px solid #2563eb;
+}
+
+.preview-titulo {
+    font-weight: 600;
+    color: #1e40af;
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+}
+
+.preview-items {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.preview-item {
+    color: #475569;
+    font-size: 0.875rem;
+    line-height: 1.4;
+}
+
+.nota-ayuda {
+    display: block;
+    margin-top: 0.5rem;
+    color: #64748b;
+    font-size: 0.8rem;
+    font-style: italic;
+    text-align: center;
+}
+
+.mensaje-pedido-texto {
+    font-family: 'Courier New', monospace;
+    font-size: 0.95rem;
+    color: #1e293b;
+    margin-bottom: 0.75rem;
+    padding: 0.5rem;
+    background: rgba(37, 99, 235, 0.05);
+    border-radius: 6px;
+    line-height: 1.5;
+}
+
+.btn-copiar-mensaje {
+    width: 100%;
+    background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
+    color: white;
+    border: none;
+    padding: 0.75rem;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.95rem;
+    font-weight: 600;
+    transition: all 0.2s ease;
+}
+
+.btn-copiar-mensaje:hover {
+    transform: scale(1.02);
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+}
+
+.btn-copiar-mensaje:active {
+    transform: scale(0.98);
+}
+
+.btn-copiar-completo {
+    width: 100%;
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    color: white;
+    border: none;
+    padding: 0.875rem 1.5rem;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: 600;
+    margin-top: 0.75rem;
+    transition: all 0.2s ease;
+}
+
+.btn-copiar-completo:hover {
+    transform: scale(1.02);
+    box-shadow: 0 6px 16px rgba(16, 185, 129, 0.3);
+}
+
+.btn-copiar-completo:active {
+    transform: scale(0.98);
+}
+
+body.modo-oscuro .mensaje-pedido-box {
+    background: rgba(30, 41, 59, 0.6);
+    border-color: #3b82f6;
+}
+
+body.modo-oscuro .mensaje-pedido-box:hover {
+    background: rgba(30, 41, 59, 0.8);
+    border-color: #60a5fa;
+}
+
+body.modo-oscuro .mensaje-pedido-preview {
+    background: rgba(37, 99, 235, 0.15);
+    border-left-color: #60a5fa;
+}
+
+body.modo-oscuro .preview-titulo {
+    color: #93c5fd;
+}
+
+body.modo-oscuro .preview-item {
+    color: #cbd5e1;
+}
+
+body.modo-oscuro .nota-ayuda {
+    color: #94a3b8;
+}
+
+body.modo-oscuro .mensaje-pedido-texto {
+    color: #e2e8f0;
+    background: rgba(37, 99, 235, 0.15);
+}
+
+.paso-contenido {
+    flex: 1;
+}
+
+.paso-contenido p {
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+    color: #64748b;
+}
+
+.dato-copiable {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: white;
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: 2px solid transparent;
+}
+
+.dato-copiable:hover {
+    background: #f8fafc;
+    border-color: #FF006E;
+    transform: translateX(2px);
+}
+
+.dato-copiable:active {
+    transform: scale(0.98);
+}
+
+.numero-nequi,
+.monto-nequi,
+.referencia-nequi {
+    font-family: 'Courier New', monospace;
+    font-size: 1.1rem;
+    color: #FF006E;
+    font-weight: 700;
+    letter-spacing: 1px;
+}
+
+.btn-copiar-mini {
+    background: linear-gradient(135deg, #FF006E 0%, #D4004F 100%);
+    color: white;
+    border: none;
+    padding: 0.4rem 0.8rem;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+}
+
+.btn-copiar-mini:hover {
+    transform: scale(1.1);
+    box-shadow: 0 4px 12px rgba(255, 0, 110, 0.3);
+}
+
+.btn-copiar-mini:active {
+    transform: scale(0.95);
+}
+
+body.modo-oscuro .paso-nequi p {
+    color: var(--texto-oscuro);
+}
+
+body.modo-oscuro .paso-contenido p {
+    color: #94a3b8;
+}
+
+body.modo-oscuro .dato-copiable {
+    background: rgba(30, 41, 59, 0.6);
+    border-color: rgba(100, 116, 139, 0.3);
+}
+
+body.modo-oscuro .dato-copiable:hover {
+    background: rgba(30, 41, 59, 0.8);
+    border-color: #FF006E;
+}
+
+.info-importante {
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.05), rgba(5, 150, 105, 0.08));
+    border: 2px solid rgba(16, 185, 129, 0.3);
+    border-radius: 12px;
+    padding: 1.25rem;
     margin: 0 1.5rem 1.5rem 1.5rem;
     text-align: center;
 }
 
-.codigo-referencia {
-    margin-top: 0.5rem;
-    font-family: monospace;
-    font-size: 1.1rem;
+.info-importante p {
+    margin: 0 0 0.5rem 0;
+    color: #059669;
+    font-size: 0.95rem;
+    font-weight: 500;
 }
 
-.codigo-referencia strong {
-    color: #FF006E;
-    background: rgba(255, 0, 110, 0.1);
-    padding: 0.25rem 0.75rem;
-    border-radius: 6px;
+.info-importante strong {
+    color: #047857;
+}
+
+/* Responsive para modal Nequi */
+@media (max-width: 768px) {
+    .modal-nequi {
+        max-width: 95%;
+        margin: 0.5rem;
+    }
+    
+    .header-modal-nequi {
+        padding: 0.65rem;
+    }
+    
+    .logo-nequi {
+        font-size: 0.95rem;
+    }
+    
+    .monto-destacado {
+        font-size: 1.6rem;
+        padding: 0.3rem 0.9rem;
+    }
+    
+    .contenido-compacto {
+        padding: 0.65rem;
+    }
+    
+    .dato-row {
+        padding: 0.55rem 0.75rem;
+        gap: 0.5rem;
+    }
+    
+    .dato-valor {
+        font-size: 0.9rem;
+    }
+    
+    .btn-copiar-dato {
+        padding: 0.35rem 0.65rem;
+        font-size: 0.65rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .modal-overlay-nequi {
+        padding: 0.25rem;
+    }
+    
+    .modal-nequi {
+        max-height: 98vh;
+        border-radius: 12px;
+    }
+    
+    .header-modal-nequi {
+        padding: 0.6rem;
+        border-radius: 12px 12px 0 0;
+    }
+    
+    .logo-nequi {
+        font-size: 0.9rem;
+    }
+    
+    .monto-destacado {
+        font-size: 1.5rem;
+        padding: 0.3rem 0.85rem;
+    }
+    
+    .dato-label {
+        font-size: 0.6rem;
+    }
+    
+    .dato-valor {
+        font-size: 0.85rem;
+    }
+    
+    .btn-copiar-dato {
+        padding: 0.3rem 0.55rem;
+        font-size: 0.6rem;
+    }
+    
+    .pedido-titulo {
+        font-size: 0.75rem;
+    }
+    
+    .btn-copiar-pedido {
+        padding: 0.35rem 0.6rem;
+        font-size: 0.65rem;
+    }
+    
+    .acciones-modal-nequi {
+        padding: 0.65rem;
+        gap: 0.5rem;
+    }
+    
+    .acciones-modal-nequi .boton {
+        padding: 0.65rem 0.85rem;
+        font-size: 0.8rem;
+    }
 }
 
 .acciones-modal-nequi {
-    padding: 0 1.5rem 1.5rem 1.5rem;
+    padding: 0.75rem;
     display: flex;
     flex-direction: column;
-    gap: 0.75rem;
+    gap: 0.6rem;
+    flex-shrink: 0;
+    background: white;
+    border-top: 1px solid #e2e8f0;
 }
 
-.boton-outline {
-    background: transparent;
-    border: 2px solid var(--color-primario);
-    color: var(--color-primario);
+body.modo-oscuro .acciones-modal-nequi {
+    background: var(--fondo-oscuro);
+    border-top-color: rgba(100, 116, 139, 0.2);
 }
 
-.boton-outline:hover {
-    background: var(--color-primario);
+.acciones-modal-nequi .boton {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.acciones-modal-nequi .boton-whatsapp {
+    background: linear-gradient(135deg, #25d366 0%, #20ba5a 100%);
     color: white;
+    box-shadow: 0 2px 8px rgba(37, 211, 102, 0.2);
+}
+
+.acciones-modal-nequi .boton-whatsapp:hover {
+    background: linear-gradient(135deg, #20ba5a 0%, #128c7e 100%);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(37, 211, 102, 0.3);
+}
+
+.acciones-modal-nequi .boton-outline {
+    background: white;
+    border: 2px solid #e2e8f0;
+    color: #64748b;
+    box-shadow: none;
+}
+
+.acciones-modal-nequi .boton-outline:hover {
+    background: #f8fafc;
+    border-color: #cbd5e1;
+    color: #475569;
+    transform: none;
 }
 
 .boton-secundario {
