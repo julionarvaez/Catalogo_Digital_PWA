@@ -5169,7 +5169,14 @@ class SistemaResenas {
      * Cargar opciones de productos en el select
      */
     loadProductOptions() {
-        if (!this.elementos.productoSelect || typeof productos === 'undefined') {
+        if (!this.elementos.productoSelect) {
+            return;
+        }
+        
+        // Esperar a que los productos estén cargados
+        if (!productos || productos.length === 0) {
+            console.log('⏳ Esperando a que se carguen los productos...');
+            setTimeout(() => this.loadProductOptions(), 500);
             return;
         }
         
@@ -5182,9 +5189,11 @@ class SistemaResenas {
         productos.forEach(producto => {
             const option = document.createElement('option');
             option.value = producto.id;
-            option.textContent = `${producto.emoji} ${producto.nombre}`;
+            option.textContent = `${producto.emoji || ''} ${producto.nombre}`;
             this.elementos.productoSelect.appendChild(option);
         });
+        
+        console.log(`✅ ${productos.length} productos cargados en el selector`);
     }
 
     /**
