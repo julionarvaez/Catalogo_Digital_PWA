@@ -1247,12 +1247,6 @@
             <button class="review-tab" onclick="filterReviews('pending')" data-filter="pending">
                 Pendientes <span class="tab-badge" id="countPending">0</span>
             </button>
-            <button class="review-tab" onclick="filterReviews('productos')" data-filter="productos">
-                🛍️ Opiniones de Productos <span class="tab-badge" id="countProductos">0</span>
-            </button>
-            <button class="review-tab" onclick="filterReviews('generales')" data-filter="generales">
-                💬 Reseñas Generales <span class="tab-badge" id="countGenerales">0</span>
-            </button>
             <button class="review-tab" onclick="filterReviews('flagged')" data-filter="flagged">
                 Reportadas <span class="tab-badge" id="countFlagged">0</span>
             </button>
@@ -1533,15 +1527,11 @@
             const all = allReviews.length;
             const published = allReviews.filter(r => r.published).length;
             const pending = allReviews.filter(r => !r.published).length;
-            const productos = allReviews.filter(r => r.productoId || r.esOpinionProducto).length;
-            const generales = allReviews.filter(r => !r.productoId && !r.esOpinionProducto).length;
             const flagged = allReviews.filter(r => r.flagged).length;
 
             document.getElementById('countAll').textContent = all;
             document.getElementById('countPublished').textContent = published;
             document.getElementById('countPending').textContent = pending;
-            document.getElementById('countProductos').textContent = productos;
-            document.getElementById('countGenerales').textContent = generales;
             document.getElementById('countFlagged').textContent = flagged;
         }
 
@@ -1579,10 +1569,6 @@
                 filtered = filtered.filter(r => r.published);
             } else if (currentFilter === 'pending') {
                 filtered = filtered.filter(r => !r.published);
-            } else if (currentFilter === 'productos') {
-                filtered = filtered.filter(r => r.productoId || r.esOpinionProducto);
-            } else if (currentFilter === 'generales') {
-                filtered = filtered.filter(r => !r.productoId && !r.esOpinionProducto);
             } else if (currentFilter === 'flagged') {
                 filtered = filtered.filter(r => r.flagged);
             }
