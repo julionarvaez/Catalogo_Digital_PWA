@@ -176,21 +176,22 @@ exports.handler = async (event) => {
         );
         
         // Construir URL del widget de Wompi con todos los parámetros
-        // IMPORTANTE: Los parámetros con : deben ser construidos manualmente para evitar encoding incorrecto
-        const baseUrl = 'https://checkout.wompi.co/p/';
-        const params = [
-            `public-key=${encodeURIComponent(WOMPI_PUBLIC_KEY)}`,
-            `currency=${encodeURIComponent(moneda)}`,
-            `amount-in-cents=${encodeURIComponent(amountInCents.toString())}`,
-            `reference=${encodeURIComponent(referencia)}`,
-            `signature:integrity=${encodeURIComponent(signature)}`, // Wompi requiere : literal, no %3A
-            `redirect-url=${encodeURIComponent(redirectUrl)}`,
-            `customer-data:email=${encodeURIComponent(email)}`,
-            `customer-data:full-name=${encodeURIComponent(nombre || 'Cliente')}`,
-            `customer-data:phone-number=${encodeURIComponent(telefono || '3135212887')}`
-        ];
-
-        const checkoutUrl = baseUrl + params.join('&');
+        // CRÍTICO: Wompi requiere parámetros específicos sin encoding de los dos puntos (:)
+        const checkoutParams = new URLSearchParams();
+        checkoutParams.append('public-key', WOMPI_PUBLIC_KEY);
+        checkoutParams.append('currency', moneda);
+        checkoutParams.append('amount-in-cents', amountInCents.toString());
+        checkoutParams.append('reference', referencia);
+        checkoutParams.append('redirect-url', redirectUrl);
+        
+        // Construir la URL base con parámetros estándar
+        let checkoutUrl = 'https://checkout.wompi.co/p/?' + checkoutParams.toString();
+        
+        // Agregar parámetros con : de forma manual (sin encoding del :)
+        checkoutUrl += `&signature:integrity=${signature}`;
+        checkoutUrl += `&customer-data:email=${encodeURIComponent(email)}`;
+        checkoutUrl += `&customer-data:full-name=${encodeURIComponent(nombre || 'Cliente')}`;
+        checkoutUrl += `&customer-data:phone-number=${encodeURIComponent(telefono || '3135212887')}`;
 
         console.log('✅ Transacción creada exitosamente:');
         console.log('   Referencia:', referencia);
