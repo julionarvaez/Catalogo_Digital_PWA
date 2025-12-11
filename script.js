@@ -666,7 +666,8 @@ let ordenamientoActual = {
 };
 
 // Datos de popularidad simulados (en producción vendrían de tu backend/analytics)
-const datosPopularidad = {
+// Valores base iniciales de popularidad (se incrementan diariamente de forma automática)
+const datosPopularidadBase = {
     1: { ventas: 450, valoracion: 4.8 },
     2: { ventas: 320, valoracion: 4.6 },
     3: { ventas: 280, valoracion: 4.5 },
@@ -722,6 +723,80 @@ const datosPopularidad = {
     140: { ventas: 360, valoracion: 4.6 },
     141: { ventas: 380, valoracion: 4.6 }
 };
+
+/**
+ * Sistema de incremento automático diario de ventas
+ * Las ventas aumentan cada día de forma realista y aleatoria
+ */
+function obtenerDatosPopularidad() {
+    const fechaHoy = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
+    const datosGuardados = localStorage.getItem('popularidad_productos');
+    const fechaGuardada = localStorage.getItem('popularidad_fecha');
+    
+    let datosActuales = {};
+    
+    // Si hay datos guardados y son del mismo día, usarlos
+    if (datosGuardados && fechaGuardada === fechaHoy) {
+        try {
+            datosActuales = JSON.parse(datosGuardados);
+            console.log('📊 Datos de popularidad cargados (hoy)');
+            return datosActuales;
+        } catch (e) {
+            console.warn('Error parseando datos guardados, reiniciando...');
+        }
+    }
+    
+    // Si es un nuevo día o no hay datos, incrementar ventas
+    console.log('📈 Nuevo día detectado - Incrementando ventas automáticamente');
+    
+    // Calcular días transcurridos desde una fecha base
+    const fechaBase = new Date('2025-12-01');
+    const hoy = new Date(fechaHoy);
+    const diasTranscurridos = Math.floor((hoy - fechaBase) / (1000 * 60 * 60 * 24));
+    
+    // Generar datos actualizados basados en los días transcurridos
+    Object.keys(datosPopularidadBase).forEach(productoId => {
+        const base = datosPopularidadBase[productoId];
+        
+        // Incremento diario aleatorio basado en popularidad del producto
+        // Productos más populares (mayor valoración) tienen más incremento
+        const factorPopularidad = base.valoracion / 5; // 0.8 a 1.0
+        const incrementoBase = Math.floor(factorPopularidad * 8); // 6-8 ventas base
+        
+        // Variación aleatoria para cada producto (usar ID como seed para consistencia en el mismo día)
+        const seed = productoId * 1000 + diasTranscurridos;
+        const randomFactor = ((seed % 100) / 100); // 0 a 0.99
+        const variacion = Math.floor(randomFactor * 5); // 0-4 ventas adicionales
+        
+        const incrementoDiario = incrementoBase + variacion;
+        const ventasActuales = base.ventas + (incrementoDiario * diasTranscurridos);
+        
+        // La valoración puede mejorar ligeramente con el tiempo (muy lento)
+        let valoracionActual = base.valoracion;
+        if (diasTranscurridos > 0 && diasTranscurridos % 10 === 0) {
+            // Cada 10 días, posibilidad de subir 0.1
+            if (valoracionActual < 5.0 && randomFactor > 0.7) {
+                valoracionActual = Math.min(5.0, valoracionActual + 0.1);
+            }
+        }
+        
+        datosActuales[productoId] = {
+            ventas: ventasActuales,
+            valoracion: Math.round(valoracionActual * 10) / 10 // redondear a 1 decimal
+        };
+    });
+    
+    // Guardar datos actualizados
+    localStorage.setItem('popularidad_productos', JSON.stringify(datosActuales));
+    localStorage.setItem('popularidad_fecha', fechaHoy);
+    
+    console.log(`✅ Ventas actualizadas para el día ${fechaHoy} (+${diasTranscurridos} días desde base)`);
+    
+    return datosActuales;
+}
+
+// Obtener datos de popularidad actualizados
+const datosPopularidad = obtenerDatosPopularidad();
 
 /**
  * Aplicar filtros de ordenamiento
@@ -5262,9 +5337,9 @@ class SistemaResenas {
         this.updateCarouselControls();
         this.createIndicators();
         
-        // Mostrar primera reseña
+        // Mostrar primera reseña sin hacer scroll (inicialización)
         this.currentIndex = 0;
-        this.showReview(0);
+        this.showReview(0, false);
     }
 
     /**
@@ -5490,8 +5565,10 @@ class SistemaResenas {
 
     /**
      * Mostrar una reseña específica
+     * @param {number} index - Índice de la reseña a mostrar
+     * @param {boolean} shouldScroll - Si debe hacer scroll (true por defecto)
      */
-    showReview(index) {
+    showReview(index, shouldScroll = true) {
         if (!this.elementos.track || this.resenas.length === 0) return;
         
         // Asegurar que el índice esté en rango
@@ -5500,14 +5577,16 @@ class SistemaResenas {
         
         this.currentIndex = index;
         
-        // Hacer scroll a la tarjeta específica
-        const cards = this.elementos.track.querySelectorAll('.resena-card');
-        if (cards[index]) {
-            cards[index].scrollIntoView({
-                behavior: 'smooth',
-                block: 'nearest',
-                inline: 'center'
-            });
+        // Hacer scroll a la tarjeta específica solo si se solicita
+        if (shouldScroll) {
+            const cards = this.elementos.track.querySelectorAll('.resena-card');
+            if (cards[index]) {
+                cards[index].scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'nearest',
+                    inline: 'center'
+                });
+            }
         }
         
         // Actualizar indicadores
@@ -6846,7 +6925,8 @@ async function enviarResenaProducto(event) {
         if (typeof reviewsManager !== 'undefined' && reviewsManager) {
             await reviewsManager.submitReview(nuevaResena);
             
-            mostrarNotificacion('✅ ¡Gracias por tu opinión!', 'exito');
+            // Mensaje personalizado indicando que requiere aprobación
+            mostrarNotificacion('✅ ¡Gracias por tu opinión! Será publicada después de ser revisada por nuestro equipo.', 'exito');
             
             // Limpiar formulario
             document.getElementById('modalResenaForm').reset();
@@ -6857,7 +6937,7 @@ async function enviarResenaProducto(event) {
             // Cambiar a la tab de lista
             cambiarTabResenas('lista');
             
-            // Recargar reseñas
+            // Recargar reseñas (solo mostrará las publicadas)
             setTimeout(() => {
                 cargarResenasProducto(productoModalActual.id);
             }, 500);
@@ -6876,3 +6956,85 @@ async function enviarResenaProducto(event) {
         btnEnviar.innerHTML = textoOriginal;
     }
 }
+
+// ========================================
+// UTILIDADES DEL SISTEMA DE POPULARIDAD
+// ========================================
+
+/**
+ * Reiniciar sistema de popularidad (útil para testing o reinicio manual)
+ * Ejecutar en consola: reiniciarPopularidad()
+ */
+window.reiniciarPopularidad = function() {
+    localStorage.removeItem('popularidad_productos');
+    localStorage.removeItem('popularidad_fecha');
+    console.log('🔄 Sistema de popularidad reiniciado');
+    console.log('🔃 Recarga la página para ver los valores base');
+};
+
+/**
+ * Ver estadísticas actuales de popularidad
+ * Ejecutar en consola: verEstadisticasPopularidad()
+ */
+window.verEstadisticasPopularidad = function() {
+    const fechaHoy = new Date().toISOString().split('T')[0];
+    const datosGuardados = localStorage.getItem('popularidad_productos');
+    const fechaGuardada = localStorage.getItem('popularidad_fecha');
+    
+    console.log('📊 ESTADÍSTICAS DE POPULARIDAD');
+    console.log('================================');
+    console.log('Fecha actual:', fechaHoy);
+    console.log('Fecha guardada:', fechaGuardada);
+    console.log('Días desde última actualización:', fechaGuardada === fechaHoy ? 0 : 'Nuevo día');
+    
+    if (datosGuardados) {
+        const datos = JSON.parse(datosGuardados);
+        console.log('\n📈 PRODUCTOS CON MÁS VENTAS:');
+        const top10 = Object.entries(datos)
+            .sort((a, b) => b[1].ventas - a[1].ventas)
+            .slice(0, 10);
+        
+        top10.forEach((item, index) => {
+            const [id, data] = item;
+            const producto = productos.find(p => p.id == id);
+            console.log(`${index + 1}. ${producto?.nombre || 'Producto ' + id}: ${data.ventas} ventas | ⭐ ${data.valoracion}`);
+        });
+        
+        console.log('\n⭐ MEJOR VALORADOS:');
+        const mejorValorados = Object.entries(datos)
+            .sort((a, b) => b[1].valoracion - a[1].valoracion)
+            .slice(0, 5);
+        
+        mejorValorados.forEach((item, index) => {
+            const [id, data] = item;
+            const producto = productos.find(p => p.id == id);
+            console.log(`${index + 1}. ${producto?.nombre || 'Producto ' + id}: ⭐ ${data.valoracion} | 📦 ${data.ventas} ventas`);
+        });
+    } else {
+        console.log('⚠️ No hay datos guardados');
+    }
+    
+    console.log('\n💡 Comandos disponibles:');
+    console.log('  - reiniciarPopularidad() : Reinicia el sistema a valores base');
+    console.log('  - verEstadisticasPopularidad() : Ver este informe nuevamente');
+};
+
+/**
+ * Forzar actualización de ventas (simular nuevo día)
+ * Solo para testing - Ejecutar en consola: simularNuevoDia()
+ */
+window.simularNuevoDia = function() {
+    const fechaGuardada = localStorage.getItem('popularidad_fecha');
+    if (fechaGuardada) {
+        const fecha = new Date(fechaGuardada);
+        fecha.setDate(fecha.getDate() - 1); // Retroceder un día
+        localStorage.setItem('popularidad_fecha', fecha.toISOString().split('T')[0]);
+        console.log('⏰ Fecha retrocedida. Recarga la página para ver el incremento de ventas');
+    } else {
+        console.log('⚠️ No hay datos guardados. Recarga la página primero');
+    }
+};
+
+console.log('💡 Sistema de popularidad dinámico activado');
+console.log('📊 Las ventas se incrementan automáticamente cada día');
+console.log('🔧 Usa verEstadisticasPopularidad() en consola para ver estadísticas');

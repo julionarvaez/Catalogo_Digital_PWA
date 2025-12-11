@@ -16,17 +16,29 @@ const crypto = require('crypto');
  */
 function validarConfiguracion() {
     const errores = [];
+    const advertencias = [];
     
     if (!process.env.WOMPI_PUBLIC_KEY) {
         errores.push('WOMPI_PUBLIC_KEY no configurada');
+    } else if (!process.env.WOMPI_PUBLIC_KEY.startsWith('pub_')) {
+        advertencias.push('WOMPI_PUBLIC_KEY no comienza con "pub_" - verifica que sea correcta');
     }
     
     if (!process.env.WOMPI_PRIVATE_KEY) {
         errores.push('WOMPI_PRIVATE_KEY no configurada');
+    } else if (!process.env.WOMPI_PRIVATE_KEY.startsWith('prv_')) {
+        advertencias.push('WOMPI_PRIVATE_KEY no comienza con "prv_" - verifica que sea correcta');
     }
     
     if (!process.env.WOMPI_INTEGRITY_SECRET) {
         errores.push('WOMPI_INTEGRITY_SECRET no configurada - Requerida para Nequi y otros medios de pago');
+    } else if (!process.env.WOMPI_INTEGRITY_SECRET.includes('integrity')) {
+        advertencias.push('WOMPI_INTEGRITY_SECRET no contiene "integrity" - verifica que sea correcta (debe ser test_integrity_... o prod_integrity_...)');
+    }
+    
+    // Log de advertencias si las hay
+    if (advertencias.length > 0) {
+        console.warn('⚠️ Advertencias de configuración:', advertencias);
     }
     
     return errores;
@@ -35,17 +47,20 @@ function validarConfiguracion() {
 /**
  * Generar firma de integridad según documentación de Wompi
  * Formato: SHA256(referencia + amountInCents + moneda + integritySecret)
+ * IMPORTANTE: El orden es crítico: reference + amount_in_cents + currency + integrity_secret
  */
 function generarFirmaIntegridad(referencia, amountInCents, moneda, integritySecret) {
     try {
+        // Concatenar en el orden exacto que requiere Wompi
         const signatureString = `${referencia}${amountInCents}${moneda}${integritySecret}`;
         const signature = crypto.createHash('sha256').update(signatureString).digest('hex');
         
-        console.log('🔐 Firma generada para:', {
-            referencia,
-            monto: amountInCents,
-            moneda
-        });
+        console.log('🔐 Generando firma de integridad:');
+        console.log('   Referencia:', referencia);
+        console.log('   Monto (centavos):', amountInCents);
+        console.log('   Moneda:', moneda);
+        console.log('   String a firmar (sin secret):', `${referencia}${amountInCents}${moneda}[SECRET]`);
+        console.log('   Firma generada:', signature);
         
         return signature;
     } catch (error) {
@@ -161,26 +176,28 @@ exports.handler = async (event) => {
         );
         
         // Construir URL del widget de Wompi con todos los parámetros
-        const checkoutParams = {
-            'public-key': WOMPI_PUBLIC_KEY,
-            'currency': moneda,
-            'amount-in-cents': amountInCents.toString(),
-            'reference': referencia,
-            'signature:integrity': signature,
-            'redirect-url': redirectUrl,
-            'customer-data:email': email,
-            'customer-data:full-name': nombre || 'Cliente',
-            'customer-data:phone-number': telefono || '3135212887'
-        };
+        // IMPORTANTE: Los parámetros con : deben ser construidos manualmente para evitar encoding incorrecto
+        const baseUrl = 'https://checkout.wompi.co/p/';
+        const params = [
+            `public-key=${encodeURIComponent(WOMPI_PUBLIC_KEY)}`,
+            `currency=${encodeURIComponent(moneda)}`,
+            `amount-in-cents=${encodeURIComponent(amountInCents.toString())}`,
+            `reference=${encodeURIComponent(referencia)}`,
+            `signature:integrity=${encodeURIComponent(signature)}`, // Wompi requiere : literal, no %3A
+            `redirect-url=${encodeURIComponent(redirectUrl)}`,
+            `customer-data:email=${encodeURIComponent(email)}`,
+            `customer-data:full-name=${encodeURIComponent(nombre || 'Cliente')}`,
+            `customer-data:phone-number=${encodeURIComponent(telefono || '3135212887')}`
+        ];
 
-        const checkoutUrl = 'https://checkout.wompi.co/p/?' + new URLSearchParams(checkoutParams).toString();
+        const checkoutUrl = baseUrl + params.join('&');
 
-        console.log('✅ Transacción creada exitosamente:', {
-            referencia,
-            monto: amountInCents,
-            moneda,
-            email
-        });
+        console.log('✅ Transacción creada exitosamente:');
+        console.log('   Referencia:', referencia);
+        console.log('   Monto (centavos):', amountInCents);
+        console.log('   Moneda:', moneda);
+        console.log('   Email:', email);
+        console.log('   URL de checkout generada (primeros 150 chars):', checkoutUrl.substring(0, 150) + '...');
         
         return {
             statusCode: 200,

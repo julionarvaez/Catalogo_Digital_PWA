@@ -282,26 +282,35 @@ exports.handler = async (event, context) => {
         }
         
         // Sanitizar datos
+        // IMPORTANTE: Opiniones de productos (con productoId) requieren moderación
+        const esOpinionProducto = reviewData.productoId && reviewData.productoId !== null;
+        const requireModeracion = esOpinionProducto; // Las opiniones de productos necesitan aprobación
+        
         const sanitizedData = {
             nombre: sanitizeText(reviewData.nombre),
             texto: sanitizeText(reviewData.texto),
             rating: reviewData.rating,
             productoId: reviewData.productoId || null,
             createdAt: Timestamp.now(),
-            published: true, // ✅ SIEMPRE PUBLICAR - Sin moderación
+            published: !requireModeracion, // Solo reseñas generales se publican automáticamente
             verified: false,
             clientIP: clientIP.split(',')[0].trim(), // Solo primera IP
-            userAgent: event.headers['user-agent'] || 'unknown'
+            userAgent: event.headers['user-agent'] || 'unknown',
+            esOpinionProducto: esOpinionProducto // Campo para identificar en panel admin
         };
         
         // Detección básica de spam (solo para registro, no bloquea publicación)
         if (detectSpam(sanitizedData.texto, sanitizedData.nombre)) {
-            console.log(`⚠️ Posible spam detectado de IP: ${clientIP} (publicada de todas formas)`);
+            console.log(`⚠️ Posible spam detectado de IP: ${clientIP}`);
             sanitizedData.flagged = true;
             sanitizedData.flagReason = 'Posible spam detectado';
         }
         
-        console.log(`✅ Reseña auto-publicada: rating=${sanitizedData.rating}, textLength=${sanitizedData.texto.length}`);
+        if (esOpinionProducto) {
+            console.log(`📝 Opinión de producto guardada (Pendiente moderación): productoId=${sanitizedData.productoId}, rating=${sanitizedData.rating}`);
+        } else {
+            console.log(`✅ Reseña general auto-publicada: rating=${sanitizedData.rating}, textLength=${sanitizedData.texto.length}`);
+        }
         
         // Inicializar Firestore
         const db = initFirebase();

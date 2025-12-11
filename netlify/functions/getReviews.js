@@ -46,19 +46,36 @@ function initFirebase() {
 /**
  * Formatear reseña para respuesta
  */
-function formatReview(doc) {
+function formatReview(doc, includeAdminFields = false) {
     const data = doc.data();
     
-    return {
+    // Convertir Firestore Timestamp a formato serializable
+    let createdAt = data.createdAt;
+    if (createdAt && createdAt.toDate) {
+        createdAt = createdAt.toDate().toISOString();
+    } else if (createdAt && createdAt._seconds) {
+        createdAt = new Date(createdAt._seconds * 1000).toISOString();
+    }
+    
+    const review = {
         id: doc.id,
         nombre: data.nombre,
         texto: data.texto,
         rating: data.rating,
         productoId: data.productoId,
-        createdAt: data.createdAt,
+        createdAt: createdAt,
         verified: data.verified || false
-        // No exponer datos internos como IP, userAgent, etc.
     };
+    
+    // Incluir campos adicionales para panel de administración
+    if (includeAdminFields) {
+        review.published = data.published !== undefined ? data.published : false;
+        review.flagged = data.flagged || false;
+        review.adminResponse = data.adminResponse || null;
+        review.esOpinionProducto = data.esOpinionProducto || (data.productoId ? true : false);
+    }
+    
+    return review;
 }
 
 /**
@@ -110,7 +127,7 @@ async function getReviews(useCache = true, includeAll = false) {
         
         const reviews = [];
         snapshot.forEach(doc => {
-            reviews.push(formatReview(doc));
+            reviews.push(formatReview(doc, includeAll));
         });
         
         // Actualizar cache (solo si es query pública)

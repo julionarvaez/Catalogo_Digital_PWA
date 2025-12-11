@@ -1247,6 +1247,12 @@
             <button class="review-tab" onclick="filterReviews('pending')" data-filter="pending">
                 Pendientes <span class="tab-badge" id="countPending">0</span>
             </button>
+            <button class="review-tab" onclick="filterReviews('productos')" data-filter="productos">
+                🛍️ Opiniones de Productos <span class="tab-badge" id="countProductos">0</span>
+            </button>
+            <button class="review-tab" onclick="filterReviews('generales')" data-filter="generales">
+                💬 Reseñas Generales <span class="tab-badge" id="countGenerales">0</span>
+            </button>
             <button class="review-tab" onclick="filterReviews('flagged')" data-filter="flagged">
                 Reportadas <span class="tab-badge" id="countFlagged">0</span>
             </button>
@@ -1527,11 +1533,15 @@
             const all = allReviews.length;
             const published = allReviews.filter(r => r.published).length;
             const pending = allReviews.filter(r => !r.published).length;
+            const productos = allReviews.filter(r => r.productoId || r.esOpinionProducto).length;
+            const generales = allReviews.filter(r => !r.productoId && !r.esOpinionProducto).length;
             const flagged = allReviews.filter(r => r.flagged).length;
 
             document.getElementById('countAll').textContent = all;
             document.getElementById('countPublished').textContent = published;
             document.getElementById('countPending').textContent = pending;
+            document.getElementById('countProductos').textContent = productos;
+            document.getElementById('countGenerales').textContent = generales;
             document.getElementById('countFlagged').textContent = flagged;
         }
 
@@ -1569,6 +1579,10 @@
                 filtered = filtered.filter(r => r.published);
             } else if (currentFilter === 'pending') {
                 filtered = filtered.filter(r => !r.published);
+            } else if (currentFilter === 'productos') {
+                filtered = filtered.filter(r => r.productoId || r.esOpinionProducto);
+            } else if (currentFilter === 'generales') {
+                filtered = filtered.filter(r => !r.productoId && !r.esOpinionProducto);
             } else if (currentFilter === 'flagged') {
                 filtered = filtered.filter(r => r.flagged);
             }
@@ -1633,16 +1647,37 @@
             });
 
             const badges = [];
+            
+            // Badge de tipo de reseña (Opinión de Producto vs Reseña General)
+            if (review.productoId || review.esOpinionProducto) {
+                badges.push('<span class="badge" style="background:#8b5cf6;color:white;">🛍️ Opinión de Producto</span>');
+            } else {
+                badges.push('<span class="badge" style="background:#3b82f6;color:white;">💬 Reseña General</span>');
+            }
+            
+            // Badge de estado de publicación
             if (review.published) {
                 badges.push('<span class="badge published">✅ Publicada</span>');
             } else {
                 badges.push('<span class="badge pending">⏳ Pendiente Aprobación</span>');
             }
+            
             if (review.verified) {
                 badges.push('<span class="badge verified">✓ Compra Verificada</span>');
             }
             if (review.flagged) {
                 badges.push('<span class="badge" style="background:#ef4444;color:white;">🚩 Reportada</span>');
+            }
+
+            // Información del producto si existe
+            let productoInfo = '';
+            if (review.productoId) {
+                productoInfo = `
+                    <div style="background:#f3f4f6;padding:12px;border-radius:8px;margin-bottom:12px;border-left:4px solid #8b5cf6;">
+                        <strong style="color:#6b7280;font-size:12px;text-transform:uppercase;">Producto ID:</strong>
+                        <span style="color:#374151;font-weight:500;margin-left:8px;">#${review.productoId}</span>
+                    </div>
+                `;
             }
 
             return `
@@ -1657,6 +1692,7 @@
                         </div>
                         <div class="review-rating">${stars}</div>
                     </div>
+                    ${productoInfo}
                     <div class="review-text">${review.texto}</div>
                     <div style="display:flex;gap:8px;flex-wrap:wrap;margin:16px 0;">${badges.join('')}</div>
                     ${review.adminResponse ? `
