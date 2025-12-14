@@ -370,9 +370,9 @@
     },
     {
       "id": 111,
-      "nombre": "Combo_06: 300 unidades sin Fritar ",
+      "nombre": "Combo_06: 400 unidades sin Fritar ",
       "categoria": "pasabocas",
-      "precio": 167990,
+      "precio": 223990,
       "descripcion": "Incluye 200 deditos, 100 empanadas y 100 medallones en tamaño pasaboca sin Fritar. Ideal para eventos grandes.",
       "emoji": "🥳",
       "imagen": "./Imagenes/Productos/Pasabocas/Sin Fritar/Combo_02---.jpg",
@@ -436,9 +436,9 @@
     },
     {
       "id": 110,
-      "nombre": "Combo_06: 300 unidades Fritos",
+      "nombre": "Combo_06: 400 unidades Fritos",
       "categoria": "pasabocas",
-      "precio": 194990,
+      "precio": 255990,
       "descripcion": "Incluye 200 deditos, 100 empanadas y 100 medallones en tamaño pasaboca ya Fritos. Ideal para eventos grandes.",
       "emoji": "🥳",
       "imagen": "./Imagenes/Productos/Pasabocas/Combos-2---.jpg",
