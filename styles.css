@@ -3650,6 +3650,38 @@ body.modo-oscuro .total-carrito {
     text-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }
 
+/* Precios del combo */
+.precios-combo {
+    display: flex;
+    align-items: center;
+    gap: 0.625rem;
+    margin: 0.5rem 0;
+    flex-wrap: wrap;
+}
+
+.precio-normal {
+    font-size: 0.95rem;
+    font-weight: 600;
+    text-decoration: line-through;
+    opacity: 0.75;
+    color: rgba(255, 255, 255, 0.8);
+    font-variant-numeric: tabular-nums;
+}
+
+.precio-descuento {
+    font-size: 1.35rem;
+    font-weight: 800;
+    color: white;
+    font-family: var(--font-display);
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    letter-spacing: -0.01em;
+    font-variant-numeric: tabular-nums;
+    background: rgba(255, 255, 255, 0.15);
+    padding: 0.2rem 0.6rem;
+    border-radius: 0.4rem;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+}
+
 .items-combo {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
@@ -4454,6 +4486,22 @@ body.modo-oscuro .pie-pagina {
         font-size: 1.15rem;
         margin-bottom: 0.5rem;
         padding-right: 4rem;
+    }
+
+    .precios-combo {
+        flex-direction: row;
+        align-items: center;
+        gap: 0.5rem;
+        margin: 0.5rem 0;
+    }
+
+    .precio-normal {
+        font-size: 0.85rem;
+    }
+
+    .precio-descuento {
+        font-size: 1.15rem;
+        padding: 0.15rem 0.5rem;
     }
 
     .items-combo {
