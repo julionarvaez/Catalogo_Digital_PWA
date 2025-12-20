@@ -1,5 +1,5 @@
 
-const CACHE_VERSION = '1.0.74'; // ⭐ Incrementado para sistema de productos dinámicos
+const CACHE_VERSION = '1.0.75'; // ⭐ Incrementado para sistema de productos dinámicos
 const CACHE_NAME = `alimento-del-cielo-v${CACHE_VERSION}`;
 const APP_VERSION = CACHE_VERSION;
 
